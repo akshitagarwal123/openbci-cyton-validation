@@ -47,3 +47,8 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Correction: the 13:55-14:13 ECG session was recorded with the **gold electrode** (on the channel 1 lead), not the dry one. Result: 810 beats, 100 % clean, ~80 bpm, SNR 47, and the live 8-s average matched the pulse oximeter. **Step 2 gold ECG: PASS.**
 - Next: Step 3 with the gold electrode (blinks, jaw clench, alpha, SSVEP).
 - Project and repo are private for now.
+
+## 2026-10-04 (night, 23:26–23:32)
+
+- Dry electrode repaired and tested for ECG (wrist). When in contact the signal is as good as gold: same beat shape (match 0.97), SNR 31, 100 % clean beats. But it lost skin contact 24 % of the time (only 27 % of the run usable), so the test is **partial**; retest with a firm strap and oximeter readings.
+- Gold vs dry comparison chart added to the tracker.

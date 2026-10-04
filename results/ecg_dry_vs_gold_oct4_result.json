@@ -1,0 +1,32 @@
+{
+ "gold": {
+  "total_s": 600,
+  "usable_pct": 100,
+  "railed_pct": 0.0,
+  "best_window": "14:03:15-14:13:15",
+  "beats": 808,
+  "kept_pct": 99.9,
+  "mean_bpm": 80.9,
+  "r_peak_uv": 728,
+  "noise_uv": 15.5,
+  "snr": 46.8,
+  "shape_match": 0.964,
+  "mains_50hz_uv": 418.3,
+  "drift_uv": 59522
+ },
+ "dry": {
+  "total_s": 337,
+  "usable_pct": 27,
+  "railed_pct": 24.1,
+  "best_window": "23:30:37-23:31:07",
+  "beats": 47,
+  "kept_pct": 100.0,
+  "mean_bpm": 93.5,
+  "r_peak_uv": 514,
+  "noise_uv": 16.6,
+  "snr": 31.0,
+  "shape_match": 0.973,
+  "mains_50hz_uv": 114.3,
+  "drift_uv": 4893
+ }
+}

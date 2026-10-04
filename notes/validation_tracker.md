@@ -53,8 +53,12 @@ Like checking a weighing scale with a known 1 kg weight before weighing anything
 
 | Test | Status | Date | Key result |
 |---|---|---|---|
-| ECG vs pulse oximeter, dry electrode | ⏸ On hold | — | Dry electrode broken; retest after repair. The 13:21 attempt (75.8 % clean, SNR 5.2) was poor contact |
+| ECG vs pulse oximeter, dry electrode (repaired) | ⚠️ PARTIAL: signal good, contact unstable | 2026-10-04 23:26–23:32 | When touching skin properly: 100 % clean beats, SNR 31, same heartbeat shape as gold (shape match 0.97). But the electrode lost contact (channel railed) 24 % of the time and only 27 % of 30-s windows were usable. Oximeter readings not noted. Retest with a firm strap |
 | ECG vs pulse oximeter, gold electrode | ✅ PASS | 2026-10-04 14:03–14:13 | 810 beats, 100 % clean, 80.6 bpm average, SNR 46.9, textbook P-QRS-T; live dashboard 8-s average matched the pulse oximeter (checked by eye). Gold electrode was on the channel 1 lead |
+
+![Dry vs gold electrode ECG, 4 Oct: both show the same clean P-QRS-T beat; gold was usable for the whole 10 min, dry only 27 % of the time](images/ecg_dry_vs_gold_oct4.png)
+
+**Dry vs gold (4 Oct):** both electrodes record the same real heartbeat with a textbook shape, so the board and the dry electrode itself work. The difference is **stability**: the gold cup stayed in contact for 10 minutes; the dry electrode kept lifting off the skin, which makes the channel jump to its limit (railed). Fix: a tight strap and a little moisture under the dry electrode.
 
 ![Gold electrode ECG, 4 Oct: noisy and double-counted before 14:03, then ~80 bpm with 100 % clean beats after re-seating the electrode](images/ecg_dry_session_oct4.png)
 
