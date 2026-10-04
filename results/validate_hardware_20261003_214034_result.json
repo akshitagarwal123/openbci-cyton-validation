@@ -1,0 +1,45 @@
+{
+  "test": "hardware",
+  "time": "2026-10-03T21:39:52",
+  "passed": true,
+  "checks": [
+    {
+      "check": "shorted: noise 1\u201345 Hz (\u00b5V)",
+      "channel": 1,
+      "value": 0.1,
+      "criterion": "\u2264 1.5 \u00b5V",
+      "pass": true
+    },
+    {
+      "check": "shorted: 50 Hz (\u00b5V)",
+      "channel": 1,
+      "value": 0.03,
+      "criterion": "\u2264 1.0 \u00b5V",
+      "pass": true
+    },
+    {
+      "check": "shorted: noise 1\u201345 Hz (\u00b5V)",
+      "channel": 2,
+      "value": 0.1,
+      "criterion": "\u2264 1.5 \u00b5V",
+      "pass": true
+    },
+    {
+      "check": "shorted: 50 Hz (\u00b5V)",
+      "channel": 2,
+      "value": 0.03,
+      "criterion": "\u2264 1.0 \u00b5V",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "ch1_seconds": {
+      "flat": 41
+    },
+    "ch1_shorted_offset_uv": -24.4,
+    "ch2_seconds": {
+      "flat": 41
+    },
+    "ch2_shorted_offset_uv": -17.4
+  }
+}

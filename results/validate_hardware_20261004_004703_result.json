@@ -1,0 +1,57 @@
+{
+  "test": "hardware",
+  "time": "2026-10-04T00:46:45",
+  "passed": true,
+  "checks": [
+    {
+      "check": "test signal amplitude (1x)",
+      "channel": 1,
+      "value": 1870.0,
+      "criterion": "\u00b11875 \u00b5V \u00b1 2 %",
+      "pass": true
+    },
+    {
+      "check": "test signal period (slow)",
+      "channel": 1,
+      "value": 1.024,
+      "criterion": "1.024 s \u00b1 2 %",
+      "pass": true
+    },
+    {
+      "check": "test signal amplitude (1x)",
+      "channel": 2,
+      "value": 1870.4,
+      "criterion": "\u00b11875 \u00b5V \u00b1 2 %",
+      "pass": true
+    },
+    {
+      "check": "test signal period (slow)",
+      "channel": 2,
+      "value": 1.024,
+      "criterion": "1.024 s \u00b1 2 %",
+      "pass": true
+    },
+    {
+      "check": "ch1 vs ch2 waveform correlation",
+      "channel": null,
+      "value": 1.0,
+      "criterion": "> 0.999",
+      "pass": true
+    },
+    {
+      "check": "ch1 vs ch2 gain match (%)",
+      "channel": null,
+      "value": 0.018,
+      "criterion": "\u2264 0.5 %",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "ch1_seconds": {
+      "square": 17
+    },
+    "ch2_seconds": {
+      "square": 17
+    }
+  }
+}

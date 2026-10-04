@@ -1,0 +1,35 @@
+{
+  "test": "integrity",
+  "time": "2026-10-03T21:22:22",
+  "passed": true,
+  "checks": [
+    {
+      "check": "sample rate (Hz)",
+      "channel": null,
+      "value": 250.04,
+      "criterion": "250 \u00b1 0.5",
+      "pass": true
+    },
+    {
+      "check": "dropped packets (%)",
+      "channel": null,
+      "value": 0.0,
+      "criterion": "< 0.1 %",
+      "pass": true
+    },
+    {
+      "check": "timestamps going backwards",
+      "channel": null,
+      "value": 0,
+      "criterion": "0",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "samples": 14989,
+    "seconds": 59.9,
+    "rate_hz": 250.04,
+    "dropped": 0,
+    "backwards_timestamps": 0
+  }
+}

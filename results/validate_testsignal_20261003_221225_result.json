@@ -1,0 +1,127 @@
+{
+  "test": "testsignal",
+  "time": "2026-10-03T22:12:25",
+  "passed": true,
+  "results": {
+    "1x slow ch1": {
+      "half_amp_uv": 1870.0,
+      "period_s": 1.024,
+      "amp_err_pct": -0.27,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow ch2": {
+      "half_amp_uv": 1870.4,
+      "period_s": 1.024,
+      "amp_err_pct": -0.25,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow ch3": {
+      "half_amp_uv": 1871.0,
+      "period_s": 1.024,
+      "amp_err_pct": -0.21,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow ch4": {
+      "half_amp_uv": 1870.7,
+      "period_s": 1.024,
+      "amp_err_pct": -0.23,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow ch5": {
+      "half_amp_uv": 1871.7,
+      "period_s": 1.024,
+      "amp_err_pct": -0.18,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow ch6": {
+      "half_amp_uv": 1872.2,
+      "period_s": 1.024,
+      "amp_err_pct": -0.15,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow ch7": {
+      "half_amp_uv": 1871.3,
+      "period_s": 1.024,
+      "amp_err_pct": -0.2,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow ch8": {
+      "half_amp_uv": 1870.3,
+      "period_s": 1.024,
+      "amp_err_pct": -0.25,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x slow gain spread": {
+      "spread_pct": 0.115,
+      "pass": true
+    },
+    "1x fast ch1": {
+      "half_amp_uv": 1870.0,
+      "period_s": 0.512,
+      "amp_err_pct": -0.26,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast ch2": {
+      "half_amp_uv": 1870.4,
+      "period_s": 0.512,
+      "amp_err_pct": -0.25,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast ch3": {
+      "half_amp_uv": 1871.0,
+      "period_s": 0.512,
+      "amp_err_pct": -0.21,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast ch4": {
+      "half_amp_uv": 1870.7,
+      "period_s": 0.512,
+      "amp_err_pct": -0.23,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast ch5": {
+      "half_amp_uv": 1871.7,
+      "period_s": 0.512,
+      "amp_err_pct": -0.18,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast ch6": {
+      "half_amp_uv": 1872.2,
+      "period_s": 0.512,
+      "amp_err_pct": -0.15,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast ch7": {
+      "half_amp_uv": 1871.3,
+      "period_s": 0.512,
+      "amp_err_pct": -0.19,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast ch8": {
+      "half_amp_uv": 1870.3,
+      "period_s": 0.512,
+      "amp_err_pct": -0.25,
+      "period_err_pct": 0.0,
+      "pass": true
+    },
+    "1x fast gain spread": {
+      "spread_pct": 0.115,
+      "pass": true
+    }
+  }
+}

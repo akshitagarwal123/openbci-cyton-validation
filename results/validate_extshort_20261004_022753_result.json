@@ -1,0 +1,31 @@
+{
+  "test": "extshort",
+  "time": "2026-10-04T02:27:53",
+  "passed": true,
+  "checks": [
+    {
+      "check": "noise 1\u201345 Hz (\u00b5V)",
+      "channel": 1,
+      "value": 0.12,
+      "criterion": "\u2264 1.0 \u00b5V",
+      "pass": true
+    },
+    {
+      "check": "50 Hz hum (\u00b5V)",
+      "channel": 1,
+      "value": 0.1,
+      "criterion": "\u2264 1.0 \u00b5V",
+      "pass": true
+    },
+    {
+      "check": "offset drift (\u00b5V)",
+      "channel": 1,
+      "value": 0.3,
+      "criterion": "\u2264 50 \u00b5V over window",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "ch1_offset_uv": -25.1
+  }
+}

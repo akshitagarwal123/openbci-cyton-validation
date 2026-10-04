@@ -1,0 +1,57 @@
+{
+  "test": "ecg",
+  "time": "2026-10-04T13:20:33",
+  "passed": false,
+  "checks": [
+    {
+      "check": "beats kept (%)",
+      "channel": 1,
+      "value": 75.8,
+      "criterion": "\u2265 95 %",
+      "pass": false
+    },
+    {
+      "check": "SNR (R peak / noise)",
+      "channel": 1,
+      "value": 5.2,
+      "criterion": "\u2265 10",
+      "pass": false
+    },
+    {
+      "check": "QRS width (ms)",
+      "channel": 1,
+      "value": 80,
+      "criterion": "60\u2013120 ms",
+      "pass": true
+    },
+    {
+      "check": "T wave after R (ms)",
+      "channel": 1,
+      "value": 212,
+      "criterion": "150\u2013350 ms",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "ch1": {
+      "seconds": 57.1,
+      "railed_pct": 0.0,
+      "offset_uv": 134194,
+      "drift_uv": 14521,
+      "mains_50hz_uv": 1308.5,
+      "below_1hz_uv": 911.2,
+      "beats": 96,
+      "kept_pct": 75.8,
+      "mean_bpm": 98.8,
+      "r_peak_uv": 305,
+      "noise_uv": 58.5,
+      "snr": 5.2,
+      "shape_match": 0.838,
+      "clean_beats_pct": 56.4,
+      "filtered_rms_uv": 319.4,
+      "qrs_ms": 80,
+      "t_wave_ms": 212,
+      "t_wave_uv": 358
+    }
+  }
+}
