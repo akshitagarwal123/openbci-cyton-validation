@@ -1,0 +1,15 @@
+{
+ "window": "2026-10-05 00:04:01-00:04:29",
+ "electrode": "dry, channel 1",
+ "oximeter_mean": 80.3,
+ "ecg_8s_avg_mean": 81.8,
+ "mean_abs_diff_bpm": 1.6,
+ "max_abs_diff_bpm": 4.8,
+ "seconds_compared": 22,
+ "ecg_beats": 40,
+ "ecg_clean_pct": 100.0,
+ "ecg_snr": 21.3,
+ "shape_match": 0.978,
+ "pass_rule": "mean abs diff <= 3 bpm",
+ "result": "PASS"
+}

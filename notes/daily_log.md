@@ -52,3 +52,9 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 
 - Dry electrode repaired and tested for ECG (wrist). When in contact the signal is as good as gold: same beat shape (match 0.97), SNR 31, 100 % clean beats. But it lost skin contact 24 % of the time (only 27 % of the run usable), so the test is **partial**; retest with a firm strap and oximeter readings.
 - Gold vs dry comparison chart added to the tracker.
+
+## 2026-10-05 (00:04)
+
+- Dry electrode ECG vs pulse oximeter: filmed the oximeter with the phone while the Cyton recorded. Over 22 s the ECG read 81.8 bpm vs oximeter 80.3 bpm, **mean difference 1.6 bpm → PASS** (rule ≤ 3 bpm). Signal 100 % clean, SNR 21.
+- Contact still dropped out at 00:04:30 (channel railed), so long recordings need a firm strap.
+- **Step 2 complete for both electrodes.** Next: Step 3 (blinks).

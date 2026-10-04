@@ -53,8 +53,10 @@ Like checking a weighing scale with a known 1 kg weight before weighing anything
 
 | Test | Status | Date | Key result |
 |---|---|---|---|
-| ECG vs pulse oximeter, dry electrode (repaired) | ⚠️ PARTIAL: signal good, contact unstable | 2026-10-04 23:26–23:32 | When touching skin properly: 100 % clean beats, SNR 31, same heartbeat shape as gold (shape match 0.97). But the electrode lost contact (channel railed) 24 % of the time and only 27 % of 30-s windows were usable. Oximeter readings not noted. Retest with a firm strap |
+| ECG vs pulse oximeter, dry electrode (repaired) | ✅ PASS (short run) | 2026-10-05 00:04:01–00:04:29 | ECG 81.8 bpm vs oximeter 80.3 bpm, mean difference **1.6 bpm** (max 4.8) over 22 s; 40 beats, 100 % clean, SNR 21, shape match 0.98. Oximeter read from a phone video. Earlier run (4 Oct 23:26) lost contact 24 % of the time; contact still drops out after ~30 s, so a strap is needed for long recordings |
 | ECG vs pulse oximeter, gold electrode | ✅ PASS | 2026-10-04 14:03–14:13 | 810 beats, 100 % clean, 80.6 bpm average, SNR 46.9, textbook P-QRS-T; live dashboard 8-s average matched the pulse oximeter (checked by eye). Gold electrode was on the channel 1 lead |
+
+![Dry electrode ECG vs pulse oximeter (phone video), 5 Oct 00:04: the two heart rates track within 1.6 bpm on average](images/ecg_dry_vs_oximeter_oct5.png)
 
 ![Dry vs gold electrode ECG, 4 Oct: both show the same clean P-QRS-T beat; gold was usable for the whole 10 min, dry only 27 % of the time](images/ecg_dry_vs_gold_oct4.png)
 
