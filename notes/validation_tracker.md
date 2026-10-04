@@ -78,7 +78,7 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 
 ![Electrode placement for the EEG tests: forehead Fp1/Fp2 (no paste needed) or back of head O1/O2](images/electrode_placement.png)
 
-Every test records two electrode types at once: a **dry comb electrode (channel 1)** and a **gold cup electrode (channel 2)**, so we also learn which gives the cleaner signal.
+Until the dry electrode is repaired, Step 3 uses the **gold cup electrode on channel 1**. The dry electrode will be compared later.
 
 ## Earlier informal checks (before the formal tests)
 
