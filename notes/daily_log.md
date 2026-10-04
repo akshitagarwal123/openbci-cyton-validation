@@ -58,3 +58,8 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Dry electrode ECG vs pulse oximeter: filmed the oximeter with the phone while the Cyton recorded. Over 22 s the ECG read 81.8 bpm vs oximeter 80.3 bpm, **mean difference 1.6 bpm → PASS** (rule ≤ 3 bpm). Signal 100 % clean, SNR 21.
 - Contact still dropped out at 00:04:30 (channel railed), so long recordings need a firm strap.
 - **Step 2 complete for both electrodes.** Next: Step 3 (blinks).
+
+## 2026-10-05 (00:14)
+
+- Gold electrode ECG vs pulse oximeter (phone video, 56 s readable): ECG 85.0 bpm vs oximeter 84.5 bpm, **mean difference 1.5 bpm → PASS**. The ECG followed the oximeter as heart rate rose from 78 to 89 bpm. No contact loss.
+- Both electrodes now pass the oximeter check (dry 1.6 bpm, gold 1.5 bpm). Gold keeps contact better; dry needs a strap.
