@@ -53,10 +53,10 @@ Like checking a weighing scale with a known 1 kg weight before weighing anything
 
 | Test | Status | Date | Key result |
 |---|---|---|---|
-| ECG vs pulse oximeter, dry electrode (ch1) | ⏸ On hold: dry electrode broken, to be repaired |  2026-10-04 13:21 | 75.8 % beats clean, SNR 5.2: weak dry-skin contact; ECG shape correct (QRS 80 ms, T 212 ms). Beat detector since fixed for T-wave double counting |
-| ECG vs pulse oximeter, gold electrode (ch2) | 🔄 Recording done by user on 2026-10-04 (afternoon); recording file not found yet, analysis pending | — | Gold electrode is now the primary electrode for all tests until the dry electrode is fixed |
+| ECG vs pulse oximeter, dry electrode | ⏸ On hold | — | Dry electrode broken; retest after repair. The 13:21 attempt (75.8 % clean, SNR 5.2) was poor contact |
+| ECG vs pulse oximeter, gold electrode | ✅ PASS | 2026-10-04 14:03–14:13 | 810 beats, 100 % clean, 80.6 bpm average, SNR 46.9, textbook P-QRS-T; live dashboard 8-s average matched the pulse oximeter (checked by eye). Gold electrode was on the channel 1 lead |
 
-![Dry electrode ECG, 4 Oct: noisy and double-counted before 14:03, then ~80 bpm with 100 % clean beats after re-seating the electrode](images/ecg_dry_session_oct4.png)
+![Gold electrode ECG, 4 Oct: noisy and double-counted before 14:03, then ~80 bpm with 100 % clean beats after re-seating the electrode](images/ecg_dry_session_oct4.png)
 
 ![ECG validation (2 Oct): textbook P-QRS-T beat shape, detected beats, and two heart-rate methods agreeing](images/ecg_validation_oct2.png)
 

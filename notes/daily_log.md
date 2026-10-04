@@ -44,5 +44,6 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 ## 2026-10-04 (evening)
 
 - The dry comb electrode is broken, so it is on hold until it is repaired. All remaining tests (ECG vs oximeter, blinks, jaw, alpha, SSVEP) will use the **gold cup electrode** first.
-- A gold-electrode ECG run was done, but no GUI recording after 14:18 exists on the laptop yet, so it is not analyzed. Earlier ch1/ch2 data from 13:55-14:18 is being re-checked to see which electrode was really connected.
+- Correction: the 13:55-14:13 ECG session was recorded with the **gold electrode** (on the channel 1 lead), not the dry one. Result: 810 beats, 100 % clean, ~80 bpm, SNR 47, and the live 8-s average matched the pulse oximeter. **Step 2 gold ECG: PASS.**
+- Next: Step 3 with the gold electrode (blinks, jaw clench, alpha, SSVEP).
 - Project and repo are private for now.
