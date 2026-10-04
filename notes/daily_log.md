@@ -40,3 +40,9 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 ## 2026-10-01
 - First look at live Cyton data: floating inputs, railing, 50 Hz pickup from long leads, notch/bandpass effects.
 - Built `gui_monitor.py` / `noise_breakdown.py` (LSL) for live filter + noise analysis.
+
+## 2026-10-04 (evening)
+
+- The dry comb electrode is broken, so it is on hold until it is repaired. All remaining tests (ECG vs oximeter, blinks, jaw, alpha, SSVEP) will use the **gold cup electrode** first.
+- A gold-electrode ECG run was done, but no GUI recording after 14:18 exists on the laptop yet, so it is not analyzed. Earlier ch1/ch2 data from 13:55-14:18 is being re-checked to see which electrode was really connected.
+- Project and repo are private for now.
