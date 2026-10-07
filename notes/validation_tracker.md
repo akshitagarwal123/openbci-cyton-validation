@@ -80,10 +80,12 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 
 | Test | Status | Date | Key result |
 |---|---|---|---|
-| Blinks on cue (forehead) | ⏳ Not done | — | — |
+| Blinks on cue (forehead), dry electrode | ✅ PASS | 2026-10-08 01:30 | 10/10 cued blinks detected, 1 uncued (allowed ≤ 2). Blinks are large, −300 to −600 µV, about 1.8 s after the spoken cue (speech start-up + reaction time). Room hum on the dry electrode was high (~300 µV at 50 Hz) but filtered out |
 | Jaw clench (muscle) | ⏳ Not done | — | — |
 | Alpha, eyes closed vs open (back of head) | ⏳ Not done | — | — |
 | SSVEP 12 / 15 Hz flicker | ⏳ Not done | — | — |
+
+![Blink test, dry electrode (8 Oct): every one of the 10 cues is followed by the same large blink dip; nothing similar happens before the cue](images/blinks_dry_oct8.png)
 
 ![Blink test setup, 8 Oct: dry electrode taped about 2 cm above the left eyebrow (channel 1), SRB clip on the left earlobe, BIAS clip on the right earlobe, hands-free](images/blink_setup_dry.jpg)
 

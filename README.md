@@ -8,7 +8,7 @@ Full write-up with every test, number, chart and photo: [notes/validation_tracke
 |---|---|---|
 | 1. Board itself (integrity, noise floor, test signal, external short) | Done | 250 Hz, 0 dropped; 0.10 uV noise floor; test signal ±1,870 uV vs ±1,875 spec; channels match within 0.1 % |
 | 2. ECG vs pulse oximeter | Done (gold and dry) | Gold: within 1.5 bpm of the oximeter; 810 beats, 100 % clean, SNR 47 on 4 Oct. Dry: within 1.6 bpm of the oximeter, SNR 21; needs a strap for stable contact |
-| 3. Blinks, jaw EMG, alpha, SSVEP | Next | Scripts ready |
+| 3. Blinks, jaw EMG, alpha, SSVEP | In progress | Blinks (dry electrode): 10/10 detected on cue, 1 uncued |
 
 <p>
 <img src="notes/images/testsignal_raw_vs_gui.png" width="49%">

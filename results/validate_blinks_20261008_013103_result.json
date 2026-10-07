@@ -1,0 +1,24 @@
+{
+  "test": "blinks",
+  "time": "2026-10-08T01:30:12",
+  "passed": true,
+  "checks": [
+    {
+      "check": "cued blinks detected",
+      "channel": 1,
+      "value": "10/10",
+      "criterion": "\u2265 9/10 (> 50 \u00b5V)",
+      "pass": true
+    },
+    {
+      "check": "uncued blink-sized events",
+      "channel": 1,
+      "value": 1,
+      "criterion": "\u2264 2",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "ch1_blink_peak_uv": 297.8
+  }
+}

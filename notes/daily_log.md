@@ -67,3 +67,10 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 ## 2026-10-08 (01:15)
 
 - Setting up Step 3 (blink test) with the **dry electrode**: electrode taped above the left eyebrow (ch1), SRB on the left earlobe, BIAS on the right earlobe. Placement checked by camera; waiting for the GUI session to stream.
+
+## 2026-10-08 (01:30)
+
+- **Blink test, dry electrode: PASS.** 10/10 cued blinks detected, only 1 blink-like event without a cue. Each blink is a big dip of about −300 to −600 µV.
+- The first automatic analysis said FAIL (5/10) because it only looked 1.2 s after each spoken cue; the blinks actually come ~1.8 s after the cue (the computer voice takes time to start, then the reaction). Widened the window to 0.3–2.2 s and re-analysed the same recording.
+- Also fixed `validate_board.py` so `--channels 1` applies to every test (no fake channel-2 failure when only one electrode is connected).
+- Notes on setup: unused channels 2–7 switched off in the GUI; dry electrode still picks up a lot of 50 Hz hum (~300 µV) because of its higher skin contact resistance, but the analysis filters it out.

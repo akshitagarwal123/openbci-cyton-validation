@@ -476,11 +476,12 @@ def test_blinks(args):
                                 "Try not to blink otherwise.", "blink", 10, lambda: random.uniform(3, 6))
     t, xs, _ = load(meta["start"], meta["end"])
     r = Result("blinks", (meta["start"], meta["end"]))
-    fig, axs = figure(2, f"Blink validation — {datetime.fromtimestamp(meta['start']):%Y-%m-%d %H:%M}", width=12)
+    fig, axs = figure(len(CHANNELS), f"Blink validation — {datetime.fromtimestamp(meta['start']):%Y-%m-%d %H:%M}", width=12)
     avgs = {}
     for ch in CHANNELS:
         y = bandpass(xs[ch], 0.5, 15)
-        ep_t = np.arange(-int(0.5 * FS), int(1.5 * FS))
+        # spoken cue + reaction time puts the blink ~1-1.5 s after the cue timestamp
+        ep_t = np.arange(-int(0.5 * FS), int(2.5 * FS))
         hits, epochs = 0, []
         for c in meta["cues"]:
             i = int(np.searchsorted(t, c))
@@ -488,11 +489,11 @@ def test_blinks(args):
                 continue
             e = y[i + ep_t] - np.median(y[i + ep_t[ep_t < 0]])
             epochs.append(e)
-            hits += np.max(np.abs(e[(ep_t >= 0) & (ep_t < int(1.2 * FS))])) > 50
+            hits += np.max(np.abs(e[(ep_t >= int(0.3 * FS)) & (ep_t < int(2.2 * FS))])) > 50
         # false positives: blink-sized deflections > 2 s away from any cue
         far = np.ones(len(t), bool)
         for c in meta["cues"]:
-            far &= np.abs(t - c) > 2.0
+            far &= (t < c - 1.0) | (t > c + 3.0)
         far &= t > meta["start"] + 1
         false = 0
         for i in range(0, len(y) - FS, FS):
@@ -503,12 +504,14 @@ def test_blinks(args):
         r.metrics[f"ch{ch}_blink_peak_uv"] = round(float(np.max(np.abs(avg))), 1)
         r.check("cued blinks detected", f"{hits}/{len(meta['cues'])}", hits >= 9, "≥ 9/10 (> 50 µV)", ch)
         r.check("uncued blink-sized events", false, false <= 2, "≤ 2", ch)
+        ax = axs[CHANNELS.index(ch)]
         for e in epochs:
-            axs[0 if ch == 1 else 1].plot(ep_t / FS, e, color=COLORS[ch], alpha=0.25, lw=0.8)
-        axs[0 if ch == 1 else 1].plot(ep_t / FS, avg, color=COLORS[ch], lw=2.4)
-        axs[0 if ch == 1 else 1].set(title=f"{LABELS[ch]}: epochs around each cue", xlabel="s from cue", ylabel="µV")
-    c = float(np.corrcoef(avgs[1], avgs[2])[0, 1])
-    r.check("ch1 vs ch2 blink shape correlation", round(c, 3), c > 0.8, "> 0.8")
+            ax.plot(ep_t / FS, e, color=COLORS[ch], alpha=0.25, lw=0.8)
+        ax.plot(ep_t / FS, avg, color=COLORS[ch], lw=2.4)
+        ax.set(title=f"{LABELS[ch]}: epochs around each cue", xlabel="s from cue", ylabel="µV")
+    if len(avgs) == 2:
+        c = float(np.corrcoef(avgs[1], avgs[2])[0, 1])
+        r.check("ch1 vs ch2 blink shape correlation", round(c, 3), c > 0.8, "> 0.8")
     finish(fig, prefix)
     r.save(prefix)
 
@@ -764,7 +767,7 @@ def main():
     ap.add_argument("test", choices=TESTS + ["report"])
     ap.add_argument("--analyze", help="re-analyse a saved run (.json)")
     ap.add_argument("--oximeter", type=float, nargs="+", help="ecg: oximeter readings at the 4 cues (bpm)")
-    ap.add_argument("--channels", type=int, nargs="+", default=[1, 2], help="ecg: channels to analyse (e.g. 1 for dry only)")
+    ap.add_argument("--channels", type=int, nargs="+", default=[1, 2], help="channels to analyse (e.g. 1 for one electrode only)")
     ap.add_argument("--tag", default="", help="label added to result file names, e.g. dry / gold")
     ap.add_argument("--seconds", type=float, default=60, help="integrity: how many recent seconds to check")
     ap.add_argument("--recent", type=float, help="hardware: just analyse the last N seconds (set the GUI mode yourself)")
@@ -776,6 +779,7 @@ def main():
     ap.add_argument("--stim", type=float, default=20, help="ssvep: seconds of flicker per frequency")
     ap.add_argument("--rest", type=float, default=20, help="ssvep: seconds of rest before each flicker")
     args = ap.parse_args()
+    CHANNELS[:] = args.channels
     globals()[f"test_{args.test}"](args)
 
 
