@@ -85,6 +85,8 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 | Alpha, eyes closed vs open (back of head) | ⏳ Not done | — | — |
 | SSVEP 12 / 15 Hz flicker | ⏳ Not done | — | — |
 
+![Blink test setup, 8 Oct: dry electrode taped about 2 cm above the left eyebrow (channel 1), SRB clip on the left earlobe, BIAS clip on the right earlobe, hands-free](images/blink_setup_dry.jpg)
+
 ![Electrode placement for the EEG tests: forehead Fp1/Fp2 (no paste needed) or back of head O1/O2](images/electrode_placement.png)
 
 Until the dry electrode is repaired, Step 3 uses the **gold cup electrode on channel 1**. The dry electrode will be compared later.

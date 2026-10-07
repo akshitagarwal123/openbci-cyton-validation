@@ -63,3 +63,7 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 
 - Gold electrode ECG vs pulse oximeter (phone video, 56 s readable): ECG 85.0 bpm vs oximeter 84.5 bpm, **mean difference 1.5 bpm → PASS**. The ECG followed the oximeter as heart rate rose from 78 to 89 bpm. No contact loss.
 - Both electrodes now pass the oximeter check (dry 1.6 bpm, gold 1.5 bpm). Gold keeps contact better; dry needs a strap.
+
+## 2026-10-08 (01:15)
+
+- Setting up Step 3 (blink test) with the **dry electrode**: electrode taped above the left eyebrow (ch1), SRB on the left earlobe, BIAS on the right earlobe. Placement checked by camera; waiting for the GUI session to stream.
