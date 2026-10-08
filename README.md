@@ -45,6 +45,7 @@ They read the OpenBCI GUI's own recordings (`~/Documents/OpenBCI_GUI/Recordings`
 | `live_hr.py` | Live heart-rate dashboard for oximeter comparison |
 | `breathing_hr.py` | Breathing protocol and beat-by-beat heart rate |
 | `compare_electrodes.py`, `eeg_compare.py` | Dry vs gold electrode comparisons |
+| `ssvep_runner.py` | **Brain Runner**, an SSVEP game: look at the 12 Hz or 15 Hz flashing panel to steer a ball to the gem |
 | `gui_monitor.py`, `noise_breakdown.py` | Noise breakdown per frequency |
 
 `recordings/` holds the raw OpenBCI GUI data for every test (see [recordings/README.md](recordings/README.md)). `results/` holds saved result JSONs and charts. Python deps: numpy, scipy, matplotlib, pandas, brainflow, pylsl, pygame.
