@@ -83,3 +83,11 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Next: alpha rhythm (eyes closed vs open), electrode at the back of the head.
 
 - Frequency analysis of the blink and jaw recordings: blinks add energy mainly **below 4 Hz** (×34), fading into theta/alpha; jaw clenches add energy **from ~15 Hz up to 100 Hz** (×5–15). Alpha (8–13 Hz) is the least affected band. Chart and table added to the tracker.
+
+## 2026-10-08 (22:43)
+
+- Electrode moved into the 3D-printed headset at **O1** (back of head, 2–3 cm left of the middle). Checked by a 360° camera video; first position was one ring too far to the side.
+- Quick check failed (alpha ×1.3) because of thick hair. After parting the hair, wetting the scalp and twisting the electrode in: ×4.4 in a 40-s check.
+- **Alpha test, dry electrode: PASS.** Alpha power 4.3× higher with eyes closed, peak at 9.5 Hz, 98.7 % clean data. First real **brain** signal confirmed with this board.
+- Fixed the alpha chart layout for single-channel runs. Raw recording added (`recordings/13_alpha_eyes_closed_open_dry.txt.gz`).
+- Next: SSVEP (flicker) test.

@@ -82,8 +82,14 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 |---|---|---|---|
 | Blinks on cue (forehead), dry electrode | ✅ PASS | 2026-10-08 01:30 | 10/10 cued blinks detected, 1 uncued (allowed ≤ 2). Blinks are large, −300 to −600 µV, about 1.8 s after the spoken cue (speech start-up + reaction time). Room hum on the dry electrode was high (~300 µV at 50 Hz) but filtered out |
 | Jaw clench (muscle), dry electrode | ✅ PASS | 2026-10-08 21:23 | Muscle activity (20–45 Hz) **6.8×** higher while clenching than at rest (need ≥ 5×): 23.6 µV vs 9.1 µV. A clear burst follows each of the 3 cues, ~1.5 s after the spoken word |
-| Alpha, eyes closed vs open (back of head) | ⏳ Not done | — | — |
+| Alpha, eyes closed vs open (back of head, O1), dry electrode in headset | ✅ PASS | 2026-10-08 22:43 | Alpha (8–13 Hz) power **4.3× higher with eyes closed** (need ≥ 2×); peak at **9.5 Hz**; 98.7 % clean epochs. Alpha rose in all 3 eyes-closed blocks and dropped every time the eyes opened. First attempt failed (×1.3) because the dry pins sat on thick hair; parting the hair and wetting the scalp fixed it |
 | SSVEP 12 / 15 Hz flicker | ⏳ Not done | — | — |
+
+![Alpha test, dry electrode at O1 (8 Oct): left, a clear 9.5 Hz peak appears only with eyes closed; right, alpha switches on in every eyes-closed block (blue)](images/alpha_dry_oct8.png)
+
+![Electrode position for the alpha test, seen from behind: red = first position (too far to the side), green = O1, 2–3 cm left of the middle](images/o1_placement_headset.jpg)
+
+**Tip for dry electrodes on the back of the head:** thick hair stops the pins from touching the scalp. Part the hair at the spot, wet the scalp with a little water or saliva, then twist the electrode back and forth while pressing. This raised the alpha reactivity from ×1.3 to ×4.3 and cut mains hum from ~130 µV to ~28 µV.
 
 ![Jaw clench, dry electrode (8 Oct): a burst of muscle activity follows each of the 3 "clench" cues (shaded) and fades after "relax"](images/jaw_dry_oct8.png)
 

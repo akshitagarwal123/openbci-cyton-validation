@@ -567,7 +567,7 @@ def test_alpha(args):
     t, xs, _ = load(log[0]["start"] - 2, log[-1]["end"] + 1)
     r = Result("alpha", (log[0]["start"], log[-1]["end"]))
     need = 1.5 if meta.get("site") == "forehead" else 2.0
-    fig, axs = figure(3, f"Alpha validation ({meta.get('site', 'occipital')}) — "
+    fig, axs = figure(len(CHANNELS) + 1, f"Alpha validation ({meta.get('site', 'occipital')}) — "
                          f"{datetime.fromtimestamp(log[0]['start']):%Y-%m-%d %H:%M}")
     envs = []
     for ch in CHANNELS:
@@ -581,22 +581,22 @@ def test_alpha(args):
         r.check("clean epochs (%)", m["clean_epochs_pct"], m["clean_epochs_pct"] >= 70, "≥ 70 %", ch)
         f, p_eo, p_ec = spec
         k = (f >= 1) & (f <= 40)
-        ax = axs[0 if ch == 1 else 1]
+        ax = axs[CHANNELS.index(ch)]
         ax.semilogy(f[k], np.sqrt(p_eo[k]), color=MUTED, lw=1.6, label="eyes open")
         ax.semilogy(f[k], np.sqrt(p_ec[k]), color=COLORS[ch], lw=2, label="eyes closed")
         ax.axvspan(8, 13, color="#ecebe8", lw=0)
         ax.set(title=f"{LABELS[ch]}: ×{m['alpha_reactivity']}", xlabel="Hz", ylabel="µV/√Hz")
         ax.legend(frameon=False)
         envs.append(alpha_envelope(y))
-        axs[2].plot(t - log[0]["start"], envs[-1], color=COLORS[ch], lw=1.2, label=LABELS[ch])
+        axs[-1].plot(t - log[0]["start"], envs[-1], color=COLORS[ch], lw=1.2, label=LABELS[ch])
     if len(envs) == 2:
         c = float(np.corrcoef(envs[0], envs[1])[0, 1])
         r.check("ch1 vs ch2 alpha envelope corr", round(c, 2), c > 0.5, "> 0.5")
     for ph in log:
         if ph["phase"] == "Eyes closed":
-            axs[2].axvspan(ph["start"] - log[0]["start"], ph["end"] - log[0]["start"], color="#cde2fb", lw=0)
-    axs[2].set(title="Alpha over time (blue = eyes closed)", xlabel="s", ylabel="µV")
-    axs[2].legend(frameon=False)
+            axs[-1].axvspan(ph["start"] - log[0]["start"], ph["end"] - log[0]["start"], color="#cde2fb", lw=0)
+    axs[-1].set(title="Alpha over time (blue = eyes closed)", xlabel="s", ylabel="µV")
+    axs[-1].legend(frameon=False)
     finish(fig, prefix)
     r.save(prefix)
 
