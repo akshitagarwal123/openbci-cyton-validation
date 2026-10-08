@@ -606,7 +606,8 @@ def test_alpha(args):
 def run_flicker(targets, stim_s, rest_s):
     import pygame
     pygame.init()
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN | pygame.SCALED, vsync=1)
+    size = pygame.display.get_desktop_sizes()[0]
+    screen = pygame.display.set_mode(size, pygame.FULLSCREEN | pygame.SCALED, vsync=1)
     pygame.mouse.set_visible(False)
     w, h = screen.get_size()
     font = pygame.font.SysFont(None, 60)

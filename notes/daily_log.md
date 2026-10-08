@@ -91,3 +91,10 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - **Alpha test, dry electrode: PASS.** Alpha power 4.3× higher with eyes closed, peak at 9.5 Hz, 98.7 % clean data. First real **brain** signal confirmed with this board.
 - Fixed the alpha chart layout for single-channel runs. Raw recording added (`recordings/13_alpha_eyes_closed_open_dry.txt.gz`).
 - Next: SSVEP (flicker) test.
+
+## 2026-10-08 (22:52)
+
+- Fixed the SSVEP flicker window (pygame could not open a zero-sized fullscreen); display measured at exactly 60 Hz.
+- **SSVEP test, dry electrode at O1: PASS.** Sharp peak at exactly 12 Hz (SNR 19) and 15 Hz (SNR 15) only while watching the flicker; none at rest. CCA decoder right 97 % of the time.
+- **Validation complete: 9/9 tests pass.** The two filmed-oximeter ECG sessions were added to the summary report so it reflects the passing ECG result instead of the first failed attempt.
+- Possible next steps: repeat Step 3 with the gold electrode for comparison; then move to motor imagery (C3/C4 positions, left vs right hand).

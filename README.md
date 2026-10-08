@@ -7,10 +7,13 @@ Full write-up with every test, number, chart and photo: [notes/validation_tracke
 | Step | Status | Highlights |
 |---|---|---|
 | 1. Board itself (integrity, noise floor, test signal, external short) | Done | 250 Hz, 0 dropped; 0.10 uV noise floor; test signal ±1,870 uV vs ±1,875 spec; channels match within 0.1 % |
-| 2. ECG vs pulse oximeter | Done (gold and dry) | Gold: within 1.5 bpm of the oximeter; 810 beats, 100 % clean, SNR 47 on 4 Oct. Dry: within 1.6 bpm of the oximeter, SNR 21; needs a strap for stable contact |
-| 3. Blinks, jaw EMG, alpha, SSVEP | In progress | Dry electrode: blinks 10/10 on cue; jaw clench 6.8×; **alpha 4.3× with eyes closed (9.5 Hz)** |
+| 2. ECG vs pulse oximeter | Done | Gold: within 1.5 bpm of the oximeter; 810 beats, 100 % clean, SNR 47 on 4 Oct. Dry: within 1.6 bpm of the oximeter, SNR 21; needs a strap for stable contact |
+| 3. Blinks, jaw EMG, alpha, SSVEP | Done | Dry electrode: blinks 10/10 on cue; jaw clench 6.8×; **alpha 4.3× with eyes closed (9.5 Hz)**; SSVEP peaks at exactly 12 and 15 Hz (CCA 97 %) |
+
+**Result: 9 of 9 validation tests pass.**
 
 <p>
+<img src="notes/images/validation_report.png" width="98%">
 <img src="notes/images/testsignal_raw_vs_gui.png" width="49%">
 <img src="notes/images/ecg_dry_session_oct4.png" width="49%">
 </p>

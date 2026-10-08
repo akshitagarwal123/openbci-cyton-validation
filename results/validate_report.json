@@ -1,0 +1,464 @@
+[
+  {
+    "test": "integrity",
+    "result": "PASS",
+    "time": "2026-10-03T21:22:22",
+    "checks": [
+      {
+        "check": "sample rate (Hz)",
+        "channel": null,
+        "value": 250.04,
+        "criterion": "250 \u00b1 0.5",
+        "pass": true
+      },
+      {
+        "check": "dropped packets (%)",
+        "channel": null,
+        "value": 0.0,
+        "criterion": "< 0.1 %",
+        "pass": true
+      },
+      {
+        "check": "timestamps going backwards",
+        "channel": null,
+        "value": 0,
+        "criterion": "0",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "hardware",
+    "result": "PASS",
+    "time": "2026-10-04T00:46:45",
+    "checks": [
+      {
+        "check": "test signal amplitude (1x)",
+        "channel": 1,
+        "value": 1870.0,
+        "criterion": "\u00b11875 \u00b5V \u00b1 2 %",
+        "pass": true
+      },
+      {
+        "check": "test signal period (slow)",
+        "channel": 1,
+        "value": 1.024,
+        "criterion": "1.024 s \u00b1 2 %",
+        "pass": true
+      },
+      {
+        "check": "test signal amplitude (1x)",
+        "channel": 2,
+        "value": 1870.4,
+        "criterion": "\u00b11875 \u00b5V \u00b1 2 %",
+        "pass": true
+      },
+      {
+        "check": "test signal period (slow)",
+        "channel": 2,
+        "value": 1.024,
+        "criterion": "1.024 s \u00b1 2 %",
+        "pass": true
+      },
+      {
+        "check": "ch1 vs ch2 waveform correlation",
+        "channel": null,
+        "value": 1.0,
+        "criterion": "> 0.999",
+        "pass": true
+      },
+      {
+        "check": "ch1 vs ch2 gain match (%)",
+        "channel": null,
+        "value": 0.018,
+        "criterion": "\u2264 0.5 %",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "testsignal",
+    "result": "PASS",
+    "time": "2026-10-03T22:12:25",
+    "checks": [
+      {
+        "check": "1x slow ch1",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.0,
+          "period_s": 1.024,
+          "amp_err_pct": -0.27,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow ch2",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.4,
+          "period_s": 1.024,
+          "amp_err_pct": -0.25,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow ch3",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1871.0,
+          "period_s": 1.024,
+          "amp_err_pct": -0.21,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow ch4",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.7,
+          "period_s": 1.024,
+          "amp_err_pct": -0.23,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow ch5",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1871.7,
+          "period_s": 1.024,
+          "amp_err_pct": -0.18,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow ch6",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1872.2,
+          "period_s": 1.024,
+          "amp_err_pct": -0.15,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow ch7",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1871.3,
+          "period_s": 1.024,
+          "amp_err_pct": -0.2,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow ch8",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.3,
+          "period_s": 1.024,
+          "amp_err_pct": -0.25,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x slow gain spread",
+        "channel": null,
+        "value": {
+          "spread_pct": 0.115,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch1",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.0,
+          "period_s": 0.512,
+          "amp_err_pct": -0.26,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch2",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.4,
+          "period_s": 0.512,
+          "amp_err_pct": -0.25,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch3",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1871.0,
+          "period_s": 0.512,
+          "amp_err_pct": -0.21,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch4",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.7,
+          "period_s": 0.512,
+          "amp_err_pct": -0.23,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch5",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1871.7,
+          "period_s": 0.512,
+          "amp_err_pct": -0.18,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch6",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1872.2,
+          "period_s": 0.512,
+          "amp_err_pct": -0.15,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch7",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1871.3,
+          "period_s": 0.512,
+          "amp_err_pct": -0.19,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast ch8",
+        "channel": null,
+        "value": {
+          "half_amp_uv": 1870.3,
+          "period_s": 0.512,
+          "amp_err_pct": -0.25,
+          "period_err_pct": 0.0,
+          "pass": true
+        },
+        "pass": true
+      },
+      {
+        "check": "1x fast gain spread",
+        "channel": null,
+        "value": {
+          "spread_pct": 0.115,
+          "pass": true
+        },
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "extshort",
+    "result": "PASS",
+    "time": "2026-10-04T02:27:53",
+    "checks": [
+      {
+        "check": "noise 1\u201345 Hz (\u00b5V)",
+        "channel": 1,
+        "value": 0.12,
+        "criterion": "\u2264 1.0 \u00b5V",
+        "pass": true
+      },
+      {
+        "check": "50 Hz hum (\u00b5V)",
+        "channel": 1,
+        "value": 0.1,
+        "criterion": "\u2264 1.0 \u00b5V",
+        "pass": true
+      },
+      {
+        "check": "offset drift (\u00b5V)",
+        "channel": 1,
+        "value": 0.3,
+        "criterion": "\u2264 50 \u00b5V over window",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "ecg",
+    "result": "PASS",
+    "time": "2026-10-05T00:14:34",
+    "checks": [
+      {
+        "check": "ECG vs pulse oximeter, mean |diff| (bpm)",
+        "channel": 1,
+        "value": 1.6,
+        "criterion": "\u2264 3",
+        "pass": true
+      },
+      {
+        "check": "beats kept (%)",
+        "channel": 1,
+        "value": 100.0,
+        "criterion": "\u2265 95",
+        "pass": true
+      },
+      {
+        "check": "ECG vs pulse oximeter, mean |diff| (bpm)",
+        "channel": 2,
+        "value": 1.5,
+        "criterion": "\u2264 3",
+        "pass": true
+      },
+      {
+        "check": "beats kept (%)",
+        "channel": 2,
+        "value": 100.0,
+        "criterion": "\u2265 95",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "blinks",
+    "result": "PASS",
+    "time": "2026-10-08T01:30:12",
+    "checks": [
+      {
+        "check": "cued blinks detected",
+        "channel": 1,
+        "value": "10/10",
+        "criterion": "\u2265 9/10 (> 50 \u00b5V)",
+        "pass": true
+      },
+      {
+        "check": "uncued blink-sized events",
+        "channel": 1,
+        "value": 1,
+        "criterion": "\u2264 2",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "jaw",
+    "result": "PASS",
+    "time": "2026-10-08T21:23:23",
+    "checks": [
+      {
+        "check": "20\u201345 Hz power clench / rest",
+        "channel": 1,
+        "value": 6.8,
+        "criterion": "\u2265 5\u00d7",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "alpha",
+    "result": "PASS",
+    "time": "2026-10-08T22:43:28",
+    "checks": [
+      {
+        "check": "alpha eyes-closed / open",
+        "channel": 1,
+        "value": 4.32,
+        "criterion": "\u2265 2.0\u00d7",
+        "pass": true
+      },
+      {
+        "check": "alpha peak (Hz)",
+        "channel": 1,
+        "value": 9.5,
+        "criterion": "8\u201313 Hz",
+        "pass": true
+      },
+      {
+        "check": "clean epochs (%)",
+        "channel": 1,
+        "value": 98.7,
+        "criterion": "\u2265 70 %",
+        "pass": true
+      }
+    ]
+  },
+  {
+    "test": "ssvep",
+    "result": "PASS",
+    "time": "2026-10-08T22:52:04",
+    "checks": [
+      {
+        "check": "SNR at 12.00 Hz (or 2\u00d7) flicker",
+        "channel": 1,
+        "value": 19.13,
+        "criterion": "\u2265 2",
+        "pass": true
+      },
+      {
+        "check": "SNR at 12.00 Hz during rest",
+        "channel": 1,
+        "value": 0.72,
+        "criterion": "< 2 (control)",
+        "pass": true
+      },
+      {
+        "check": "SNR at 15.00 Hz (or 2\u00d7) flicker",
+        "channel": 1,
+        "value": 14.98,
+        "criterion": "\u2265 2",
+        "pass": true
+      },
+      {
+        "check": "SNR at 15.00 Hz during rest",
+        "channel": 1,
+        "value": 1.25,
+        "criterion": "< 2 (control)",
+        "pass": true
+      },
+      {
+        "check": "CCA picks the right frequency (%)",
+        "channel": null,
+        "value": 97.1,
+        "criterion": "\u2265 80 %",
+        "pass": true
+      }
+    ]
+  }
+]

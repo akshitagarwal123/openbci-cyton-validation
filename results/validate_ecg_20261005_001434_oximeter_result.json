@@ -1,0 +1,69 @@
+{
+ "test": "ecg",
+ "time": "2026-10-05T00:14:34",
+ "passed": true,
+ "checks": [
+  {
+   "check": "ECG vs pulse oximeter, mean |diff| (bpm)",
+   "channel": 1,
+   "value": 1.6,
+   "criterion": "\u2264 3",
+   "pass": true
+  },
+  {
+   "check": "beats kept (%)",
+   "channel": 1,
+   "value": 100.0,
+   "criterion": "\u2265 95",
+   "pass": true
+  },
+  {
+   "check": "ECG vs pulse oximeter, mean |diff| (bpm)",
+   "channel": 2,
+   "value": 1.5,
+   "criterion": "\u2264 3",
+   "pass": true
+  },
+  {
+   "check": "beats kept (%)",
+   "channel": 2,
+   "value": 100.0,
+   "criterion": "\u2265 95",
+   "pass": true
+  }
+ ],
+ "metrics": {
+  "dry": {
+   "window": "2026-10-05 00:04:01-00:04:29",
+   "electrode": "dry, channel 1",
+   "oximeter_mean": 80.3,
+   "ecg_8s_avg_mean": 81.8,
+   "mean_abs_diff_bpm": 1.6,
+   "max_abs_diff_bpm": 4.8,
+   "seconds_compared": 22,
+   "ecg_beats": 40,
+   "ecg_clean_pct": 100.0,
+   "ecg_snr": 21.3,
+   "shape_match": 0.978,
+   "pass_rule": "mean abs diff <= 3 bpm",
+   "result": "PASS"
+  },
+  "gold": {
+   "window": "2026-10-05 00:14:34 + 0-56 s",
+   "electrode": "gold, channel 1",
+   "oximeter_mean": 84.5,
+   "ecg_8s_avg_mean": 85.0,
+   "mean_abs_diff_bpm": 1.5,
+   "max_abs_diff_bpm": 2.9,
+   "readings_compared": 17,
+   "beats": 112,
+   "kept_pct": 100.0,
+   "snr": 8.5,
+   "shape_match": 0.886,
+   "railed_pct": 0.0,
+   "pass_rule": "mean abs diff <= 3 bpm",
+   "result": "PASS"
+  }
+ },
+ "note": "Combined from the two filmed-oximeter sessions (dry 00:04:01, gold 00:14:34). Electrode was on the channel-1 lead in both runs; channel numbers here only label the electrode type."
+}

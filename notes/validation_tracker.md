@@ -83,7 +83,11 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 | Blinks on cue (forehead), dry electrode | ✅ PASS | 2026-10-08 01:30 | 10/10 cued blinks detected, 1 uncued (allowed ≤ 2). Blinks are large, −300 to −600 µV, about 1.8 s after the spoken cue (speech start-up + reaction time). Room hum on the dry electrode was high (~300 µV at 50 Hz) but filtered out |
 | Jaw clench (muscle), dry electrode | ✅ PASS | 2026-10-08 21:23 | Muscle activity (20–45 Hz) **6.8×** higher while clenching than at rest (need ≥ 5×): 23.6 µV vs 9.1 µV. A clear burst follows each of the 3 cues, ~1.5 s after the spoken word |
 | Alpha, eyes closed vs open (back of head, O1), dry electrode in headset | ✅ PASS | 2026-10-08 22:43 | Alpha (8–13 Hz) power **4.3× higher with eyes closed** (need ≥ 2×); peak at **9.5 Hz**; 98.7 % clean epochs. Alpha rose in all 3 eyes-closed blocks and dropped every time the eyes opened. First attempt failed (×1.3) because the dry pins sat on thick hair; parting the hair and wetting the scalp fixed it |
-| SSVEP 12 / 15 Hz flicker | ⏳ Not done | — | — |
+| SSVEP 12 / 15 Hz flicker (O1), dry electrode | ✅ PASS | 2026-10-08 22:52 | Peak at exactly the flicker rate: **SNR 19.1 at 12 Hz, 15.0 at 15 Hz** (need ≥ 2); no peak during rest (0.72 and 1.25). Harmonics at 24 and 30 Hz also visible. A standard SSVEP decoder (CCA) picked the right frequency in **97.1 %** of 2-s windows (need ≥ 80 %). Screen measured at exactly 60 Hz, so 12 Hz = 5 frames, 15 Hz = 4 frames |
+
+![SSVEP, dry electrode at O1 (8 Oct): sharp peaks at exactly 12 Hz and 15 Hz (and their doubles, 24 and 30 Hz) appear only while looking at the flicker; dotted = rest](images/ssvep_dry_oct8.png)
+
+**Step 3 complete ✅:** every cause-and-effect test passed with the dry electrode: blinks appear only on cue, jaw muscle noise only when clenching, the alpha rhythm only with eyes closed, and a brain response at exactly the frequency on the screen. The board records real eye, muscle and **brain** signals.
 
 ![Alpha test, dry electrode at O1 (8 Oct): left, a clear 9.5 Hz peak appears only with eyes closed; right, alpha switches on in every eyes-closed block (blue)](images/alpha_dry_oct8.png)
 
@@ -119,6 +123,12 @@ Each blink and clench was compared with the quiet moments in between (`tools/eve
 - **Alpha (8–13 Hz) is the cleanest window**: barely touched by clenching and only moderately by blinks, which is why alpha is the next test.
 
 ![Frequency content of blinks and jaw clenches vs rest: blinks raise the slow frequencies, clenches raise everything above ~15 Hz](images/event_spectra_oct8.png)
+
+## Overall result
+
+![Validation report: 9 of 9 tests passed](images/validation_report.png)
+
+All 9 validation tests pass: the board's own accuracy (integrity, noise floor, test signal, external short), an independent device (ECG vs pulse oximeter, dry and gold), and cause and effect (blinks, jaw, alpha, SSVEP). One-page summary: `python tools/validate_board.py report`.
 
 ## Earlier informal checks (before the formal tests)
 
