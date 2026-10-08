@@ -74,3 +74,10 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - The first automatic analysis said FAIL (5/10) because it only looked 1.2 s after each spoken cue; the blinks actually come ~1.8 s after the cue (the computer voice takes time to start, then the reaction). Widened the window to 0.3–2.2 s and re-analysed the same recording.
 - Also fixed `validate_board.py` so `--channels 1` applies to every test (no fake channel-2 failure when only one electrode is connected).
 - Notes on setup: unused channels 2–7 switched off in the GUI; dry electrode still picks up a lot of 50 Hz hum (~300 µV) because of its higher skin contact resistance, but the analysis filters it out.
+
+## 2026-10-08 (21:23)
+
+- Setup re-checked by camera and signal before the test: muscle noise at rest only 4 µV, 50 Hz hum down to 79 µV (best so far for the dry electrode).
+- **Jaw-clench test, dry electrode: PASS.** Muscle activity was 6.8× higher while clenching than at rest (need ≥ 5×). Each of the 3 clenches shows a clear burst, starting ~1.5 s after the spoken cue (same speech delay as the blink test).
+- Raw recording added to `recordings/12_jaw_clench_dry.txt.gz`.
+- Next: alpha rhythm (eyes closed vs open), electrode at the back of the head.

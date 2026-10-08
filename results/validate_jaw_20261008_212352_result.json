@@ -1,0 +1,18 @@
+{
+  "test": "jaw",
+  "time": "2026-10-08T21:23:23",
+  "passed": true,
+  "checks": [
+    {
+      "check": "20\u201345 Hz power clench / rest",
+      "channel": 1,
+      "value": 6.8,
+      "criterion": "\u2265 5\u00d7",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "ch1_emg_clench_uv": 23.6,
+    "ch1_emg_rest_uv": 9.1
+  }
+}

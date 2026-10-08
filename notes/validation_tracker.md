@@ -81,9 +81,11 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 | Test | Status | Date | Key result |
 |---|---|---|---|
 | Blinks on cue (forehead), dry electrode | ✅ PASS | 2026-10-08 01:30 | 10/10 cued blinks detected, 1 uncued (allowed ≤ 2). Blinks are large, −300 to −600 µV, about 1.8 s after the spoken cue (speech start-up + reaction time). Room hum on the dry electrode was high (~300 µV at 50 Hz) but filtered out |
-| Jaw clench (muscle) | ⏳ Not done | — | — |
+| Jaw clench (muscle), dry electrode | ✅ PASS | 2026-10-08 21:23 | Muscle activity (20–45 Hz) **6.8×** higher while clenching than at rest (need ≥ 5×): 23.6 µV vs 9.1 µV. A clear burst follows each of the 3 cues, ~1.5 s after the spoken word |
 | Alpha, eyes closed vs open (back of head) | ⏳ Not done | — | — |
 | SSVEP 12 / 15 Hz flicker | ⏳ Not done | — | — |
+
+![Jaw clench, dry electrode (8 Oct): a burst of muscle activity follows each of the 3 "clench" cues (shaded) and fades after "relax"](images/jaw_dry_oct8.png)
 
 ![Blink test, dry electrode (8 Oct): every one of the 10 cues is followed by the same large blink dip; nothing similar happens before the cue](images/blinks_dry_oct8.png)
 
