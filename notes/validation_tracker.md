@@ -95,6 +95,25 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 
 Until the dry electrode is repaired, Step 3 uses the **gold cup electrode on channel 1**. The dry electrode will be compared later.
 
+### What frequencies do blinks and jaw clenches produce? (8 Oct, dry electrode on forehead)
+
+Each blink and clench was compared with the quiet moments in between (`tools/event_spectra.py`, 50 Hz mains removed). This tells us which frequencies each artifact pollutes, which matters later when we look for real brain signals.
+
+| Frequency band | Blink vs rest | Jaw clench vs rest |
+|---|---|---|
+| 0.5–4 Hz (slow) | **232 vs 7 µV (×34)** | not meaningful (rest windows included natural blinks) |
+| 4–8 Hz (theta) | 52 vs 4 µV (×12) | ×1.2 |
+| 8–13 Hz (alpha) | 18 vs 3 µV (×6) | ×1.6 |
+| 13–30 Hz (beta) | ×2.6 | **21 vs 4.5 µV (×4.7)** |
+| 30–45 Hz | ×1.6 | **20 vs 2.2 µV (×9)** |
+| 55–100 Hz | ×1.7 | **27 vs 1.8 µV (×15)** |
+
+- **Blinks are slow and huge**: most of their energy is below 4 Hz, spilling into theta and alpha. Eye activity can fake brain rhythms below ~13 Hz, so EEG analysis must remove blinks or avoid frontal sites.
+- **Jaw clenches are fast and broad**: muscle (EMG) energy spreads from ~15 Hz up to 100 Hz and beyond. It drowns out beta and gamma, which is exactly where motor-imagery signals live (mu 8–13 Hz, beta 13–30 Hz). So the jaw, face and neck must stay relaxed during BCI recordings.
+- **Alpha (8–13 Hz) is the cleanest window**: barely touched by clenching and only moderately by blinks, which is why alpha is the next test.
+
+![Frequency content of blinks and jaw clenches vs rest: blinks raise the slow frequencies, clenches raise everything above ~15 Hz](images/event_spectra_oct8.png)
+
 ## Earlier informal checks (before the formal tests)
 
 | Check | Date | Result |

@@ -1,0 +1,78 @@
+{
+ "Blink": [
+  {
+   "band": "0.5\u20134 Hz (eye/slow)",
+   "event_uv": 232.5,
+   "rest_uv": 6.8,
+   "ratio": 34.3
+  },
+  {
+   "band": "4\u20138 theta",
+   "event_uv": 51.9,
+   "rest_uv": 4.2,
+   "ratio": 12.5
+  },
+  {
+   "band": "8\u201313 alpha",
+   "event_uv": 18.3,
+   "rest_uv": 2.9,
+   "ratio": 6.3
+  },
+  {
+   "band": "13\u201330 beta",
+   "event_uv": 9.4,
+   "rest_uv": 3.6,
+   "ratio": 2.6
+  },
+  {
+   "band": "30\u201345 gamma/muscle",
+   "event_uv": 3.7,
+   "rest_uv": 2.3,
+   "ratio": 1.6
+  },
+  {
+   "band": "55\u2013100 high (muscle)",
+   "event_uv": 3.2,
+   "rest_uv": 1.9,
+   "ratio": 1.7
+  }
+ ],
+ "Jaw clench": [
+  {
+   "band": "0.5\u20134 Hz (eye/slow)",
+   "event_uv": 18.9,
+   "rest_uv": 73.5,
+   "ratio": 0.3
+  },
+  {
+   "band": "4\u20138 theta",
+   "event_uv": 4.8,
+   "rest_uv": 4.1,
+   "ratio": 1.2
+  },
+  {
+   "band": "8\u201313 alpha",
+   "event_uv": 6.4,
+   "rest_uv": 3.9,
+   "ratio": 1.6
+  },
+  {
+   "band": "13\u201330 beta",
+   "event_uv": 21.3,
+   "rest_uv": 4.5,
+   "ratio": 4.7
+  },
+  {
+   "band": "30\u201345 gamma/muscle",
+   "event_uv": 19.8,
+   "rest_uv": 2.2,
+   "ratio": 9.0
+  },
+  {
+   "band": "55\u2013100 high (muscle)",
+   "event_uv": 26.9,
+   "rest_uv": 1.8,
+   "ratio": 15.2
+  }
+ ]
+}

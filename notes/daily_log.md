@@ -81,3 +81,5 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - **Jaw-clench test, dry electrode: PASS.** Muscle activity was 6.8× higher while clenching than at rest (need ≥ 5×). Each of the 3 clenches shows a clear burst, starting ~1.5 s after the spoken cue (same speech delay as the blink test).
 - Raw recording added to `recordings/12_jaw_clench_dry.txt.gz`.
 - Next: alpha rhythm (eyes closed vs open), electrode at the back of the head.
+
+- Frequency analysis of the blink and jaw recordings: blinks add energy mainly **below 4 Hz** (×34), fading into theta/alpha; jaw clenches add energy **from ~15 Hz up to 100 Hz** (×5–15). Alpha (8–13 Hz) is the least affected band. Chart and table added to the tracker.
