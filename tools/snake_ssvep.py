@@ -12,11 +12,17 @@ the GUI streaming. Every decision is logged to runs/snake_ssvep_<time>.csv.
 Usage:
     python live_inference/snake_ssvep.py
     python live_inference/snake_ssvep.py --keyboard       # arrow keys (practice)
-    python live_inference/snake_ssvep.py --steps 3 --decide 4 --margin 0.12
+    python live_inference/snake_ssvep.py --steps 3 --decide 4
+    python live_inference/snake_ssvep.py --reuse-calibration   # skip the 35-s calibration
+
+The game starts with a short calibration (look left 3x, right 3x) so it learns
+your own 12 Hz / 15 Hz response pattern; decisions then use the nearest pattern,
+which cancels the 12 Hz bias and a weaker 15 Hz response.
 Keys: Esc quits.
 """
 
 import argparse
+import json
 import os
 import random
 import time
@@ -36,8 +42,10 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--steps", type=int, default=3, help="cells moved between decisions")
     ap.add_argument("--decide", type=float, default=4.0, help="seconds of flicker per decision")
-    ap.add_argument("--margin", type=float, default=0.12,
-                    help="how much stronger one score must be to turn; otherwise go straight")
+    ap.add_argument("--confidence", type=float, default=0.15,
+                    help="0-0.5: how far toward one calibrated pattern the scores must be to turn")
+    ap.add_argument("--reuse-calibration", action="store_true", help="use the last saved calibration")
+    ap.add_argument("--calib-trials", type=int, default=3, help="calibration looks per side")
     ap.add_argument("--keyboard", action="store_true")
     ap.add_argument("--channel", type=int, default=1)
     args = ap.parse_args()
@@ -83,7 +91,7 @@ def main():
         img = font.render(s, True, color)
         screen.blit(img, img.get_rect(center=center))
 
-    def draw(snake, food, d, status="", status_color=INK, flicker_k=None, frac=None):
+    def draw(snake, food, d, status="", status_color=INK, flicker_k=None, frac=None, highlight=None):
         screen.fill(BG)
         pygame.draw.rect(screen, GRID, board)
         for i, (x, y) in enumerate(snake):
@@ -100,7 +108,7 @@ def main():
             else:
                 n = frames[side]
                 pygame.draw.rect(screen, (255, 255, 255) if (flicker_k % n) < (n + 1) // 2 else (0, 0, 0), rect)
-            pygame.draw.rect(screen, MUTED, rect, 2)
+            pygame.draw.rect(screen, HEAD if side == highlight else MUTED, rect, 8 if side == highlight else 2)
             text("TURN LEFT  12 Hz" if side == "left" else "TURN RIGHT  15 Hz", small, MUTED, (rect.centerx, rect.bottom + 22))
         text(f"Length {len(snake)}", small, MUTED, (W // 2, 26))
         if frac is not None:
@@ -114,6 +122,53 @@ def main():
         free = [(x, y) for x in range(cols) for y in range(rows) if (x, y) not in snake]
         return random.choice(free)
 
+    calib_path = os.path.join(os.path.dirname(__file__), "runs", "ssvep_calibration.json")
+
+    def flicker_and_read(snake, food, d, status, highlight=None):
+        k, t_start = 0, time.time()
+        while time.time() - t_start < args.decide:
+            events()
+            draw(snake, food, d, status, MUTED, flicker_k=k, frac=(time.time() - t_start) / args.decide,
+                 highlight=highlight)
+            k += 1
+        t_end = time.time()
+        wait = time.time() + 4
+        while brain.pump() < t_end and time.time() < wait:
+            events()
+            draw(snake, food, d, "reading your brain…")
+        return brain.decide(t_start + 0.5, t_end)
+
+    def calibrate(snake, food, d):
+        pts = {"left": [], "right": []}
+        order = ["left", "right"] * args.calib_trials
+        random.shuffle(order)
+        for i, side in enumerate(order, 1):
+            t0 = time.time()
+            while time.time() - t0 < 2.0:
+                events()
+                brain.pump()
+                draw(snake, food, d, f"Calibration {i}/{len(order)}: get ready to look {side.upper()}", INK,
+                     highlight=side)
+            _, sc, note = flicker_and_read(snake, food, d, f"look at the {side.upper()} panel", highlight=side)
+            if sc:
+                pts[side].append([sc["left"], sc["right"]])
+        if not pts["left"] or not pts["right"]:
+            return None
+        cal = {"left": np.mean(pts["left"], axis=0).tolist(), "right": np.mean(pts["right"], axis=0).tolist(),
+               "points": pts, "time": datetime.now().isoformat(timespec="seconds")}
+        ok = sum(classify(cal, {"left": a, "right": b})[0] == side for side in pts for a, b in pts[side])
+        cal["self_accuracy"] = ok / sum(len(v) for v in pts.values())
+        json.dump(cal, open(calib_path, "w"), indent=1)
+        return cal
+
+    def classify(cal, scores):
+        """Project the scores onto the line from the LEFT pattern to the RIGHT pattern: -0.5 = left, +0.5 = right."""
+        cl, cr, s_ = np.array(cal["left"]), np.array(cal["right"]), np.array([scores["left"], scores["right"]])
+        axis = cr - cl
+        pos = float(np.dot(s_ - (cl + cr) / 2, axis) / max(np.dot(axis, axis), 1e-9))
+        side = "right" if pos > 0 else "left"
+        return side, pos
+
     snake = [(cols // 2 - i, rows // 2) for i in range(3)]
     di = 0
     food = new_food(snake)
@@ -125,6 +180,20 @@ def main():
             if brain:
                 brain.pump()
             draw(snake, food, DIRS[di], "Look at a flashing panel to turn · nothing clear = straight")
+        cal = None
+        if brain:
+            if args.reuse_calibration and os.path.exists(calib_path):
+                cal = json.load(open(calib_path))
+            else:
+                cal = calibrate(snake, food, DIRS[di])
+            if cal:
+                t0 = time.time()
+                while time.time() - t0 < 4:
+                    events()
+                    brain.pump()
+                    draw(snake, food, DIRS[di], f"Calibrated: it recognised {100 * cal['self_accuracy']:.0f}% of your looks. Go!", GOOD)
+                log.write(f"0,calibration,{cal['left'][0]:.3f}/{cal['left'][1]:.3f},{cal['right'][0]:.3f}/{cal['right'][1]:.3f},"
+                          f"left pattern / right pattern (12Hz/15Hz),{cal['self_accuracy']:.2f}\n")
         alive = True
         while alive:
             # move a few cells
@@ -171,11 +240,19 @@ def main():
                     events()
                     draw(snake, food, DIRS[di], "reading your brain…")
                 side, scores, note = brain.decide(t_start + 0.5, t_end)
-                if side and abs(scores["left"] - scores["right"]) >= args.margin:
+                choice = "straight"
+                if scores and cal:
+                    side, pos = classify(cal, scores)
+                    # a turn also needs a real response: at least half of what that side gave in calibration
+                    own = scores["left"] if side == "left" else scores["right"]
+                    floor = 0.5 * (cal["left"][0] if side == "left" else cal["right"][1])
+                    note = f"pos {pos:+.2f}"
+                    if abs(pos) >= args.confidence and own >= floor:
+                        choice = side
+                    else:
+                        note += " (weak response)" if own < floor else " (not confident)"
+                elif scores and abs(scores["left"] - scores["right"]) >= 0.12:
                     choice = side
-                else:
-                    choice = "straight"
-                    note = note or "no clear winner"
             if choice == "left":
                 di = (di - 1) % 4
             elif choice == "right":
