@@ -44,4 +44,4 @@ They read the OpenBCI GUI's own recordings (`~/Documents/OpenBCI_GUI/Recordings`
 | `compare_electrodes.py`, `eeg_compare.py` | Dry vs gold electrode comparisons |
 | `gui_monitor.py`, `noise_breakdown.py` | Noise breakdown per frequency |
 
-`results/` holds saved result JSONs and charts. Python deps: numpy, scipy, matplotlib, pandas, brainflow, pylsl, pygame.
+`recordings/` holds the raw OpenBCI GUI data for every test (see [recordings/README.md](recordings/README.md)). `results/` holds saved result JSONs and charts. Python deps: numpy, scipy, matplotlib, pandas, brainflow, pylsl, pygame.
