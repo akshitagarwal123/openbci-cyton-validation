@@ -1,0 +1,46 @@
+{
+  "test": "blinks",
+  "time": "2026-10-09T23:56:36",
+  "passed": true,
+  "checks": [
+    {
+      "check": "cued blinks detected",
+      "channel": 1,
+      "value": "10/10",
+      "criterion": "\u2265 9/10 (> 50 \u00b5V)",
+      "pass": true
+    },
+    {
+      "check": "uncued blink-sized events",
+      "channel": 1,
+      "value": 1,
+      "criterion": "\u2264 2",
+      "pass": true
+    },
+    {
+      "check": "cued blinks detected",
+      "channel": 2,
+      "value": "9/10",
+      "criterion": "\u2265 9/10 (> 50 \u00b5V)",
+      "pass": true
+    },
+    {
+      "check": "uncued blink-sized events",
+      "channel": 2,
+      "value": 1,
+      "criterion": "\u2264 2",
+      "pass": true
+    },
+    {
+      "check": "ch1 vs ch2 blink shape correlation",
+      "channel": null,
+      "value": 0.95,
+      "criterion": "> 0.8",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "ch1_blink_peak_uv": 115.6,
+    "ch2_blink_peak_uv": 113.3
+  }
+}

@@ -81,6 +81,7 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 | Test | Status | Date | Key result |
 |---|---|---|---|
 | Blinks on cue (forehead), dry electrode | ✅ PASS | 2026-10-08 01:30 | 10/10 cued blinks detected, 1 uncued (allowed ≤ 2). Blinks are large, −300 to −600 µV, about 1.8 s after the spoken cue (speech start-up + reaction time). Room hum on the dry electrode was high (~300 µV at 50 Hz) but filtered out |
+| Blinks on cue, **dry (ch1) and gold + Ag/AgCl gel (ch2) at the same time** | ✅ PASS | 2026-10-09 23:56 | Dry 10/10, gold 9/10 cued blinks (gold missed cue 2 because that blink came early); 1 uncued each. Blink shape on the two electrodes correlates **0.95**. Same blink size on both (~300 µV), but at rest gold had far less noise (50 Hz hum 4–11 µV vs ~300 µV dry) |
 | Jaw clench (muscle), dry electrode | ✅ PASS | 2026-10-08 21:23 | Muscle activity (20–45 Hz) **6.8×** higher while clenching than at rest (need ≥ 5×): 23.6 µV vs 9.1 µV. A clear burst follows each of the 3 cues, ~1.5 s after the spoken word |
 | Alpha, eyes closed vs open (back of head, O1), dry electrode in headset | ✅ PASS | 2026-10-08 22:43 | Alpha (8–13 Hz) power **4.3× higher with eyes closed** (need ≥ 2×); peak at **9.5 Hz**; 98.7 % clean epochs. Alpha rose in all 3 eyes-closed blocks and dropped every time the eyes opened. First attempt failed (×1.3) because the dry pins sat on thick hair; parting the hair and wetting the scalp fixed it |
 | SSVEP 12 / 15 Hz flicker (O1), dry electrode | ✅ PASS | 2026-10-08 22:52 | Peak at exactly the flicker rate: **SNR 19.1 at 12 Hz, 15.0 at 15 Hz** (need ≥ 2); no peak during rest (0.72 and 1.25). Harmonics at 24 and 30 Hz also visible. A standard SSVEP decoder (CCA) picked the right frequency in **97.1 %** of 2-s windows (need ≥ 80 %). Screen measured at exactly 60 Hz, so 12 Hz = 5 frames, 15 Hz = 4 frames |
@@ -96,6 +97,10 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 **Tip for dry electrodes on the back of the head:** thick hair stops the pins from touching the scalp. Part the hair at the spot, wet the scalp with a little water or saliva, then twist the electrode back and forth while pressing. This raised the alpha reactivity from ×1.3 to ×4.3 and cut mains hum from ~130 µV to ~28 µV.
 
 ![Jaw clench, dry electrode (8 Oct): a burst of muscle activity follows each of the 3 "clench" cues (shaded) and fades after "relax"](images/jaw_dry_oct8.png)
+
+![Blink test with both electrodes at once (9 Oct): dry (left) and gold (right) show the same blink after each cue](images/blinks_dry_vs_gold_oct9.png)
+
+**Why the gold channel first read as a flat line (9 Oct):** a gold cup on dry skin builds up a large steady voltage (DC offset, ~175,000 µV) that slowly creeps past the board's ±187,500 µV limit, so the channel sits flat at the limit, exactly like an unplugged input. It is not a broken wire. Fix: fill the cup with gel (or water/saliva) and press it on; or lower the channel gain from x24 to x8 for more headroom. With Ag/AgCl gel the offset fell to ~143,000 µV and the signal was clean.
 
 ![Blink test, dry electrode (8 Oct): every one of the 10 cues is followed by the same large blink dip; nothing similar happens before the cue](images/blinks_dry_oct8.png)
 

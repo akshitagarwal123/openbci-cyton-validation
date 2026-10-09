@@ -98,3 +98,10 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - **SSVEP test, dry electrode at O1: PASS.** Sharp peak at exactly 12 Hz (SNR 19) and 15 Hz (SNR 15) only while watching the flicker; none at rest. CCA decoder right 97 % of the time.
 - **Validation complete: 9/9 tests pass.** The two filmed-oximeter ECG sessions were added to the summary report so it reflects the passing ECG result instead of the first failed attempt.
 - Possible next steps: repeat Step 3 with the gold electrode for comparison; then move to motor imagery (C3/C4 positions, left vs right hand).
+
+## 2026-10-09 (23:35–00:05)
+
+- Gold channel kept reading a flat line at the limit. Traced step by step: board pins fine (same on N2P and N3P, dry works on N1P); the gold cup on dry skin had a DC offset of ~175,000 µV creeping past the ±187,500 µV range. Wet contact + Ag/AgCl gel fixed it.
+- **Blink test with dry (ch1) and gold (ch2) recorded together: PASS on both.** Dry 10/10, gold 9/10; blink shapes match (correlation 0.95). Gold is much quieter at rest (hum 4–11 µV vs ~300 µV).
+- New tool `tools/video_eeg.py`: records the webcam with exact clock timestamps and builds a side-by-side video (face + scrolling EEG). Tonight's video used an estimated sync; future recordings will be exact.
+- Raw recording: `recordings/15_blinks_dry_and_gold.txt.gz`.

@@ -48,6 +48,7 @@ They read the OpenBCI GUI's own recordings (`~/Documents/OpenBCI_GUI/Recordings`
 | `ssvep_runner.py` | **Brain Runner**, an SSVEP game: look at the 12 Hz or 15 Hz flashing panel to steer a ball to the gem |
 | `snake_ssvep.py` | **Brain Snake**: turn-based snake; look at the 12 Hz panel to turn left, 15 Hz to turn right, nothing clear = straight |
 | `flicker_window.py` | Small 12/15/10 Hz flicker window to watch SSVEP live next to the OpenBCI GUI's FFT plot |
+| `video_eeg.py` | Records the webcam with exact clock timestamps and builds a side-by-side video of face + scrolling EEG |
 | `gui_monitor.py`, `noise_breakdown.py` | Noise breakdown per frequency |
 
 `recordings/` holds the raw OpenBCI GUI data for every test (see [recordings/README.md](recordings/README.md)). `results/` holds saved result JSONs and charts. Python deps: numpy, scipy, matplotlib, pandas, brainflow, pylsl, pygame.
