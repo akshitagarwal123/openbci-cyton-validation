@@ -123,7 +123,26 @@ def build(args):
     out = args.session + "_side_by_side.mp4"
     start_in_video = a - t0_video
     x_expr = f"(t+{a - span_a - WIN / 2:.3f})*{PX}"
-    filt = (f"[0:v]trim=start={start_in_video:.3f}:duration={b - a:.3f},setpts=PTS-STARTPTS,scale=-2:{H}[face];"
+    face = f"[0:v]trim=start={start_in_video:.3f}:duration={b - a:.3f},setpts=PTS-STARTPTS,scale=-2:{H}"
+    if args.keep or args.pixelate:
+        # privacy: blur everything, keep the electrode area sharp, pixelate the eyes (blinks stay visible)
+        face += ",split=3[f0][f1][f2];[f0]boxblur=28:6[bg];"
+        last = "bg"
+        if args.keep:
+            x, y, w, h = args.keep
+            face += f"[f1]crop={w}:{h}:{x}:{y}[keep];[{last}][keep]overlay={x}:{y}[k1];"
+            last = "k1"
+        else:
+            face += "[f1]nullsink;"
+        if args.pixelate:
+            x, y, w, h, n = args.pixelate
+            face += (f"[f2]crop={w}:{h}:{x}:{y},scale={max(1, w // n)}:{max(1, h // n)},"
+                     f"scale={w}:{h}:flags=neighbor[pix];[{last}][pix]overlay={x}:{y}[face];")
+        else:
+            face += f"[f2]nullsink;[{last}]null[face];"
+    else:
+        face += "[face];"
+    filt = (face +
             f"[1:v]loop=loop=-1:size=1,setpts=N/30/TB,crop={WIN * PX}:{H}:x='{x_expr}':y=0,trim=duration={b - a:.3f}[eeg];"
             f"[eeg][2:v]overlay[eegl];[face][eegl]hstack=2,format=yuv420p[v]")
     subprocess.run(["ffmpeg", "-v", "error", "-i", meta["video"], "-loop", "1", "-framerate", "30", "-i", strip,
@@ -143,6 +162,10 @@ def main():
     b.add_argument("--channels", type=int, nargs="+", default=[1, 2])
     b.add_argument("--labels", nargs="+", default=["dry", "gold"])
     b.add_argument("--test", help="validate_*.json of the test run, for cue markers and trimming")
+    b.add_argument("--keep", type=int, nargs=4, metavar=("X", "Y", "W", "H"),
+                   help="privacy: region kept sharp (camera pixels), everything else blurred")
+    b.add_argument("--pixelate", type=int, nargs=5, metavar=("X", "Y", "W", "H", "BLOCK"),
+                   help="privacy: region pixelated with BLOCK-pixel squares (e.g. the eyes)")
     args = ap.parse_args()
     record(args) if args.cmd == "record" else build(args)
 
