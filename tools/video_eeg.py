@@ -60,11 +60,13 @@ def build(args):
     t0_video = meta["first_frame_wall"]
     dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
                                          "csv=p=0", meta["video"]]).strip())
-    cues, title = [], "EEG"
+    cues, title, hold, word = [], "EEG", 1.0, "CUE"
     a, b = t0_video, t0_video + dur
     if args.test:
         tm = json.load(open(args.test))
         cues = tm.get("cues", [])
+        hold = tm.get("hold") or 1.0
+        word = {"jaw": "CLENCH", "blinks": "BLINK"}.get(os.path.basename(args.test).split("_")[1], "CUE")
         a, b = max(a, tm["start"] - 3), min(b, tm["end"] + 3)
         title = os.path.basename(args.test).split("_")[1].capitalize() + " test"
     d = load_recordings(a - 2, b + 2)
@@ -120,6 +122,18 @@ def build(args):
     ov.savefig(overlay, transparent=True)
     plt.close(ov)
 
+    bn = plt.figure(figsize=(4.2, 1.1), dpi=100)
+    bn.patch.set_alpha(0)
+    axb = bn.add_axes([0, 0, 1, 1])
+    axb.axis("off")
+    axb.add_patch(plt.Rectangle((0, 0), 1, 1, color="#d03b3b", alpha=0.85, transform=axb.transAxes))
+    axb.text(0.5, 0.5, word, color="white", fontsize=40, fontweight="bold", ha="center", va="center")
+    banner = args.session + "_banner.png"
+    bn.savefig(banner, transparent=True)
+    plt.close(bn)
+    windows = [(c - a, c - a + hold) for c in cues if 0 <= c - a <= b - a]
+    enable = "+".join(f"between(t,{x0:.2f},{x1:.2f})" for x0, x1 in windows) or "0"
+
     out = args.session + "_side_by_side.mp4"
     start_in_video = a - t0_video
     x_expr = f"(t+{a - span_a - WIN / 2:.3f})*{PX}"
@@ -134,19 +148,24 @@ def build(args):
             last = "k1"
         else:
             face += "[f1]nullsink;"
-        if args.pixelate:
-            x, y, w, h, n = args.pixelate
-            face += (f"[f2]crop={w}:{h}:{x}:{y},scale={max(1, w // n)}:{max(1, h // n)},"
-                     f"scale={w}:{h}:flags=neighbor[pix];[{last}][pix]overlay={x}:{y}[face];")
+        regions = args.pixelate or []
+        if regions:
+            face += f"[f2]split={len(regions)}" + "".join(f"[p{i}]" for i in range(len(regions))) + ";"
+            for i, (x, y, w, h, n) in enumerate(regions):
+                dst = "face" if i == len(regions) - 1 else f"o{i}"
+                face += (f"[p{i}]crop={w}:{h}:{x}:{y},scale={max(1, w // n)}:{max(1, h // n)},"
+                         f"scale={w}:{h}:flags=neighbor[q{i}];[{last}][q{i}]overlay={x}:{y}[{dst}];")
+                last = dst
         else:
             face += f"[f2]nullsink;[{last}]null[face];"
     else:
         face += "[face];"
     filt = (face +
             f"[1:v]loop=loop=-1:size=1,setpts=N/30/TB,crop={WIN * PX}:{H}:x='{x_expr}':y=0,trim=duration={b - a:.3f}[eeg];"
-            f"[eeg][2:v]overlay[eegl];[face][eegl]hstack=2,format=yuv420p[v]")
+            f"[face][3:v]overlay=30:30:enable='{enable}'[faceb];"
+            f"[eeg][2:v]overlay[eegl];[faceb][eegl]hstack=2,format=yuv420p[v]")
     subprocess.run(["ffmpeg", "-v", "error", "-i", meta["video"], "-loop", "1", "-framerate", "30", "-i", strip,
-                    "-i", overlay, "-filter_complex", filt, "-map", "[v]", "-map", "0:a?",
+                    "-i", overlay, "-i", banner, "-filter_complex", filt, "-map", "[v]", "-map", "0:a?",
                     "-af", f"atrim=start={start_in_video:.3f}:duration={b - a:.3f},asetpts=PTS-STARTPTS",
                     "-r", "30", "-c:v", "h264_videotoolbox", "-b:v", "6M", "-c:a", "aac", "-y", out], check=True)
     print(f"Saved {out}")
@@ -166,8 +185,8 @@ def main():
     b.add_argument("--min-scale", type=float, default=150, help="smallest y-range in µV")
     b.add_argument("--keep", type=int, nargs=4, metavar=("X", "Y", "W", "H"),
                    help="privacy: region kept sharp (camera pixels), everything else blurred")
-    b.add_argument("--pixelate", type=int, nargs=5, metavar=("X", "Y", "W", "H", "BLOCK"),
-                   help="privacy: region pixelated with BLOCK-pixel squares (e.g. the eyes)")
+    b.add_argument("--pixelate", type=int, nargs=5, action="append", metavar=("X", "Y", "W", "H", "BLOCK"),
+                   help="privacy: region pixelated with BLOCK-pixel squares (repeatable: eyes, jaw)")
     args = ap.parse_args()
     record(args) if args.cmd == "record" else build(args)
 
