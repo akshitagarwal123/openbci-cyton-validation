@@ -16,6 +16,7 @@ The exact OpenBCI GUI data behind each test, cut from the full GUI recordings to
 | `10_ecg_gold_vs_oximeter_video` | 2026-10-05 00:14–00:16 | ECG vs filmed pulse oximeter (00:14:34 +56 s) | gold | PASS, 1.5 bpm |
 | `11_blinks_dry` | 2026-10-08 01:30–01:31 | 10 spoken blink cues | dry | PASS, 10/10 |
 | `12_jaw_clench_dry` | 2026-10-08 21:23 | 3 spoken clench / relax cues | dry | PASS, 6.8× |
+| `16_jaw_clench_dry_and_gold` | 2026-10-10 01:14 | 3 clench / relax cues, dry ch1 + gold ch2 on the forehead | dry + gold | PASS, 5.9× and 6.9× |
 | `15_blinks_dry_and_gold` | 2026-10-09 23:56–23:57 | 10 blink cues, dry on ch1 + gold with Ag/AgCl gel on ch2 (forehead) | dry + gold | PASS, 10/10 and 9/10 |
 | `14_ssvep_12_15hz_dry` | 2026-10-08 22:52–22:54 | Rest / 12 Hz flicker / rest / 15 Hz flicker, 20 s each, electrode at O1 | dry | PASS, SNR 19 and 15 |
 | `13_alpha_eyes_closed_open_dry` | 2026-10-08 22:43–22:46 | Eyes open / closed, 30 s × 3, electrode at O1 (back of head) | dry | PASS, 4.3× |

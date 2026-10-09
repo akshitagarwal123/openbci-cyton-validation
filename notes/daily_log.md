@@ -105,3 +105,10 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - **Blink test with dry (ch1) and gold (ch2) recorded together: PASS on both.** Dry 10/10, gold 9/10; blink shapes match (correlation 0.95). Gold is much quieter at rest (hum 4–11 µV vs ~300 µV).
 - New tool `tools/video_eeg.py`: records the webcam with exact clock timestamps and builds a side-by-side video (face + scrolling EEG). Tonight's video used an estimated sync; future recordings will be exact.
 - Raw recording: `recordings/15_blinks_dry_and_gold.txt.gz`.
+
+## 2026-10-10 (00:03–01:16)
+
+- Stream stopped at 00:03: growing "Lost N samples" then "No new data in 5 s" = board battery flat. Swapped battery, new GUI session.
+- **Jaw-clench test, dry + gold together: PASS.** Dry 5.9×, gold 6.9× more muscle activity while clenching.
+- First **exactly synced** face + EEG video using `tools/video_eeg.py` (camera frames stamped with the clock), with privacy mode: forehead/electrodes sharp, eyes pixelated, rest blurred. Added a `--band` option so the jaw video shows the 20–45 Hz muscle signal.
+- Raw recording: `recordings/16_jaw_clench_dry_and_gold.txt.gz`. Next: alpha and SSVEP with both electrodes at the back of the head.

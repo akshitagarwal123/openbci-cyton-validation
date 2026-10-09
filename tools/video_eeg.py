@@ -73,7 +73,7 @@ def build(args):
     for ch in args.channels:
         x = d[f"EXG Channel {ch - 1}"].values.astype(float)
         bb, aa = iirnotch(50, 30, FS)
-        traces.append(filtfilt(bb, aa, sosfiltfilt(butter(4, [0.5, 15], "bandpass", fs=FS, output="sos"),
+        traces.append(filtfilt(bb, aa, sosfiltfilt(butter(4, args.band, "bandpass", fs=FS, output="sos"),
                                                    x - np.median(x))))
 
     # one long strip image, scrolled by ffmpeg: PX pixels per second, cursor in the middle
@@ -87,7 +87,7 @@ def build(args):
         ax = fig.add_axes([0, 1 - (i + 1) / n + 0.06 / n, 1, 0.82 / n])
         m = (t >= span_a) & (t <= span_b)
         ax.plot(t[m], y[m], color=COLORS[i % 4], lw=1.4)
-        lim = max(150, np.percentile(np.abs(y[m]), 99.5) * 1.15)
+        lim = max(args.min_scale, np.percentile(np.abs(y[m]), 99.5) * 1.15)
         ax.set_ylim(-lim, lim)
         ax.set_xlim(span_a, span_b)
         for c in cues:
@@ -112,7 +112,7 @@ def build(args):
     axo.text(0.51, 0.975, "now", color="#d03b3b", fontsize=13, va="top")
     for i, ch in enumerate(args.channels):
         lab = args.labels[i] if args.labels and i < len(args.labels) else f"ch{ch}"
-        axo.text(0.01, 1 - i / n - 0.03, f"Ch{ch} ({lab}), 0.5–15 Hz", fontsize=13, va="top", color=COLORS[i % 4],
+        axo.text(0.01, 1 - i / n - 0.03, f"Ch{ch} ({lab}), {args.band[0]:g}–{args.band[1]:g} Hz", fontsize=13, va="top", color=COLORS[i % 4],
                  fontweight="bold")
     sync = meta.get("note") or "camera and EEG synced by clock"
     axo.text(0.01, 0.01, f"{title} · {WIN} s window · {sync}", fontsize=11, color="#52514e")
@@ -162,6 +162,8 @@ def main():
     b.add_argument("--channels", type=int, nargs="+", default=[1, 2])
     b.add_argument("--labels", nargs="+", default=["dry", "gold"])
     b.add_argument("--test", help="validate_*.json of the test run, for cue markers and trimming")
+    b.add_argument("--band", type=float, nargs=2, default=[0.5, 15], help="EEG filter band (jaw: 20 45)")
+    b.add_argument("--min-scale", type=float, default=150, help="smallest y-range in µV")
     b.add_argument("--keep", type=int, nargs=4, metavar=("X", "Y", "W", "H"),
                    help="privacy: region kept sharp (camera pixels), everything else blurred")
     b.add_argument("--pixelate", type=int, nargs=5, metavar=("X", "Y", "W", "H", "BLOCK"),
