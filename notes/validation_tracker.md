@@ -85,11 +85,14 @@ You do something on cue, and the signal must change **only when you do it**. Ran
 | Jaw clench (muscle), dry electrode | ✅ PASS | 2026-10-08 21:23 | Muscle activity (20–45 Hz) **6.8×** higher while clenching than at rest (need ≥ 5×): 23.6 µV vs 9.1 µV. A clear burst follows each of the 3 cues, ~1.5 s after the spoken word |
 | Jaw clench, **dry (ch1) and gold + gel (ch2) at the same time** | ✅ PASS | 2026-10-10 01:14 | Muscle power while clenching vs rest: dry **5.9×**, gold **6.9×** (need ≥ 5×). The two muscle traces rise and fall together after every cue. Synced face + EEG video recorded (kept private) |
 | Alpha, eyes closed vs open (back of head, O1), dry electrode in headset | ✅ PASS | 2026-10-08 22:43 | Alpha (8–13 Hz) power **4.3× higher with eyes closed** (need ≥ 2×); peak at **9.5 Hz**; 98.7 % clean epochs. Alpha rose in all 3 eyes-closed blocks and dropped every time the eyes opened. First attempt failed (×1.3) because the dry pins sat on thick hair; parting the hair and wetting the scalp fixed it |
+| Alpha, **dry (ch1, O1) and gold + gel (ch2, Oz) at the same time** | ✅ PASS | 2026-10-11 01:43 | Eyes-closed / open alpha power: dry **4.3×**, gold **5.7×** (need ≥ 2×); both peak at **9.5 Hz**; 96 % clean epochs; the two alpha envelopes correlate 0.77. Gold picks up more alpha (7.9 vs 5.2 µV eyes closed) with less hum (6 vs 26 µV) |
 | SSVEP 12 / 15 Hz flicker (O1), dry electrode | ✅ PASS | 2026-10-08 22:52 | Peak at exactly the flicker rate: **SNR 19.1 at 12 Hz, 15.0 at 15 Hz** (need ≥ 2); no peak during rest (0.72 and 1.25). Harmonics at 24 and 30 Hz also visible. A standard SSVEP decoder (CCA) picked the right frequency in **97.1 %** of 2-s windows (need ≥ 80 %). Screen measured at exactly 60 Hz, so 12 Hz = 5 frames, 15 Hz = 4 frames |
 
 ![SSVEP, dry electrode at O1 (8 Oct): sharp peaks at exactly 12 Hz and 15 Hz (and their doubles, 24 and 30 Hz) appear only while looking at the flicker; dotted = rest](images/ssvep_dry_oct8.png)
 
 **Step 3 complete ✅:** every cause-and-effect test passed with the dry electrode: blinks appear only on cue, jaw muscle noise only when clenching, the alpha rhythm only with eyes closed, and a brain response at exactly the frequency on the screen. The board records real eye, muscle and **brain** signals.
+
+![Alpha with both electrodes (11 Oct): a 9.5 Hz peak appears with eyes closed on dry (left) and gold (middle); right, alpha rises in every eyes-closed block on both](images/alpha_dry_vs_gold_oct11.png)
 
 ![Alpha test, dry electrode at O1 (8 Oct): left, a clear 9.5 Hz peak appears only with eyes closed; right, alpha switches on in every eyes-closed block (blue)](images/alpha_dry_oct8.png)
 

@@ -596,6 +596,8 @@ def test_alpha(args):
         if ph["phase"] == "Eyes closed":
             axs[-1].axvspan(ph["start"] - log[0]["start"], ph["end"] - log[0]["start"], color="#cde2fb", lw=0)
     axs[-1].set(title="Alpha over time (blue = eyes closed)", xlabel="s", ylabel="µV")
+    top = max(float(np.percentile(e, 99)) for e in envs) * 1.3
+    axs[-1].set_ylim(0, top)  # a single movement spike would otherwise flatten the eyes-open/closed pattern
     axs[-1].legend(frameon=False)
     finish(fig, prefix)
     r.save(prefix)

@@ -112,3 +112,11 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - **Jaw-clench test, dry + gold together: PASS.** Dry 5.9×, gold 6.9× more muscle activity while clenching.
 - First **exactly synced** face + EEG video using `tools/video_eeg.py` (camera frames stamped with the clock), with privacy mode: forehead/electrodes sharp, eyes pixelated, rest blurred. Added a `--band` option so the jaw video shows the 20–45 Hz muscle signal.
 - Raw recording: `recordings/16_jaw_clench_dry_and_gold.txt.gz`. Next: alpha and SSVEP with both electrodes at the back of the head.
+
+## 2026-10-11 (01:18–01:47)
+
+- Board connecting again after pushing the power switch fully to PC (it was half-way).
+- Quick 40-s eyes-closed check: alpha up 3.1× (ch1) and 4.7× (ch2), both peaking at 9 Hz.
+- **Alpha test, dry (O1) + gold with gel (Oz) together: PASS on both.** Dry 4.3×, gold 5.7×, both peak 9.5 Hz, 96 % clean data, envelopes correlate 0.77.
+- Chart fix: the alpha-over-time panel now ignores a single movement spike when setting its scale.
+- Raw recording: `recordings/17_alpha_dry_and_gold.txt.gz`. Remaining gold test: SSVEP.
