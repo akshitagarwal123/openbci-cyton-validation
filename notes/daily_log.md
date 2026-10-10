@@ -120,3 +120,4 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - **Alpha test, dry (O1) + gold with gel (Oz) together: PASS on both.** Dry 4.3×, gold 5.7×, both peak 9.5 Hz, 96 % clean data, envelopes correlate 0.77.
 - Chart fix: the alpha-over-time panel now ignores a single movement spike when setting its scale.
 - Raw recording: `recordings/17_alpha_dry_and_gold.txt.gz`. Remaining gold test: SSVEP.
+- Repeated the alpha test (01:53) while recording a synced face + EEG video: PASS again (dry 2.4×, gold 4.3×, both 9.5 Hz). The video tool now supports tests with labelled blocks (alpha, SSVEP) and shows an EYES CLOSED / FLICKER banner. Fixed a bug where the EEG panel showed the camera image.

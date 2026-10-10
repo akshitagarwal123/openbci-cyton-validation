@@ -60,15 +60,28 @@ def build(args):
     t0_video = meta["first_frame_wall"]
     dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of",
                                          "csv=p=0", meta["video"]]).strip())
-    cues, title, hold, word = [], "EEG", 1.0, "CUE"
+    cues, title = [], "EEG"
     a, b = t0_video, t0_video + dur
+    banners = []  # (word, wall start, wall end)
     if args.test:
         tm = json.load(open(args.test))
-        cues = tm.get("cues", [])
-        hold = tm.get("hold") or 1.0
-        word = {"jaw": "CLENCH", "blinks": "BLINK"}.get(os.path.basename(args.test).split("_")[1], "CUE")
-        a, b = max(a, tm["start"] - 3), min(b, tm["end"] + 3)
-        title = os.path.basename(args.test).split("_")[1].capitalize() + " test"
+        test = os.path.basename(args.test).split("_")[1]
+        title = test.upper() if test == "ssvep" else test.capitalize() + " test"
+        if "phases" in tm:  # alpha / ssvep: labelled blocks instead of cues
+            ph = tm["phases"]
+            a, b = max(a, ph[0]["start"] - 3), min(b, ph[-1]["end"] + 3)
+            cues = [p["start"] for p in ph]
+            for p in ph:
+                if p["phase"] == "Eyes closed":
+                    banners.append(("EYES CLOSED", p["start"], p["end"]))
+                elif p["phase"] == "Flicker":
+                    banners.append((f"{p['target_hz']:g} Hz FLICKER", p["start"], p["end"]))
+        else:
+            cues = tm.get("cues", [])
+            hold = tm.get("hold") or 1.0
+            word = {"jaw": "CLENCH", "blinks": "BLINK"}.get(test, "CUE")
+            banners = [(word, c, c + hold) for c in cues]
+            a, b = max(a, tm["start"] - 3), min(b, tm["end"] + 3)
     d = load_recordings(a - 2, b + 2)
     t = d["t"].values
     traces = []
@@ -122,17 +135,20 @@ def build(args):
     ov.savefig(overlay, transparent=True)
     plt.close(ov)
 
-    bn = plt.figure(figsize=(4.2, 1.1), dpi=100)
-    bn.patch.set_alpha(0)
-    axb = bn.add_axes([0, 0, 1, 1])
-    axb.axis("off")
-    axb.add_patch(plt.Rectangle((0, 0), 1, 1, color="#d03b3b", alpha=0.85, transform=axb.transAxes))
-    axb.text(0.5, 0.5, word, color="white", fontsize=40, fontweight="bold", ha="center", va="center")
-    banner = args.session + "_banner.png"
-    bn.savefig(banner, transparent=True)
-    plt.close(bn)
-    windows = [(c - a, c - a + hold) for c in cues if 0 <= c - a <= b - a]
-    enable = "+".join(f"between(t,{x0:.2f},{x1:.2f})" for x0, x1 in windows) or "0"
+    banner_files = []
+    for i, w in enumerate(dict.fromkeys(bw for bw, _, _ in banners)):
+        bn = plt.figure(figsize=(max(4.2, 0.36 * len(w) + 0.8), 1.1), dpi=100)
+        bn.patch.set_alpha(0)
+        axb = bn.add_axes([0, 0, 1, 1])
+        axb.axis("off")
+        axb.add_patch(plt.Rectangle((0, 0), 1, 1, color="#d03b3b", alpha=0.85, transform=axb.transAxes))
+        axb.text(0.5, 0.5, w, color="white", fontsize=36, fontweight="bold", ha="center", va="center")
+        path = f"{args.session}_banner{i}.png"
+        bn.savefig(path, transparent=True)
+        plt.close(bn)
+        wins = [(x0 - a, x1 - a) for bw, x0, x1 in banners if bw == w and x1 >= a and x0 <= b]
+        enable = "+".join(f"between(t,{x0:.2f},{x1:.2f})" for x0, x1 in wins) or "0"
+        banner_files.append((path, enable))
 
     out = args.session + "_side_by_side.mp4"
     start_in_video = a - t0_video
@@ -161,11 +177,12 @@ def build(args):
     else:
         face += "[face];"
     filt = (face +
-            f"[1:v]loop=loop=-1:size=1,setpts=N/30/TB,crop={WIN * PX}:{H}:x='{x_expr}':y=0,trim=duration={b - a:.3f}[eeg];"
-            f"[face][3:v]overlay=30:30:enable='{enable}'[faceb];"
-            f"[eeg][2:v]overlay[eegl];[faceb][eegl]hstack=2,format=yuv420p[v]")
+            f"[1:v]loop=loop=-1:size=1,setpts=N/30/TB,crop={WIN * PX}:{H}:x='{x_expr}':y=0,trim=duration={b - a:.3f}[eeg];" +
+            "".join(f"[{'face' if i == 0 else f'fb{i - 1}'}][{3 + i}:v]overlay=30:30:enable='{en}'[fb{i}];"
+                    for i, (_, en) in enumerate(banner_files)) +
+            f"[eeg][2:v]overlay[eegl];[{f'fb{len(banner_files) - 1}' if banner_files else 'face'}][eegl]hstack=2,format=yuv420p[v]")
     subprocess.run(["ffmpeg", "-v", "error", "-i", meta["video"], "-loop", "1", "-framerate", "30", "-i", strip,
-                    "-i", overlay, "-i", banner, "-filter_complex", filt, "-map", "[v]", "-map", "0:a?",
+                    "-i", overlay, *[x for path, _ in banner_files for x in ("-i", path)], "-filter_complex", filt, "-map", "[v]", "-map", "0:a?",
                     "-af", f"atrim=start={start_in_video:.3f}:duration={b - a:.3f},asetpts=PTS-STARTPTS",
                     "-r", "30", "-c:v", "h264_videotoolbox", "-b:v", "6M", "-c:a", "aac", "-y", out], check=True)
     print(f"Saved {out}")
