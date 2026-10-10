@@ -1,0 +1,73 @@
+{
+  "test": "ssvep",
+  "time": "2026-10-11T02:08:41",
+  "passed": false,
+  "checks": [
+    {
+      "check": "SNR at 11.99 Hz (or 2\u00d7) flicker",
+      "channel": 1,
+      "value": 1.19,
+      "criterion": "\u2265 2",
+      "pass": false
+    },
+    {
+      "check": "SNR at 11.99 Hz during rest",
+      "channel": 1,
+      "value": 1.06,
+      "criterion": "< 2 (control)",
+      "pass": true
+    },
+    {
+      "check": "SNR at 11.99 Hz (or 2\u00d7) flicker",
+      "channel": 2,
+      "value": 0.93,
+      "criterion": "\u2265 2",
+      "pass": false
+    },
+    {
+      "check": "SNR at 11.99 Hz during rest",
+      "channel": 2,
+      "value": 1.05,
+      "criterion": "< 2 (control)",
+      "pass": true
+    },
+    {
+      "check": "SNR at 14.99 Hz (or 2\u00d7) flicker",
+      "channel": 1,
+      "value": 1.42,
+      "criterion": "\u2265 2",
+      "pass": false
+    },
+    {
+      "check": "SNR at 14.99 Hz during rest",
+      "channel": 1,
+      "value": 0.89,
+      "criterion": "< 2 (control)",
+      "pass": true
+    },
+    {
+      "check": "SNR at 14.99 Hz (or 2\u00d7) flicker",
+      "channel": 2,
+      "value": 1.2,
+      "criterion": "\u2265 2",
+      "pass": false
+    },
+    {
+      "check": "SNR at 14.99 Hz during rest",
+      "channel": 2,
+      "value": 1.17,
+      "criterion": "< 2 (control)",
+      "pass": true
+    },
+    {
+      "check": "CCA picks the right frequency (%)",
+      "channel": null,
+      "value": 73.5,
+      "criterion": "\u2265 80 %",
+      "pass": false
+    }
+  ],
+  "metrics": {
+    "cca_windows": 34
+  }
+}

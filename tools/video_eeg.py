@@ -98,18 +98,30 @@ def build(args):
     fig = plt.figure(figsize=(width / 100, H / 100), dpi=100)
     fig.patch.set_facecolor("#fcfcfb")
     n = len(traces)
+    t_ref = cues[0] if cues else a  # time axis counts from the first cue / phase
+    lims, rects = [], []
     for i, (ch, y) in enumerate(zip(args.channels, traces)):
-        ax = fig.add_axes([0, 1 - (i + 1) / n + 0.06 / n, 1, 0.82 / n])
+        rect = [0, 1 - (i + 1) / n + 0.08 / n, 1, 0.74 / n]
+        rects.append(rect)
+        ax = fig.add_axes(rect)
         m = (t >= span_a) & (t <= span_b)
-        ax.plot(t[m], y[m], color=COLORS[i % 4], lw=1.4)
         lim = max(args.min_scale, np.percentile(np.abs(y[m]), 99.5) * 1.15)
-        ax.set_ylim(-lim, lim)
+        lims.append(lim)
+        for v in (-lim, -lim / 2, lim / 2, lim):
+            ax.axhline(v, color="#e3e2de", lw=0.8, zorder=0)
+        ax.axhline(0, color="#c9c7c1", lw=0.9, zorder=0)
+        ax.plot(t[m], y[m], color=COLORS[i % 4], lw=1.4)
+        ax.set_ylim(-lim * 1.05, lim * 1.25)
         ax.set_xlim(span_a, span_b)
         for c in cues:
             ax.axvline(c, color="#898781", ls="--", lw=1.2)
-            ax.text(c + 0.05, lim * 0.82, "cue", color="#52514e", fontsize=11)
-        for s in np.arange(np.ceil(span_a), span_b, 1):
-            ax.axvline(s, color="#ecebe8", lw=0.6, zorder=0)
+        for sec in np.arange(np.ceil(span_a), span_b, 1):
+            ax.axvline(sec, color="#ecebe8", lw=0.6, zorder=0)
+            w = (t >= sec) & (t < sec + 1)
+            if w.sum() > FS // 2:  # signal size in this second, printed above the trace
+                ax.text(sec + 0.5, lim * 1.13, f"{np.std(y[w]):.1f}", ha="center", va="center", fontsize=10,
+                        color=COLORS[i % 4], alpha=0.9)
+            ax.text(sec + 0.04, -lim * 0.98, f"{sec - t_ref:+.0f} s", fontsize=9, color="#898781", va="bottom")
         ax.axis("off")
         ax.set_facecolor("#fcfcfb")
     strip = args.session + "_strip.png"
@@ -125,9 +137,18 @@ def build(args):
     axo.axis("off")
     axo.axvline(0.5, color="#d03b3b", lw=2)
     axo.text(0.51, 0.975, "now", color="#d03b3b", fontsize=13, va="top")
+    for i, (rect, lim) in enumerate(zip(rects, lims)):
+        y0, hh = rect[1], rect[3]
+        to_y = lambda v: y0 + (v + lim * 1.05) / (lim * 2.3) * hh
+        for v in (-lim, -lim / 2, 0, lim / 2, lim):
+            axo.plot([0, 0.012], [to_y(v)] * 2, color="#52514e", lw=1)
+            axo.text(0.015, to_y(v), f"{v:+.0f} µV" if v else "0", fontsize=10, va="center", color="#52514e",
+                     bbox=dict(boxstyle="round,pad=0.15", fc="#fcfcfb", ec="none", alpha=0.85))
+        axo.text(0.985, to_y(lim * 1.13), "RMS µV / s", fontsize=9, ha="right", va="center", color="#898781",
+                 bbox=dict(boxstyle="round,pad=0.15", fc="#fcfcfb", ec="none", alpha=0.85))
     for i, ch in enumerate(args.channels):
         lab = args.labels[i] if args.labels and i < len(args.labels) else f"ch{ch}"
-        axo.text(0.01, 1 - i / n - 0.03, f"Ch{ch} ({lab}), {args.band[0]:g}–{args.band[1]:g} Hz", fontsize=13, va="top", color=COLORS[i % 4],
+        axo.text(0.12, 1 - i / n - 0.03, f"Ch{ch} ({lab}), {args.band[0]:g}–{args.band[1]:g} Hz", fontsize=13, va="top", color=COLORS[i % 4],
                  fontweight="bold")
     sync = meta.get("note") or "camera and EEG synced by clock"
     axo.text(0.01, 0.01, f"{title} · {WIN} s window · {sync}", fontsize=11, color="#52514e")

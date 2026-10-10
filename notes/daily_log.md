@@ -121,3 +121,9 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Chart fix: the alpha-over-time panel now ignores a single movement spike when setting its scale.
 - Raw recording: `recordings/17_alpha_dry_and_gold.txt.gz`. Remaining gold test: SSVEP.
 - Repeated the alpha test (01:53) while recording a synced face + EEG video: PASS again (dry 2.4×, gold 4.3×, both 9.5 Hz). The video tool now supports tests with labelled blocks (alpha, SSVEP) and shows an EYES CLOSED / FLICKER banner. Fixed a bug where the EEG panel showed the camera image.
+
+## 2026-10-11 (02:08–02:25)
+
+- SSVEP with dry + gold, first try (02:08): **failed** — both ear clips (SRB, BIAS) had come off, so both channels recorded the same floating reference (identical spectra, alpha 0.8 µV, offsets ~-115,000 µV). Lesson: if two channels suddenly look identical, check the SRB clip first.
+- Second try (02:19), clips back on: **partial** — 12 Hz response on both electrodes (SNR 3.0 / 2.1), no clear 15 Hz response. Timing verified second by second; camera shows eyes on screen. Likely cause: electrodes higher than O1/Oz. Retest planned with electrodes in the lowest back ring and `--stim 30`.
+- Side-by-side videos now include a µV scale, seconds from the start, and per-second RMS above each trace.

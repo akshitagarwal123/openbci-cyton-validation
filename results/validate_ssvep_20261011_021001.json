@@ -1,0 +1,37 @@
+{
+  "phases": [
+    {
+      "phase": "Rest",
+      "target_hz": 12,
+      "delivered_hz": 11.991,
+      "measured_hz": null,
+      "start": 1791664721.044229,
+      "end": 1791664741.044517
+    },
+    {
+      "phase": "Flicker",
+      "target_hz": 12,
+      "delivered_hz": 11.991,
+      "measured_hz": 11.999,
+      "start": 1791664741.0446641,
+      "end": 1791664761.0621881
+    },
+    {
+      "phase": "Rest",
+      "target_hz": 15,
+      "delivered_hz": 14.988,
+      "measured_hz": null,
+      "start": 1791664761.0622988,
+      "end": 1791664781.077955
+    },
+    {
+      "phase": "Flicker",
+      "target_hz": 15,
+      "delivered_hz": 14.988,
+      "measured_hz": 15.002,
+      "start": 1791664781.078036,
+      "end": 1791664801.0951989
+    }
+  ],
+  "refresh_hz": 59.95368458932456
+}
