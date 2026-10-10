@@ -35,6 +35,12 @@ Brain signals are only about 10-50 microvolts (uV). Room electricity, movement a
 
 Glossary: **SRB** = reference clip (every channel = electrode minus SRB); **BIAS** = ground clip that cancels body noise; **50 Hz hum** = mains interference (India), removed with a notch filter; **railed** = channel stuck at the board limit, usually electrode not on skin. Full explanations, tables and photos: [validation tracker](notes/validation_tracker.md).
 
+## Product concept
+
+A Blender model of a wearable version (stretchy cap, 10-20 electrode holders, harness, back-mounted case): see [design/](design/README.md).
+
+<img src="design/render_back_three_quarter.jpg" width="60%">
+
 ## Tools (`tools/`)
 They read the OpenBCI GUI's own recordings (`~/Documents/OpenBCI_GUI/Recordings`), so no extra streaming setup is needed.
 
