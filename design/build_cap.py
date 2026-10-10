@@ -20,6 +20,8 @@ argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 SAMPLES = int(argv[argv.index("--samples") + 1]) if "--samples" in argv else 96
 RES = (int(argv[argv.index("--res") + 1]), int(argv[argv.index("--res") + 2])) if "--res" in argv else (1600, 1200)
 RENDER = "--no-render" not in argv
+ANIM = "--anim" in argv
+FROM = int(argv[argv.index("--from") + 1]) if "--from" in argv else 1
 
 R = Vector((0.80, 1.00, 0.95))  # head radii: x = ear to ear, y = front/back, z = height
 
@@ -257,7 +259,15 @@ def case_part(name, maker, material, local, bev=0.0):
 shell = case_part("Case shell", lambda: bpy.ops.mesh.primitive_cube_add(size=1), M["shell"],
                   Matrix.Translation((0, 0, D / 2)) @ Matrix.Diagonal((W, H, D, 1)), 0.0)
 shell.scale = (W, H, D)
-bevel(shell, 0.06, 6)
+bm = bmesh.new()
+bm.from_mesh(shell.data)
+bmesh.ops.delete(bm, geom=[f for f in bm.faces if f.normal.z > 0.9], context="FACES")
+bm.to_mesh(shell.data)
+bm.free()
+wall = shell.modifiers.new("Wall", "SOLIDIFY")
+wall.thickness = 0.035
+wall.offset = -1
+bevel(shell, 0.03, 5)
 lid = case_part("Case lid", lambda: bpy.ops.mesh.primitive_cube_add(size=1), M["lid"],
                 Matrix.Translation((0, 0, D + 0.006)))
 lid.scale = (W - 0.03, H - 0.03, 0.02)
@@ -284,6 +294,55 @@ txt.data.size = 0.075
 txt.data.extrude = 0.002
 txt.data.materials.append(M["text"])
 txt.matrix_world = CASE @ Matrix.Translation((0, 0.05, D + 0.017))
+# lid details move with the lid
+for o in (stripe, led, txt):
+    o.parent = lid
+    o.matrix_parent_inverse = lid.matrix_world.inverted()
+
+# ---------------------------------------------------------------- inside the case
+M["pcb"] = mat("Cyton PCB", hexc("#f2f1ec"), rough=0.5)
+M["ic"] = mat("IC", hexc("#151515"), rough=0.35)
+M["pins"] = mat("Header pins", hexc("#d4a548"), rough=0.2, metal=1.0)
+M["nylon"] = mat("Nylon standoff", hexc("#efe9dc"), rough=0.6)
+M["foil"] = mat("LiPo foil", hexc("#c9ced2"), rough=0.3, metal=0.7)
+M["kapton"] = mat("Kapton", hexc("#d9a43a"), rough=0.4)
+M["divider"] = mat("Divider", hexc("#6b7178"), rough=0.6)
+M["red"] = mat("Red wire", hexc("#c8352b"), rough=0.5)
+
+
+def inside(name, maker, material, local, scale=None, bev=0.0):
+    o = add_mesh(name, maker, material)
+    o.matrix_world = CASE @ local
+    if scale:
+        o.scale = scale
+    if bev:
+        bevel(o, bev, 3)
+    return o
+
+
+cube = lambda: bpy.ops.mesh.primitive_cube_add(size=1)
+inside("LiPo battery", cube, M["foil"], Matrix.Translation((0, -0.04, 0.07)), (0.55, 0.36, 0.07), 0.015)
+inside("Battery tape", cube, M["kapton"], Matrix.Translation((0.22, -0.04, 0.07)), (0.08, 0.365, 0.075))
+inside("Divider", cube, M["divider"], Matrix.Translation((0, 0, 0.125)), (0.66, 0.66, 0.01), 0.004)
+for x, y in ((0.22, 0.22), (-0.22, 0.22), (0.22, -0.22), (-0.22, -0.22)):
+    inside("Standoff", lambda: bpy.ops.mesh.primitive_cylinder_add(radius=0.018, depth=0.17, vertices=20), M["nylon"],
+           Matrix.Translation((x, y, 0.11)))
+pcb = inside("Cyton board", lambda: bpy.ops.mesh.primitive_cylinder_add(radius=0.30, depth=0.016, vertices=8),
+             M["pcb"], Matrix.Translation((0, 0, 0.2)) @ Matrix.Rotation(math.pi / 8, 4, "Z"))
+inside("ADS1299", cube, M["ic"], Matrix.Translation((-0.05, 0.03, 0.214)), (0.1, 0.1, 0.014), 0.003)
+inside("PIC32", cube, M["ic"], Matrix.Translation((-0.06, -0.13, 0.214)), (0.07, 0.11, 0.014), 0.003)
+inside("Radio module", cube, M["ic"], Matrix.Translation((0.11, -0.12, 0.216)), (0.09, 0.07, 0.018), 0.003)
+inside("Board LED", lambda: bpy.ops.mesh.primitive_uv_sphere_add(radius=0.008), M["led"],
+       Matrix.Translation((0.17, -0.06, 0.212)))
+inside("Board switch", cube, M["accent"], Matrix.Translation((0.25, -0.02, 0.215)), (0.03, 0.05, 0.02))
+inside("Pin header", cube, M["ic"], Matrix.Translation((0, 0.21, 0.222)), (0.42, 0.05, 0.03))
+for i in range(10):
+    inside("Pin", lambda: bpy.ops.mesh.primitive_cylinder_add(radius=0.005, depth=0.07, vertices=8), M["pins"],
+           Matrix.Translation((-0.18 + i * 0.04, 0.21, 0.255)))
+inside("Harness plug", cube, M["orange"], Matrix.Translation((0, 0.21, 0.27)), (0.43, 0.055, 0.035), 0.006)
+plug_top = (CASE @ Matrix.Translation((0, 0.24, 0.27))).to_translation()
+gland_in = (CASE @ Matrix.Translation((0, H / 2 - 0.03, D * 0.55))).to_translation()
+
 
 # ---------------------------------------------------------------- harness (bezier tubes over the cap)
 def surface_path(d0, d1, lift, steps):
@@ -313,6 +372,11 @@ def tube(name, pts, radius, material):
 
 
 band = tube("Cap band", band_pts, 0.022, M["band"])
+tube("Harness inside", [plug_top, plug_top.lerp(gland_in, 0.5) + an * 0.03, gland_in], 0.02, M["lead"])
+for k, (mt, dx) in enumerate(((M["red"], 0.02), (M["band"], -0.02))):
+    a = (CASE @ Matrix.Translation((0.27, -0.04 + dx, 0.08))).to_translation()
+    b = (CASE @ Matrix.Translation((0.27, 0.05 + dx, 0.2))).to_translation()
+    tube("Battery wire", [a, a.lerp(b, 0.5) + Vector((0, 0, 0)) + an * 0.02, b], 0.006, mt)
 # chin strap: from the band above each ear, in front of the ear, under the chin, with a buckle
 for s_ in (1, -1):
     pts = [Vector((s_ * 0.80, -0.05, 0.03)), Vector((s_ * 0.79, -0.22, -0.30)), Vector((s_ * 0.66, -0.42, -0.58)),
@@ -393,6 +457,8 @@ scene.render.film_transparent = False
 try:
     prefs = bpy.context.preferences.addons["cycles"].preferences
     prefs.compute_device_type = "METAL"
+    if hasattr(prefs, "kernel_optimization_level"):
+        prefs.kernel_optimization_level = "OFF"  # background Metal kernel specialisation crashed Blender 5.2
     prefs.get_devices()
     for d in prefs.devices:
         d.use = True
@@ -426,5 +492,83 @@ for shot, loc in SHOTS.items():
         scene.render.filepath = os.path.join(HERE, f"render_{shot}.png")
         bpy.ops.render.render(write_still=True)
         print("rendered", shot)
+        if shot == "case_closeup":
+            lid_home = lid.matrix_world.copy()
+            side = (CASE.to_3x3() @ Vector((1, 0, 0))).normalized()
+            lid.matrix_world = Matrix.Translation(an * 0.45 + side * 0.95) @ lid_home
+            cam.location = case_target.location + an * 2.6 + Vector((0, 0, 1.1)) - side * 0.5
+            scene.render.filepath = os.path.join(HERE, "render_case_internals.png")
+            bpy.ops.render.render(write_still=True)
+            print("rendered case_internals")
+            lid.matrix_world = lid_home
+
+# ---------------------------------------------------------------- animation: open the case and explode it
+def group(name, members):
+    e = link(bpy.data.objects.new(name, None))
+    e.matrix_world = CASE.copy()
+    for o in bpy.data.objects:
+        if any(o.name == m or o.name.startswith(m + ".") for m in members):
+            o.parent = e
+            o.matrix_parent_inverse = e.matrix_world.inverted()
+    return e
+
+
+board_grp = group("Board assembly", ["Cyton board", "ADS1299", "PIC32", "Radio module", "Board LED", "Board switch",
+                                     "Pin header", "Pin", "Harness plug"])
+div_grp = group("Divider group", ["Divider"])
+bat_grp = group("Battery group", ["LiPo battery", "Battery tape"])
+side = (CASE.to_3x3() @ Vector((1, 0, 0))).normalized()
+F = scene.render.fps = 30
+scene.frame_start, scene.frame_end = 1, 180
+
+
+def key(obj, frame, loc):
+    obj.location = loc
+    obj.keyframe_insert("location", frame=frame)
+
+
+lid_parent = link(bpy.data.objects.new("Lid mover", None))
+lid.parent = lid_parent
+for f, off in ((1, 0), (30, 0), (60, 0.45), (85, 0.45)):
+    key(lid_parent, f, an * off)
+key(lid_parent, 110, an * 0.45 + side * 1.0)
+for grp, rise in ((board_grp, 0.55), (div_grp, 0.3), (bat_grp, 0.08)):
+    home = grp.location.copy()
+    key(grp, 1, home)
+    key(grp, 110, home)
+    key(grp, 145, home + an * rise)
+    key(grp, 180, home + an * rise)
+for o in bpy.data.objects:
+    if o.name.startswith(("Harness inside", "Battery wire")):
+        o.hide_render = False
+        o.keyframe_insert("hide_render", frame=109)
+        o.hide_render = True
+        o.keyframe_insert("hide_render", frame=110)
+        o.hide_render = False
+for fc_owner in [lid_parent, board_grp, div_grp, bat_grp]:
+    if fc_owner.animation_data and fc_owner.animation_data.action:
+        for fc in getattr(fc_owner.animation_data.action, "fcurves", []):
+            for kp in fc.keyframe_points:
+                kp.interpolation = "BEZIER"
+
+anim_cam = link(bpy.data.objects.new("anim_cam", bpy.data.cameras.new("anim_cam")))
+anim_cam.data.lens = 55
+tc = anim_cam.constraints.new("TRACK_TO")
+tc.target = case_target
+c0 = case_target.location
+key(anim_cam, 1, c0 + an * 2.8 + side * 1.6 + Vector((0, 0, 0.6)))
+key(anim_cam, 90, c0 + an * 3.0 + side * 0.4 + Vector((0, 0, 1.0)))
+key(anim_cam, 180, c0 + an * 2.9 - side * 1.3 + Vector((0, 0, 1.3)))
+if ANIM:
+    scene.camera = anim_cam
+    scene.cycles.samples = 32
+    scene.render.resolution_x, scene.render.resolution_y = 1280, 720
+    os.makedirs(os.path.join(HERE, "anim_frames"), exist_ok=True)
+    scene.render.filepath = os.path.join(HERE, "anim_frames", "f_")
+    scene.render.image_settings.file_format = "PNG"
+    scene.frame_start = FROM
+    bpy.ops.render.render(animation=True)
+    scene.frame_start = 1
+    print("rendered animation")
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(HERE, "eeg_cap_concept.blend"))
 print("saved", os.path.join(HERE, "eeg_cap_concept.blend"))
