@@ -91,13 +91,31 @@ def build(args):
         traces.append(filtfilt(bb, aa, sosfiltfilt(butter(4, args.band, "bandpass", fs=FS, output="sos"),
                                                    x - np.median(x))))
 
+    track = None
+    if args.track:
+        ch0 = args.channels[0]
+        x0 = d[f"EXG Channel {ch0 - 1}"].values.astype(float)
+        bb, aa = iirnotch(50, 30, FS)
+        y0 = filtfilt(bb, aa, sosfiltfilt(butter(4, [5, 45], "bandpass", fs=FS, output="sos"), x0 - np.median(x0)))
+        win, step = 2 * FS, FS // 4
+        times, amps = [], {fq: [] for fq in args.track}
+        k = np.arange(win)
+        hann = np.hanning(win)
+        for i in range(0, len(y0) - win, step):
+            seg = y0[i:i + win] * hann
+            times.append(t[i + win // 2])
+            for fq in args.track:  # amplitude of a sine at exactly fq (single-bin DFT)
+                c = np.sum(seg * np.exp(-2j * np.pi * fq * k / FS))
+                amps[fq].append(2 * abs(c) / hann.sum())
+        track = (np.array(times), {fq: np.array(v) for fq, v in amps.items()}, ch0)
+
     # one long strip image, scrolled by ffmpeg: PX pixels per second, cursor in the middle
     PX, WIN, H = 120, 8, 720
     span_a, span_b = a - WIN / 2, b + WIN / 2
     width = int((span_b - span_a) * PX)
     fig = plt.figure(figsize=(width / 100, H / 100), dpi=100)
     fig.patch.set_facecolor("#fcfcfb")
-    n = len(traces)
+    n = len(traces) + (1 if track is not None else 0)
     t_ref = cues[0] if cues else a  # time axis counts from the first cue / phase
     lims, rects = [], []
     for i, (ch, y) in enumerate(zip(args.channels, traces)):
@@ -124,6 +142,23 @@ def build(args):
             ax.text(sec + 0.04, -lim * 0.98, f"{sec - t_ref:+.0f} s", fontsize=9, color="#898781", va="bottom")
         ax.axis("off")
         ax.set_facecolor("#fcfcfb")
+    if track is not None:
+        tt, amps, ch0 = track
+        rect = [0, 0.08 / n, 1, 0.74 / n]
+        ax = fig.add_axes(rect)
+        top = max(np.percentile(np.concatenate(list(amps.values())), 99.5) * 1.2, 1.0)
+        for j, (fq, v) in enumerate(amps.items()):
+            ax.plot(tt, v, color=["#2a9d5c", "#8a5cd6", "#c49a3c"][j % 3], lw=2.2)
+        for c in cues:
+            ax.axvline(c, color="#898781", ls="--", lw=1.2)
+        for v in (top / 4, top / 2, 3 * top / 4):
+            ax.axhline(v, color="#e3e2de", lw=0.8, zorder=0)
+        ax.set_ylim(0, top)
+        ax.set_xlim(span_a, span_b)
+        ax.axis("off")
+        rects.append(rect)
+        lims.append(None)
+        track_top = top
     strip = args.session + "_strip.png"
     fig.savefig(strip, facecolor=fig.get_facecolor())
     plt.close(fig)
@@ -139,6 +174,18 @@ def build(args):
     axo.text(0.51, 0.975, "now", color="#d03b3b", fontsize=13, va="top")
     for i, (rect, lim) in enumerate(zip(rects, lims)):
         y0, hh = rect[1], rect[3]
+        if lim is None:  # tracked-frequency row: 0..top µV
+            for v in (0, track_top / 2, track_top):
+                axo.plot([0, 0.012], [y0 + v / track_top * hh] * 2, color="#52514e", lw=1)
+                axo.text(0.015, y0 + v / track_top * hh, f"{v:.1f} µV" if v else "0", fontsize=10, va="center",
+                         color="#52514e", bbox=dict(boxstyle="round,pad=0.15", fc="#fcfcfb", ec="none", alpha=0.85))
+            labels = "   ".join(f"{fq:g} Hz" for fq in args.track)
+            axo.text(0.12, y0 + hh + 0.035, f"Ch{track[2]} size of the wave at exactly:", fontsize=12, color="#52514e",
+                     va="center", fontweight="bold")
+            for j, fq in enumerate(args.track):
+                axo.text(0.6 + j * 0.16, y0 + hh + 0.035, f"— {fq:g} Hz", fontsize=13, va="center", fontweight="bold",
+                         color=["#2a9d5c", "#8a5cd6", "#c49a3c"][j % 3])
+            continue
         to_y = lambda v: y0 + (v + lim * 1.05) / (lim * 2.3) * hh
         for v in (-lim, -lim / 2, 0, lim / 2, lim):
             axo.plot([0, 0.012], [to_y(v)] * 2, color="#52514e", lw=1)
@@ -220,6 +267,7 @@ def main():
     b.add_argument("--labels", nargs="+", default=["dry", "gold"])
     b.add_argument("--test", help="validate_*.json of the test run, for cue markers and trimming")
     b.add_argument("--band", type=float, nargs=2, default=[0.5, 15], help="EEG filter band (jaw: 20 45)")
+    b.add_argument("--track", type=float, nargs="+", help="extra row: live amplitude at these frequencies (SSVEP), first channel")
     b.add_argument("--min-scale", type=float, default=150, help="smallest y-range in µV")
     b.add_argument("--keep", type=int, nargs=4, metavar=("X", "Y", "W", "H"),
                    help="privacy: region kept sharp (camera pixels), everything else blurred")
