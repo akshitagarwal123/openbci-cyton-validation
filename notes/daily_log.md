@@ -127,3 +127,10 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - SSVEP with dry + gold, first try (02:08): **failed** — both ear clips (SRB, BIAS) had come off, so both channels recorded the same floating reference (identical spectra, alpha 0.8 µV, offsets ~-115,000 µV). Lesson: if two channels suddenly look identical, check the SRB clip first.
 - Second try (02:19), clips back on: **partial** — 12 Hz response on both electrodes (SNR 3.0 / 2.1), no clear 15 Hz response. Timing verified second by second; camera shows eyes on screen. Likely cause: electrodes higher than O1/Oz. Retest planned with electrodes in the lowest back ring and `--stim 30`.
 - Side-by-side videos now include a µV scale, seconds from the start, and per-second RMS above each trace.
+
+## 2026-10-11 (evening)
+
+- A 3.5 Hz interference (with multiples at 7, 10.5, 14 Hz) seen on both channels in the 02:24 run was gone with the fan off.
+- At 18:53 the two channels were exactly identical (correlation 1.00) with huge 2,000 µV slow waves: a reference (SRB) problem after re-fitting the headset. Fixed by re-seating the clips/leads; at 18:57 the channels were independent again (0.63) with normal 5 µV alpha.
+- **SSVEP retest with 30-s flickers (19:00): dry electrode PASSES on its own** (SNR 3.3 / 3.7, CCA 83 %). Gold detects 12 Hz but not 15 Hz reliably. Synced face + EEG video recorded.
+- Raw recording: `recordings/18_ssvep_dry_and_gold.txt.gz`.
