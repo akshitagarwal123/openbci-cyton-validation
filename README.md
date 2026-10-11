@@ -47,6 +47,10 @@ Brain signals are only about 10-50 microvolts (uV). Room electricity, movement a
 
 Glossary: **SRB** = reference clip (every channel = electrode minus SRB); **BIAS** = ground clip that cancels body noise; **50 Hz hum** = mains interference (India), removed with a notch filter; **railed** = channel stuck at the board limit, usually electrode not on skin. Full explanations, tables and photos: [validation tracker](notes/validation_tracker.md).
 
+## Own 16-channel board (design in progress)
+
+A 16-channel, battery-powered board derived from the open-source Cyton + Daisy (2 × ADS1299 + ESP32-S3), compatible with BrainFlow and the OpenBCI GUI: specification, parts list and firmware outline in [hardware/](hardware/README.md).
+
 ## Product concept
 
 A Blender model of a wearable version (stretchy cap, 10-20 electrode holders, harness, back-mounted case): see [design/](design/README.md).

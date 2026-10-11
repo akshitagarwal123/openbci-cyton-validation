@@ -1,0 +1,26 @@
+block,ref,qty,part,package,function,notes
+Analog front end,U1-U2,2,TI ADS1299IPAG,TQFP-64,8-ch 24-bit biopotential ADC,Main cost item; check stock (LCSC/Mouser/DigiKey) before layout
+Analog front end,C (per ADS1299),2 sets,10uF + 100uF + 1uF x4 + 0.1uF x10,0603/0805/1206,VREF/VCAP/decoupling,Values per ADS1299 datasheet pin table [verify]
+Analog front end,R/C input network,18 sets,series resistor + filter capacitor per input (16 ch + SRB + BIAS),0402/0603,input protection and RF filtering,Copy exact values from OpenBCI Cyton schematic [verify]
+Analog front end,J_SRB,1,2-pin jumper header,2.54 mm,SRB1/SRB2 select,As on Cyton
+Digital,U3,1,Espressif ESP32-S3-WROOM-1-N8R2,module,MCU + Wi-Fi + Bluetooth LE,Antenna at board edge with keep-out
+Digital,U4,1,ST LIS3DH,LGA-16,accelerometer (optional),Motion-artifact reference; same as Cyton
+Digital,D1,1,RGB LED,0603/1010,status (charging / streaming / low battery),
+Digital,SW1,1,tactile switch,SMD,user button / boot,
+Digital,J_SD,1,micro-SD socket,SMD,offline recording (optional),
+Power,U5,1,Microchip MCP73831 (or TI BQ24075),SOT-23-5 / QFN,1S LiPo charger,BQ24075 if running while charging is needed
+Power,U6,1,TI TLV62569 (or Diodes AP2112K-3.3),SOT-23-5,3.3 V for ESP32 + DVDD,ESP32 Wi-Fi peaks ~400 mA
+Power,U7,1,TI TPS7A2025 (or TPS7A4901),SOT-23-5,+2.5 V ultra-low-noise AVDD,
+Power,U8,1,TI LM2776 (or TPS60403),SOT-23-6,charge-pump inverter for negative rail,Place far from analog inputs
+Power,U9,1,TI TPS7A3001,MSOP-8,-2.5 V ultra-low-noise AVSS,
+Power,L/FB,4,ferrite beads + inductors,0603/0805,rail filtering,
+Power,SW2,1,slide switch,SMD,battery power switch,Accessible through the case
+Power,BT1,1,1S LiPo 2000 mAh with protection PCB,~60x40x7 mm,battery,~11-13 h Wi-Fi streaming (estimate)
+Power,J_BAT,1,JST-PH 2-pin,THT/SMD,battery connector,
+Connectors,J_USB,1,USB-C receptacle (16-pin),SMD,charging + firmware upload,CC resistors 5.1k x2
+Connectors,J_EEG,1,2x10 shrouded IDC header 2.54 mm (keyed),THT,electrode harness: 16 ch + SRB + BIAS + 2 AGND,One plug for the whole cap
+Mechanical,-,4,M2.5 nylon standoffs 10 mm,-,board mounting in case,
+Mechanical,-,1,3D-printed case (~80x75x28 mm),PLA/PETG,board + battery enclosure,See design/; plastic only (radio)
+Electrodes,-,16-18,gold cup electrodes (or sintered Ag/AgCl) with leads,-,scalp electrodes,Use with gel/paste; dry combs only for quick checks
+Electrodes,-,2,ear-clip electrodes,-,SRB + BIAS,
+Electrodes,-,1,stretch cap or printed frame with 16 holders (10-20),-,headset,S/M/L sizes
