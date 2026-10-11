@@ -139,6 +139,15 @@ Each blink and clench was compared with the quiet moments in between (`tools/eve
 
 ![Frequency content of blinks and jaw clenches vs rest: blinks raise the slow frequencies, clenches raise everything above ~15 Hz](images/event_spectra_oct8.png)
 
+## Step 4: motor signals (next)
+
+Moving a hand lowers the mu (8–13 Hz) and beta (13–30 Hz) rhythm over the **opposite** side of the head (right hand → C3, left hand → C4). This left/right difference is what a motor-imagery BCI uses.
+
+| Test | Status | Date | Key result |
+|---|---|---|---|
+| Real hand movement at C3/C4 | ⏳ setup in progress | 2026-10-11 | First try: C3 and C4 were 94–99 % identical (poor contact through hair and/or reference noise), so no left/right difference could show. Retest with gel, electrodes directly above the ear canals, and a tap test first |
+| Imagined movement + classifier | ⏳ | — | — |
+
 ## Overall result
 
 ![Validation report: 9 of 9 tests passed](images/validation_report.png)

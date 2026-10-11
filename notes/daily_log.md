@@ -136,3 +136,11 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Raw recording: `recordings/18_ssvep_dry_and_gold.txt.gz`.
 
 - Added a comparison with published OpenBCI references: our noise floor (0.10 µV) matches the published 0.09–0.14 µV for a working Cyton; alpha ratios match the published ~4.9; SSVEP dry < wet pattern matches a 102-person dataset.
+
+## 2026-10-11 (21:00–21:25) — first motor setup (C3/C4)
+
+- Moved electrodes to the C3/C4 rings (checked by 360° video: right height, but ~2–3 cm too far forward — should sit directly above the ear canals).
+- Signal ~27 µV in the GUI, almost half muscle (30–50 Hz), and **C3 and C4 were 94–99 % identical** in every band (mu, beta, muscle). Filtering to 1–30 Hz did not help: the channels stayed identical.
+- Quick movement check (right / left hand, 10 s blocks): no mu/beta drop; everything rose slightly on both sides with the muscle band → movement artifact, not a brain response.
+- Diagnosis: each channel = electrode − SRB; with poor contact through thick hair at C3/C4 (and/or a noisy SRB clip), both channels mostly show the shared reference, so no left/right difference can appear.
+- **Plan for next session:** move C3/C4 one ring back (above the ear canals), part hair and use gel (gold cups) at both, re-seat SRB, relaxed jaw; tap test (tap C3 → only ch1 jumps); aim for C3–C4 similarity < 0.8 before the motor test. In parallel: build the `motor` test script and a 2-channel (C3/C4) version of the PhysioNet classifier; get conductive paste and more gold cups.
