@@ -54,7 +54,10 @@ They read the OpenBCI GUI's own recordings (`~/Documents/OpenBCI_GUI/Recordings`
 | `ssvep_runner.py` | **Brain Runner**, an SSVEP game: look at the 12 Hz or 15 Hz flashing panel to steer a ball to the gem |
 | `snake_ssvep.py` | **Brain Snake**: turn-based snake; look at the 12 Hz panel to turn left, 15 Hz to turn right, nothing clear = straight |
 | `flicker_window.py` | Small 12/15/10 Hz flicker window to watch SSVEP live next to the OpenBCI GUI's FFT plot |
+| `ecg_vs_oximeter.py` | ECG heart rate (dashboard log) vs pulse-oximeter readings from a phone video, with chart and PASS/FAIL |
+| `ecg_dry_vs_gold.py` | Compares two ECG recordings: usable time, time at the rail, SNR and beat shape |
+| `extract_recording.py` | Cuts a test's time window out of the GUI recordings into `recordings/` |
 | `video_eeg.py` | Records the webcam with exact clock timestamps and builds a side-by-side video of face + scrolling EEG |
 | `gui_monitor.py`, `noise_breakdown.py` | Noise breakdown per frequency |
 
-`recordings/` holds the raw OpenBCI GUI data for every test (see [recordings/README.md](recordings/README.md)). `results/` holds saved result JSONs and charts. Python deps: numpy, scipy, matplotlib, pandas, brainflow, pylsl, pygame.
+`videos/` has synced face + EEG videos of the tests with µV markings (see [videos/README.md](videos/README.md)). `recordings/` holds the raw OpenBCI GUI data for every test (see [recordings/README.md](recordings/README.md)). `results/` holds saved result JSONs and charts. Python deps: numpy, scipy, matplotlib, pandas, brainflow, pylsl, pygame.
