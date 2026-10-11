@@ -3,3 +3,9 @@ __pycache__/
 runs/
 .venv/
 *.bak
+hardware/firmware/eeg16_esp32/secrets.h
+hardware/firmware/eeg16_esp32/build/
+hardware/kicad/__pycache__/
+hardware/kicad/*.kicad_prl
+hardware/kicad/*-backups/
+hardware/kicad/fab/gerbers/

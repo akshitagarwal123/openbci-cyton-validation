@@ -1,0 +1,45 @@
+2026-10-12 00:26:12.328 INFO   Freerouting v2.5.0 (build-date: 2026-10-05)
+WARNING: Final field userProfileSettings in class app.freerouting.settings.GlobalSettings has been mutated reflectively by class com.google.gson.internal.bind.ReflectiveTypeAdapterFactory$2 in unnamed module @78186a70 (file:/Users/akshitagarwal/Documents/Projects/BrainTech/tools_ext/freerouting.jar)
+WARNING: Use --enable-final-field-mutation=ALL-UNNAMED to avoid a warning
+WARNING: Mutating final fields will be blocked in a future release unless final field mutation is enabled
+2026-10-12 00:26:12.609 INFO   Hardware: 10 CPU cores, 259 CPU score, 4096 MB RAM
+2026-10-12 00:26:12.610 WARN   Deprecated settings path '-mp / --router.max_passes'; use '--router.autorouter.max_passes' instead. The old path will be removed in a future release.
+2026-10-12 00:26:12.612 WARN   GUI is disabled and you don't have a console available, so the only feedback from Freerouting is in the log.
+2026-10-12 00:26:13.683 WARN   Deprecated settings path 'router.max_passes'; use 'router.autorouter.max_passes' instead. The old path will be removed in a future release.
+2026-10-12 00:26:13.955 INFO   [B4CBAE\4E31F9] Loading board file 'braintech16.dsn'...
+2026-10-12 00:26:14.105 INFO   [B4CBAE\4E31F9] Job 'B4CBAE\4E31F9' started at 2026-10-11T18:56:14.105632Z.
+2026-10-12 00:26:14.410 WARN   Design Warning: Board has 24 pre-existing clearance violation(s) in the loaded design (before routing):
+  - 24 unfixable violation(s) (cannot be resolved by Freerouting):
+      * 24 fixed trace/via clearance violations (first 5 shown):
+          - U6.41@6 [net GND] <-> FixedVia#1499 [net GND]
+          - U6.40 [net GND] <-> FixedVia#1558 [net GND]
+          - U6.1 [net GND] <-> FixedVia#1587 [net GND]
+          - D3.1 [net GND] <-> FixedVia#1535 [net GND]
+          - D2.1 [net GND] <-> FixedVia#1594 [net GND]
+          ... and 19 more
+  - 0 potentially fixable violations
+Notice: Freerouting does not modify component placement, board outlines, or fixed items.
+Resolving these 24 unfixable violation(s) is the responsibility of the board author in their EDA tool (e.g. KiCad).
+2026-10-12 00:26:14.449 INFO   [B4CBAE\4E31F9] Pipeline thread limits: autorouter pass is single-threaded, optimizer.max_threads=9.
+2026-10-12 00:26:14.769 INFO   [B4CBAE\4E31F9] Fanout stage started on board '8363db09e7db9ed891bc237dc56a03ef' with 356 of 502 SMD pins needing fanout (104 already connected, 42 netless).
+2026-10-12 00:26:20.939 INFO   [B4CBAE\4E31F9] Fanout pass #1 on board 'ed35bca6aba74e5ee753525c599630ca' completed in 5.97 seconds with 139 SMD pins fanouted, 215 not routed, 0 insert errors, +14 extra vias (0 SMD pins still to check in pass, ripup costs=100).
+2026-10-12 00:26:25.340 INFO   [B4CBAE\4E31F9] Fanout pass #2 on board '0d1b6154ed6cc6e92f2f28c5e9c4ddc0' completed in 4.37 seconds with 9 SMD pins fanouted, 210 not routed, 0 insert errors, +0 extra vias (0 SMD pins still to check in pass, ripup costs=200).
+2026-10-12 00:26:26.576 INFO   [B4CBAE\4E31F9] Fanout pass #3 on board '0d1b6154ed6cc6e92f2f28c5e9c4ddc0' completed in 1.21 seconds with 0 SMD pins fanouted, 26 not routed, 0 insert errors, +0 extra vias (0 SMD pins still to check in pass, ripup costs=300).
+2026-10-12 00:26:26.737 INFO   [B4CBAE\4E31F9] Fanout stage completed: started with 460 total SMD pins, completed in 11.80 seconds, escaped pins: 294/460 (63.9%), using 11.91 total CPU seconds, 5.25 GB total allocated, and 168.0 MB peak heap usage.
+2026-10-12 00:26:27.277 INFO   [B4CBAE\4E31F9] Auto-routing stage started on board '0d1b6154ed6cc6e92f2f28c5e9c4ddc0' with baseline score 514.03 for 146 unrouted items.
+2026-10-12 00:27:02.890 INFO   [B4CBAE\4E31F9] Auto-routing pass #1 on board '0d1b6154ed6cc6e92f2f28c5e9c4ddc0' was completed in 35.39 seconds with score 843.19 (47 unrouted and 25 violations), using 47.46 CPU seconds and the job allocated 29.29 GB of memory so far.
+2026-10-12 00:27:14.351 INFO   [B4CBAE\4E31F9] Auto-routing pass #2 on board '0158c79e4eb402469a82ba6daaafc4d9' was completed in 11.11 seconds with score 962.89 (11 unrouted and 25 violations), using 58.48 CPU seconds and the job allocated 36.14 GB of memory so far.
+2026-10-12 00:27:18.495 INFO   [B4CBAE\4E31F9] Auto-routing pass #3 on board 'ff10cd382f921ba00dc011dbbb67cbf9' was completed in 3.83 seconds with score 992.81 (2 unrouted and 25 violations), using 62.50 CPU seconds and the job allocated 38.40 GB of memory so far.
+2026-10-12 00:27:20.512 INFO   [B4CBAE\4E31F9] Auto-routing pass #4 on board '40b90297ac45b4cf69c56fe2728190a1' was completed in 1.64 seconds with score 996.14 (1 unrouted and 25 violations), using 64.50 CPU seconds and the job allocated 39.22 GB of memory so far.
+2026-10-12 00:27:22.192 INFO   [B4CBAE\4E31F9] Auto-routing pass #5 on board '05671a2b91faa58a100ca3ef6ad89aa6' was completed in 1.35 seconds with score 996.14 (1 unrouted and 25 violations), using 66.52 CPU seconds and the job allocated 40.20 GB of memory so far.
+2026-10-12 00:27:23.675 INFO   [B4CBAE\4E31F9] Auto-routing pass #6 on board '55e53c4de8f598d6ccd47d8242fd24d3' was completed in 1.15 seconds with score 999.46 (0 unrouted and 25 violations), using 68.53 CPU seconds and the job allocated 40.94 GB of memory so far.
+2026-10-12 00:27:24.344 INFO   [B4CBAE\4E31F9] Auto-routing pass #7 on board 'a8052546d78d9ebf797d9f9888345cea' was completed in 0.32 seconds with score 999.46 (0 unrouted and 25 violations), using 68.53 CPU seconds and the job allocated 40.94 GB of memory so far.
+2026-10-12 00:27:25.292 INFO   [B4CBAE\4E31F9] Auto-routing stage completed: started with 276 unrouted nets, completed in 70.54 seconds, final score: 999.46 (0 unrouted and 25 violations), using 69.53 total CPU seconds, 41.26 GB total allocated, and 325.2 MB peak heap usage.
+2026-10-12 00:27:25.721 INFO   [B4CBAE\4E31F9] Optimization stage started on board 'a8052546d78d9ebf797d9f9888345cea'. Baseline router score: 999.46, optimizer score: 404.63, incomplete connections: 0, clearance violations: 25.
+2026-10-12 00:30:53.091 INFO   [B4CBAE\4E31F9] Optimizer pass #1 on board 'c41debb7dc0b5733bcf669ee7036977f' was completed in 206.16 seconds with the score of 405.25 (0 unrouted and 25 violations).
+2026-10-12 00:30:53.499 INFO   [B4CBAE\4E31F9] Optimizer pass #1: optimizer score 404.63 -> 405.25 (IMPROVED, 0.1526%), router score: 999.46, incomplete connections: 0, clearance violations: 25.
+2026-10-12 00:30:53.499 INFO   [B4CBAE\4E31F9] Stopping optimizer because the improvement in this pass (0.1526%) is below the threshold (2.50%).
+2026-10-12 00:30:54.188 INFO   [B4CBAE\4E31F9] Optimization stage completed:. Baseline router score: 999.46, baseline optimizer score: 404.63, final router score: 999.46, final optimizer score: 405.25, completed in 208.14 seconds, using 1143.88 total CPU seconds, 272.22 GB total allocated, and 1190.6 MB peak heap usage.
+2026-10-12 00:30:54.218 INFO   [B4CBAE\4E31F9] Job 'B4CBAE\4E31F9' finished with state: COMPLETED (elapsed: 4 minutes 40.11 seconds, finished at UTC: 2026-10-11T19:00:54.211772Z).
+2026-10-12 00:30:54.250 INFO   Saving output file '/Users/akshitagarwal/Documents/Projects/openbci-cyton-validation/hardware/kicad/braintech16.ses' (SES)...
+2026-10-12 00:30:54.254 INFO   Successfully saved output file '/Users/akshitagarwal/Documents/Projects/openbci-cyton-validation/hardware/kicad/braintech16.ses' (125874 bytes).

@@ -144,3 +144,12 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Quick movement check (right / left hand, 10 s blocks): no mu/beta drop; everything rose slightly on both sides with the muscle band → movement artifact, not a brain response.
 - Diagnosis: each channel = electrode − SRB; with poor contact through thick hair at C3/C4 (and/or a noisy SRB clip), both channels mostly show the shared reference, so no left/right difference can appear.
 - **Plan for next session:** move C3/C4 one ring back (above the ear canals), part hair and use gel (gold cups) at both, re-seat SRB, relaxed jaw; tap test (tap C3 → only ch1 jumps); aim for C3–C4 similarity < 0.8 before the motor test. In parallel: build the `motor` test script and a 2-channel (C3/C4) version of the PhysioNet classifier; get conductive paste and more gold cups.
+
+## 2026-10-11 → 12 (night) — 16-channel board design, rev A
+
+- Designed our own 16-channel board instead of buying a Cyton + Daisy: 2 × ADS1299 (same front end as Cyton) + ESP32-S3 Wi-Fi + built-in LiPo with USB-C charging, one 80 × 76 mm 4-layer PCB.
+- Every analog value checked against the TI datasheet and the Cyton schematic. Reference wiring follows TI's recommended montage (electrodes on IN+, reference on SRB1).
+- The whole circuit is written as Python (`hardware/kicad/circuit.py`); scripts generate the KiCad schematic, netlist, BOM and PCB. ERC: clean except 1 known false positive. Placement: 0 DRC errors.
+- Routed with the Freerouting autorouter in six attempts. The final one gives every ground pad its own via to a solid inner ground plane before routing, so the router only routes signals. Result: **all connections routed, 0 copper DRC errors**. Gerbers, drill, pick-and-place, BOM and a 3D STEP model are generated (`hardware/kicad/fab/`).
+- Firmware for the ESP32-S3 speaks the OpenBCI Wi-Fi Shield protocol, so BrainFlow `CYTON_DAISY_WIFI` and the OpenBCI GUI should connect directly. Compiles (70 % of flash); two bugs found by reading BrainFlow's source and fixed.
+- Not ready to order yet: needs a human review of the analog layout (decoupling caps closer to the ADS1299 pins, input traces), part-specific footprint checks and an ADS1299 stock check. Full step-by-step record: `hardware/DESIGN_LOG.md`.

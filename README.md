@@ -49,7 +49,9 @@ Glossary: **SRB** = reference clip (every channel = electrode minus SRB); **BIAS
 
 ## Own 16-channel board (design in progress)
 
-A 16-channel, battery-powered board derived from the open-source Cyton + Daisy (2 × ADS1299 + ESP32-S3), compatible with BrainFlow and the OpenBCI GUI: specification, parts list and firmware outline in [hardware/](hardware/README.md).
+A 16-channel, battery-powered board derived from the open-source Cyton + Daisy (2 × ADS1299 + ESP32-S3), compatible with BrainFlow and the OpenBCI GUI. Rev A has a KiCad schematic, a 4-layer 80 × 76 mm PCB with a first autorouted pass, a BOM, and firmware that compiles. It has not been reviewed or built yet. Specification: [hardware/](hardware/README.md). Every step and decision: [hardware/DESIGN_LOG.md](hardware/DESIGN_LOG.md).
+
+<img src="hardware/images/pcb_3d_iso.png" width="60%">
 
 ## Product concept
 

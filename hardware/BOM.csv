@@ -1,26 +1,28 @@
 block,ref,qty,part,package,function,notes
-Analog front end,U1-U2,2,TI ADS1299IPAG,TQFP-64,8-ch 24-bit biopotential ADC,Main cost item; check stock (LCSC/Mouser/DigiKey) before layout
-Analog front end,C (per ADS1299),2 sets,10uF + 100uF + 1uF x4 + 0.1uF x10,0603/0805/1206,VREF/VCAP/decoupling,Values per ADS1299 datasheet pin table [verify]
-Analog front end,R/C input network,18 sets,series resistor + filter capacitor per input (16 ch + SRB + BIAS),0402/0603,input protection and RF filtering,Copy exact values from OpenBCI Cyton schematic [verify]
-Analog front end,J_SRB,1,2-pin jumper header,2.54 mm,SRB1/SRB2 select,As on Cyton
-Digital,U3,1,Espressif ESP32-S3-WROOM-1-N8R2,module,MCU + Wi-Fi + Bluetooth LE,Antenna at board edge with keep-out
-Digital,U4,1,ST LIS3DH,LGA-16,accelerometer (optional),Motion-artifact reference; same as Cyton
-Digital,D1,1,RGB LED,0603/1010,status (charging / streaming / low battery),
-Digital,SW1,1,tactile switch,SMD,user button / boot,
-Digital,J_SD,1,micro-SD socket,SMD,offline recording (optional),
-Power,U5,1,Microchip MCP73831 (or TI BQ24075),SOT-23-5 / QFN,1S LiPo charger,BQ24075 if running while charging is needed
-Power,U6,1,TI TLV62569 (or Diodes AP2112K-3.3),SOT-23-5,3.3 V for ESP32 + DVDD,ESP32 Wi-Fi peaks ~400 mA
-Power,U7,1,TI TPS7A2025 (or TPS7A4901),SOT-23-5,+2.5 V ultra-low-noise AVDD,
-Power,U8,1,TI LM2776 (or TPS60403),SOT-23-6,charge-pump inverter for negative rail,Place far from analog inputs
-Power,U9,1,TI TPS7A3001,MSOP-8,-2.5 V ultra-low-noise AVSS,
-Power,L/FB,4,ferrite beads + inductors,0603/0805,rail filtering,
-Power,SW2,1,slide switch,SMD,battery power switch,Accessible through the case
-Power,BT1,1,1S LiPo 2000 mAh with protection PCB,~60x40x7 mm,battery,~11-13 h Wi-Fi streaming (estimate)
-Power,J_BAT,1,JST-PH 2-pin,THT/SMD,battery connector,
-Connectors,J_USB,1,USB-C receptacle (16-pin),SMD,charging + firmware upload,CC resistors 5.1k x2
-Connectors,J_EEG,1,2x10 shrouded IDC header 2.54 mm (keyed),THT,electrode harness: 16 ch + SRB + BIAS + 2 AGND,One plug for the whole cap
-Mechanical,-,4,M2.5 nylon standoffs 10 mm,-,board mounting in case,
-Mechanical,-,1,3D-printed case (~80x75x28 mm),PLA/PETG,board + battery enclosure,See design/; plastic only (radio)
+Analog front end,U8-U9,2,TI ADS1299IPAGR,TQFP-64,8-ch 24-bit biopotential ADC,Main cost item; check stock (LCSC/Mouser/DigiKey) before ordering
+Analog front end,C (per ADS1299),2 sets,10uF+0.1uF VREF; 100uF VCAP1; 1uF VCAP2/VCAP4; 1uF+0.1uF VCAP3; 0.1uF+1uF per supply,0603/1206,reference + internal regulators + decoupling,Values from ADS1299 datasheet pin table (same as Cyton)
+Analog front end,R26 C47,1+1,1 MOhm + 1.5 nF,0603,bias amplifier feedback (driven right leg),Datasheet Fig. 68
+Analog front end,D4-D21,18,bidirectional TVS 5.5 V low capacitance (e.g. Nexperia PESD5V0S1BL),SOD-882 / 0402,electrode ESD protection,Footprint is generic 0402 - check against the part bought; choose low leakage
+Analog front end,R (input),18,2.2 kOhm,0603,series current limit per input (16 ch + SRB + BIAS),As Cyton
+Analog front end,C (input),17,1 nF C0G,0603,RF filter at each ADC input,As Cyton
+Digital,U6,1,Espressif ESP32-S3-WROOM-1U-N8,module,MCU + Wi-Fi + Bluetooth LE + native USB,u.FL connector; needs a small 2.4 GHz antenna with u.FL lead
+Digital,ANT1,1,2.4 GHz FPC or stick-on antenna with u.FL lead (~100 mm),-,Wi-Fi antenna,Stick inside the case away from the battery
+Digital,U7,1,ST LIS3DHTR,LGA-16 3x3,accelerometer,Motion-artifact reference; same as Cyton; I2C 0x18
+Digital,D1-D3,3,LEDs red / green / blue,0603,charging / streaming / Wi-Fi status,
+Digital,SW2-SW3,2,tactile switch (TL3342 type),SMD,RESET and BOOT,
+Power,U1,1,Microchip MCP73831T-2ACI/OT,SOT-23-5,1S LiPo charger 500 mA,2 kOhm PROG
+Power,U2,1,TI TLV62569DBVR,SOT-23-5,3.3 V buck for ESP32 + DVDD,100k/22.1k feedback; L1 2.2 uH >=1.5 A; 2 x 22 uF
+Power,U3,1,TI LP5907MFX-2.5,SOT-23-5,+2.5 V low-noise LDO (AVDD),6.5 uV RMS
+Power,U4,1,TI LM2776DBVR,SOT-23-6,charge-pump inverter -3.3 V,Placed in the analog-power corner away from inputs
+Power,U5,1,ADI ADP7182AUJZ-2.5,TSOT-23-5,-2.5 V low-noise LDO (AVSS),EN tied to VIN - verify against datasheet
+Power,SW1,1,SPDT slide switch (PCM12 type),SMD,battery power switch,On the board edge; reachable through the case
+Power,BT1,1,1S LiPo 2000 mAh with protection PCB and JST-PH lead,~60x40x7 mm,battery,~11-13 h Wi-Fi streaming (estimate)
+Power,J2,1,JST-PH 2-pin right angle (S2B-PH-K),THT,battery connector,Check battery lead polarity before plugging in
+Connectors,J1,1,USB-C receptacle 16-pin (GCT USB4105),SMD+THT,charging + firmware upload,5.1 kOhm on CC1/CC2
+Connectors,J3,1,2x10 shrouded IDC header 2.54 mm (keyed),THT,electrode harness: 16 ch + SRB + BIAS + 2 GND,One plug for the whole cap
+Mechanical,H1-H4,4,M2.5 nylon standoffs 10 mm + screws,-,board mounting in case,
+Mechanical,-,1,3D-printed case (~88x84x30 mm),PLA/PETG,board + battery enclosure,See design/; plastic only (radio)
 Electrodes,-,16-18,gold cup electrodes (or sintered Ag/AgCl) with leads,-,scalp electrodes,Use with gel/paste; dry combs only for quick checks
 Electrodes,-,2,ear-clip electrodes,-,SRB + BIAS,
 Electrodes,-,1,stretch cap or printed frame with 16 holders (10-20),-,headset,S/M/L sizes
+Full list,-,-,see kicad/braintech16_bom.csv,-,every component with reference designators and footprints,Generated from the schematic
