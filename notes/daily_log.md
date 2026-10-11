@@ -134,3 +134,5 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - At 18:53 the two channels were exactly identical (correlation 1.00) with huge 2,000 µV slow waves: a reference (SRB) problem after re-fitting the headset. Fixed by re-seating the clips/leads; at 18:57 the channels were independent again (0.63) with normal 5 µV alpha.
 - **SSVEP retest with 30-s flickers (19:00): dry electrode PASSES on its own** (SNR 3.3 / 3.7, CCA 83 %). Gold detects 12 Hz but not 15 Hz reliably. Synced face + EEG video recorded.
 - Raw recording: `recordings/18_ssvep_dry_and_gold.txt.gz`.
+
+- Added a comparison with published OpenBCI references: our noise floor (0.10 µV) matches the published 0.09–0.14 µV for a working Cyton; alpha ratios match the published ~4.9; SSVEP dry < wet pattern matches a 102-person dataset.

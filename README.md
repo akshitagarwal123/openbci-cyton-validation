@@ -18,6 +18,18 @@ Full write-up with every test, number, chart and photo: [notes/validation_tracke
 <img src="notes/images/ecg_dry_session_oct4.png" width="49%">
 </p>
 
+## Compared with published references
+
+| Test | Published | Ours |
+|---|---|---|
+| Noise floor (inputs shorted) | 0.09–0.14 µV for a working Cyton | **0.10 µV** ✅ |
+| Cyton vs research amplifier (BrainAmp) | r² 97–100 %, ~0.8 µV difference | test signal 0.25 % off spec ✅ |
+| Alpha eyes closed / open | ratio ~4.9 | **2.4–5.7×** ✅ |
+| SSVEP wet vs dry (12 targets) | 83 % vs 63 % accuracy | dry 83–97 % (2 targets) |
+| ECG vs pulse oximeter | within ~3 bpm | **1.5–1.6 bpm** ✅ |
+
+Details and sources: [validation tracker](notes/validation_tracker.md#how-our-numbers-compare-with-published-references).
+
 ## What is this about?
 
 A brain-computer interface (BCI) reads brain signals from the scalp (EEG) and turns imagined movements into commands. The signals are recorded with an **OpenBCI Cyton**, a small 8-channel amplifier that measures tiny voltages from electrodes on the skin.

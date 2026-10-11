@@ -145,6 +145,27 @@ Each blink and clench was compared with the quiet moments in between (`tools/eve
 
 All 9 validation tests pass: the board's own accuracy (integrity, noise floor, test signal, external short), an independent device (ECG vs pulse oximeter, dry and gold), and cause and effect (blinks, jaw, alpha, SSVEP). One-page summary: `python tools/validate_board.py report`.
 
+## How our numbers compare with published references
+
+| Test | Published reference | Ours | Verdict |
+|---|---|---|---|
+| Noise floor, inputs shorted | A working Cyton reads 0.09–0.14 µV RMS [1] | 0.10 µV | ✅ in range |
+| Signal accuracy vs research amplifier | Cyton vs Brain Products BrainAmp, recorded simultaneously: r² 97–100 %, mean difference ~0.8 µV, noise not worse than a reference dataset [2] | Internal test signal 0.25 % off spec; channels matched within 0.1 % | ✅ consistent (we have not recorded against a second amplifier) |
+| Alpha, eyes closed / open | Alpha modulation ratio ~4.9, wet and dry similar [3] | 2.4–5.7× (dry 2.4–4.3, gold 4.3–5.7) | ✅ normal range |
+| SSVEP, dry vs wet | 102 people, 12 targets: accuracy 83 % wet vs 63 % dry [4] | 2 targets: dry 83–97 % | ⚠️ not directly comparable (2 targets is easier); "dry is weaker on average" matches |
+| SSVEP SNR (narrow-band, peak / neighbours) | Rule of thumb: < 2 not detectable, 2–5 usable, 5–10 good, > 10 excellent | dry 15–19 (8 Oct), 3.3–3.7 (11 Oct) | ✅ usable to excellent |
+| Gamma / fast responses | Detected with OpenBCI, but more noise and bad trials than Brain Products [5] | not tested | — |
+| ECG vs pulse oximeter | Clinical agreement target: within ~3 bpm | 1.5–1.6 bpm | ✅ |
+
+References:
+1. [Self-Noise of OpenBCI (OpenBCI community)](https://openbci.com/community/self-noise-of-openbci/)
+2. [Comparing Simultaneous Scalp EEG Recordings from the OpenBCI Cyton and Brain Products BrainAmp (Sensors 2026)](https://pmc.ncbi.nlm.nih.gov/articles/PMC12944456/)
+3. [Rapid Fabrication of Low Impedance, 3D Dry Electrodes for Physiological Sensing (arXiv)](https://arxiv.org/pdf/2201.03612)
+4. [An Open Dataset for Wearable SSVEP-Based Brain-Computer Interfaces (Sensors 2021)](https://pmc.ncbi.nlm.nih.gov/articles/PMC7916479/)
+5. [Stimulus-induced narrow-band gamma oscillations recorded with an open-hardware low-cost EEG amplifier (PLOS ONE)](https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0279881)
+
+Public datasets for side-by-side comparison: [OpenBCI Cyton eyes open/closed (Zenodo)](https://zenodo.org/records/10423897), [wearable SSVEP, wet + dry, 102 subjects](https://pmc.ncbi.nlm.nih.gov/articles/PMC7916479/).
+
 ## Earlier informal checks (before the formal tests)
 
 | Check | Date | Result |
