@@ -63,7 +63,7 @@ Each value below was read from the datasheet pin table / figures and cross-check
 | Bias amplifier feedback | 1 MΩ ∥ 1.5 nF between BIASINV and BIASOUT | datasheet Fig. 68 |
 | BIASREF | AVSS-referenced internal mid-supply (CONFIG3) → pin tied to AVSS | datasheet |
 | Second chip's bias amp | powered down; BIASIN and BIASREF to AVSS | datasheet 10.1.1 |
-| Electrode input | bidirectional TVS → 2.2 kΩ series → 1 nF to GND at the pin | Cyton |
+| Electrode input | bidirectional TVS → 2.2 kΩ series → 1 nF to GND at the pin | Cyton topology. **Correction:** Cyton's TVS is the TPD4E1B06 (0.7 pF, 0.5 nA) and its caps are X7R ±20 %; rev A uses PESD5V0S1BL (35 pF, 5–100 nA). See *Proposed rev-A changes*. |
 | CLKSEL | through 10 kΩ (chip 1 high, chip 2 low) | datasheet |
 | DAISY_IN, RESV1 | to DGND | datasheet |
 | GPIO1-4 | 10 kΩ to DGND (no floating inputs) | datasheet |
@@ -222,8 +222,8 @@ b = BoardShim(BoardIds.CYTON_DAISY_WIFI_BOARD, p)
 ## Step 10. Things still marked [verify] before ordering
 
 1. **ADP7182 EN pin**: tied to VIN (enabled). Check the polarity in the exact datasheet revision.
-2. **TVS part**: footprint is generic `D_TVS`; pick a low-capacitance, low-leakage bidirectional TVS
-   (e.g. ESD9B / PESD5V0) and check its footprint. Leakage matters for EEG.
+2. **TVS part**: the PESD5V0S1BL in rev A is too leaky and too capacitive for dry electrodes; use the
+   TPD4E1B06 like the Cyton (see *Proposed rev-A changes*, items 1 and 3).
 3. **Footprints vs purchased parts**: USB-C receptacle, slide switch, inductor, JST-PH.
 4. **Layout review by an experienced engineer.** Things I would check first:
    - **Decoupling distance:** the placer packs each ADS1299's capacitors in rows next to the chip, not
@@ -237,6 +237,86 @@ b = BoardShim(BoardIds.CYTON_DAISY_WIFI_BOARD, p)
 5. **Bench bring-up order**: power rails (no ADS fitted or with PWDN low) → one ADS1299 (read ID register
    0x3E) → second ADS1299 → shorted-input noise → internal test signal → Wi-Fi streaming → full
    validation battery (same tests as the Cyton in this repo).
+
+## Proposed rev-A changes from electrode research (pending user approval)
+
+Source: the separate electrode/wiring research session (report on the user's Mac:
+`BrainTech/reports/EEG electrodes and wiring.md`), checked against `circuit.py` at commit `3258edc`.
+**Nothing below is applied yet.** No re-placement or re-routing until the user decides.
+
+| # | Proposal | Why |
+|---|---|---|
+| 1 | Input shunt caps: **47 pF C0G ±2 %** on CH1–16 and identically on SRB (instead of 1 nF), footprint kept, DNP-able | With high, mismatched dry-contact impedance (0.5–2 MΩ) a 1 nF cap to GND turns mains common-mode into a differential signal: only about −12 to −17 dB rejection, vs −37 to −51 dB with 47 pF. The ADS1299 delta-sigma input does not need a large anti-alias cap. All values are fine with gel. |
+| 2 | BIAS series resistance **≥ 100 kΩ total**, as two footprints: RP1 outside and RP2 inside the bias loop (now 2.2 kΩ only) | BIASOUT can source about 1.1 mA (datasheet: short-circuit 1.1 mA). TI SBAA188 recommends ≤ 50 µA single-fault body current. |
+| 3 | TVS: low-leakage, low-capacitance part (**TI TPD4E1B06**, what the Cyton actually uses), DNP-able | Dry contacts are 0.3–1 MΩ, so the TVS leakage and capacitance must be tiny: ≤ 0.5 nA and < 1 pF. |
+| 4 | Connector **2×13** keyed shrouded IDC: 1 SHIELD_DRV, 2–9 IN1–IN8, 10 SRB, 11 GND, 12 BIAS, 13 GND, 14–21 IN9–IN16, 22 GND, 23 IMP_EXC, 24 +2.5V_AE, 25 −2.5V_AE, 26 spare (0 Ω/DNP to GND or SHIELD_DRV). Fallback: keep the 2×10, add a keyed 1×5 aux header with the five extra nets | Spare pins for future active electrodes |
+| 5 | ±2.5V_AE electrode supplies from AVDD/AVSS: ferrite + 10 Ω + 10 µF/100 nF at the connector, DNP 0 Ω links so a passive harness carries no supply | ~13–16 mA per rail for 17 OPA376 buffers |
+| 6 | Shield driver (DNP): OPA2376 on AVDD/AVSS, input by 0 Ω links (BIAS common-mode / buffered SRB / GND), output via 100 Ω–1 kΩ to SHIELD_DRV; second half as an optional SRB buffer with 0 Ω bypass | Do not drive the shield from BIASOUT (specified into 50 kΩ ∥ 10 pF only) |
+| 7 | IMP_EXC: ESP32-S3 GPIO (LEDC PWM) → RC low-pass → DNP series R → connector | Impedance checks with active electrodes (ADS1299 lead-off cannot see the skin through a buffer) |
+| 8 | Guard pour around the 17 input traces, jumper-selectable SHIELD_DRV or GND; matched lengths; away from charge pump, charger, antenna | Lower pickup and leakage on the high-impedance inputs |
+| 9 | Nice to have: VBUS detect → GPIO, firmware stops streaming and disables BIAS while USB is plugged in | Safety: enforces "never worn while connected to a charger/PC" in firmware |
+
+### Answers to the research session's questions
+
+**Q1. What dielectric/tolerance is the 1 nF input cap?**
+**Unspecified.** `circuit.py` has only `C("1nF", ...)`, generic 0603 footprint, no MPN. My
+purchasing `BOM.csv` says "1 nF C0G", so the two files disagree. That needs fixing whichever value is chosen.
+For reference, the Cyton schematic uses a **CKCL44X7R1H102M** 4-cap array, which is **X7R, ±20 %**, 1 nF:
+the worst case for channel-to-channel matching. The series 2.2 kΩ is also unspecified in `circuit.py`.
+The Cyton uses a CAY16 2.2 kΩ ±1 % array. If item 1 is accepted, specify the resistors as ±1 % too, since
+mismatch in R or C both degrade common-mode rejection.
+
+**Q2. PESD5V0S1BL leakage and capacitance?** (Nexperia datasheet Rev. 04, Table 9, per diode, 25 °C)
+- Leakage I_RM: **5 nA typ, 100 nA max** at V_RWM = 5 V (no value specified near 0 V).
+- Capacitance C_d: **35 pF typ, 45 pF max** at V_R = 0 V, 1 MHz.
+
+So it fails both research targets: 10–200× the 0.5 nA leakage and ~40× the 1 pF capacitance.
+**This was my mistake in rev A:** I labelled the input network "as Cyton", but the Cyton actually uses the
+**TPD4E1B06** quad TVS (TI: 0.7 pF typ, 0.5 nA max, 5.5 V, SOT-5X3 1.6 × 1.6 mm or SC70-6).
+**Important coupling between items 1 and 3:** the PESD's 35–45 pF to ground (with part-to-part spread) sits on
+the same input as the shunt cap. Changing the 1 nF to 47 pF while keeping the PESD would leave most
+of the common-mode-to-differential conversion in place. Items 1 and 3 should be done together.
+
+**Q3. LM2776 output current rating, and headroom for item 5?** (TI datasheet SNVSA56B)
+- LM2776: **200 mA** recommended max output (250 mA abs. max continuous), R_OUT 2.5 Ω typ, current limit 400 mA.
+- ADP7182: 200 mA rated. LP5907 (AVDD): 250 mA.
+- Load today: 2 × ADS1299 at **7.14 mA** I_AVDD each (datasheet, bias off) ≈ 14 mA per rail, + bias amp.
+- With 17 OPA376 buffers (≈ 0.76 mA typ / 0.95 mA max each ≈ 13–16 mA) + optional OPA2376 (~2 mA): **≈ 32 mA per rail**,
+  i.e. ~15 % of the rating. No problem.
+- Headroom for the negative LDO: −3.3 V + 32 mA × 2.5 Ω ≈ −3.22 V into the ADP7182 for −2.5 V out. That leaves ~0.7 V,
+  far above its dropout at this current. OK.
+- **One thing to check on the bench (any option):** at light load the LM2776 runs in PFM mode, with ~80–110 mV output ripple
+  between ~1 and ~50 mA (datasheet Fig. 1, V_IN = 5.5 V). The ADP7182 and the ADS1299's PSRR should remove
+  it, but measure AVSS ripple and look for spurs in the shorted-input noise test. A ~30 mA load moves it towards
+  the upper edge of that range.
+
+**Q4. Rough area and routing effort on the current 80 × 76 mm layout**
+
+Free space inside the current placement zones (from `gen_pcb.py`'s zone report): analog-power strip ~300 mm²,
+MCU column ~160 mm², digital-power column ~135 mm², total **~600 mm²**.
+
+| # | Extra parts (approx.) | Area | Routing impact |
+|---|---|---|---|
+| 1 | none (value/part change, same 0603 footprint) | 0 | none, BOM only |
+| 2 | +1 resistor (0603) | ~7 mm² | local, 1 net split |
+| 3 | 18 × 0402 TVS → 5 × TPD4E1B06 (DRL 1.6 × 1.6 mm) | ~ −25 mm² (smaller) | re-route the protection area |
+| 4 | 2×13 IDC is ~7.6 mm longer (~41 vs ~33 mm). It fits the 41 mm connector zone only just, so the zone extends towards the ESP32 column | ~+60 mm² | **new pinout: re-route the whole analog input section** |
+| 4-alt | keep 2×10 + 1×5 aux header (~13 × 5 mm) | ~+65 mm² | only 5 new nets |
+| 5 | 2 × (ferrite, 10 Ω, 10 µF, 100 nF, 0 Ω DNP) = 10 parts | ~75 mm² | local, near the connector |
+| 6 | OPA2376 (VSSOP-8) + 2 decoupling + ~6 0 Ω/R | ~90 mm² | local, 4–5 nets |
+| 7 | R + C + DNP R; GPIO IO6 (LEDC) | ~20 mm² | **one ~45 mm trace from the MCU to the connector**: route on In2/B.Cu away from the inputs |
+| 8 | solder jumper (3-pad) + pours | ~10 mm² | **manual work:** an autorouter cannot do guard pours or length matching |
+| 9 | 2 resistors (VBUS 100 k / 150 k divider → 3.0 V) to GPIO IO7 | ~14 mm² | local |
+
+**Total ≈ 30 new parts, ~250–300 mm²: fits on 80 × 76 mm** (≈ half of the free space). Free ESP32-S3 GPIOs
+(not strapping, not used): IO2, IO6, IO7, IO18, IO21, IO41, IO42, IO47, IO48.
+
+**Effort:**
+- Items 1, 2, 5, 6, 7 and 9 are `circuit.py` edits plus one `build.sh --pcb` run (~5 min each time).
+- Items 3 and 4 also go through the scripted flow, but they change the whole input section, so its earlier review would have to be redone.
+- Item 8 (guard pour, matched lengths) is **hand layout in KiCad, roughly 0.5–1 day**, and is best done in the same pass as
+  the planned human review (decoupling caps at the ADS1299 pins, input traces).
+- Suggested order if all are approved: 1+3 together → 2 → 4 (or 4-alt) → 5, 6, 7, 9 → re-place/re-route → 8 by hand → review.
 
 ## How to regenerate everything
 
