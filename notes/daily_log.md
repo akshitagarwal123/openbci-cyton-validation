@@ -153,3 +153,10 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Routed with the Freerouting autorouter in six attempts. The final one gives every ground pad its own via to a solid inner ground plane before routing, so the router only routes signals. Result: **all connections routed, 0 copper DRC errors**. Gerbers, drill, pick-and-place, BOM and a 3D STEP model are generated (`hardware/kicad/fab/`).
 - Firmware for the ESP32-S3 speaks the OpenBCI Wi-Fi Shield protocol, so BrainFlow `CYTON_DAISY_WIFI` and the OpenBCI GUI should connect directly. Compiles (70 % of flash); two bugs found by reading BrainFlow's source and fixed.
 - Not ready to order yet: needs a human review of the analog layout (decoupling caps closer to the ADS1299 pins, input traces), part-specific footprint checks and an ADS1299 stock check. Full step-by-step record: `hardware/DESIGN_LOG.md`.
+
+## 2026-10-12 (night) — electrode and wiring research
+- Literature review of electrodes and lead wiring for the 16-channel board: [`hardware/ELECTRODES_AND_WIRING.md`](../hardware/ELECTRODES_AND_WIRING.md).
+- Electrodes: use one metal everywhere, SRB and BIAS included. Sintered Ag/AgCl with chloride gel is the target; all-gold cups with Ten20 + Nuprep is the budget option. Our gold-cup DC drift and the dry comb's ~300 µV hum match the literature. Dry electrodes through hair need a buffer at the electrode, 2–3 N of contact force and ideally a driven shield.
+- Wiring: for gel electrodes, short (20–40 cm) unshielded leads sewn into the cap and bundled into one ribbon are enough. Shielding only pays off with dry or high-impedance contacts, and then the shield should be driven, not grounded.
+- Board review against `circuit.py` (3258edc): proposed rev-A changes are 47 pF C0G input caps (now 1 nF), ≥100 kΩ in series with BIAS (now 2.2 kΩ), a 2x13 connector with pins for powering active electrodes, a shield drive and impedance excitation, a DNP shield-driver footprint, and a guard pour. Sent to the PCB design session to log; **no re-layout until approved**.
+- Next: decide on the PCB changes; buy matched wet electrodes (good/better/best tiers in the report).
