@@ -3,7 +3,13 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-10-24 — 0 tasks done._
+_Last synced: 2026-10-24 — 2 of 89 tasks done._
+
+## Parts on hand (24 Oct)
+
+ESP32 DevKit V1 (38-pin) · 830-point breadboard · jumper wires · DT830D multimeter · resistor kit (600 pc) · capacitor kit (300 pc) · 5× LM358 · 5× TL072 · AD8232 ECG module + 3-lead cable · 100 ECG electrode pads · Soldron 25 W iron · 63/37 solder 0.8 mm · wick + flux · 9 V battery + snap · 18650 2200 mAh cell · 2000 mAh LiPo · Li-ion connector
+
+Still needed: TP4056 charger module **with protection** (never charge the 18650/LiPo without one), tweezers, through-hole practice kit. Later (week 6): a temperature-controlled iron for SMD bodge wires.
 
 ## Week 1: Electronics basics and KiCad setup (2026-10-24 → 2026-10-31)
 
@@ -20,8 +26,10 @@ Understand voltage, current, resistance, grounds and RC filters; get your tools 
 - [ ] Run week01_rc_filter.py with three different R and C pairs
 - [ ] Simulate an RC low-pass in LTspice and compare its cutoff with the script
 - [ ] Finish one KiCad beginner tutorial (Phil's Lab) to a practice board with 0 DRC errors
-- [ ] Order an ESP32-S3 DevKitC-1
-- [ ] Order multimeter, soldering iron, solder, flux, tweezers and a practice kit
+- [x] Get an ESP32 dev board (have: ESP32 DevKit V1)
+- [x] Get multimeter, soldering iron, solder, wick and flux (have)
+- [ ] Buy what is still missing: TP4056 charger module with protection (for the 18650/LiPo), tweezers, a through-hole soldering practice kit
+- [ ] Breadboard an RC low-pass from your kits (10 kΩ + 0.47 µF ≈ 34 Hz) and check R and C values with the multimeter
 
 **Assignment** (answers in the tracker; review: _not yet_)
 
@@ -46,6 +54,8 @@ Understand how an EEG front end works by reading the Cyton schematic, and get th
 - [ ] ESP32: set up Arduino or PlatformIO and blink an LED
 - [ ] ESP32: join Wi-Fi and send fake 8-channel data
 - [ ] See your fake data arrive in BrainFlow
+- [ ] Breadboard a TL072 non-inverting amplifier, gain 10, on the 9 V battery; measure input and output DC with the multimeter
+- [ ] AD8232 + ESP32: read your ECG with the ESP32 ADC and plot it in Python (laptop on battery, not charging)
 
 **Assignment** (answers in the tracker; review: _not yet_)
 
