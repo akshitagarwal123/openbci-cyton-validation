@@ -1,5 +1,7 @@
 # Build plan: BrainTech-8 EEG board
 
+Tracker (tick tasks, answer weekly assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
+
 Goal: **I design and build** my own Cyton-class 8-channel EEG board (schematic, PCB, firmware), and validate it against the Cyton.
 Claude's role: tutor and reviewer. Explains each topic, reviews every step against the datasheets, never hands over a finished design.
 

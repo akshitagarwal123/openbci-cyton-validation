@@ -173,3 +173,4 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Order dates: rev B **Mon 9 Nov**, rev C **Tue 8 Dec** (only if needed).
 - Fixed: these notes were briefly synced to Apple Notes from an older copy in the BrainTech folder; re-synced from this repo.
 - Update: I will design and build the board myself (Claude as tutor/reviewer). Plan rewritten as a 10-week guided build: learn → do → review each week; my own schematic (week 3), PCB (week 4), order **Sat 28 Nov**, bring-up and validation in December.
+- Added a build tracker page with week-by-week to-dos and end-of-week assignments: https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
