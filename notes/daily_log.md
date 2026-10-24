@@ -172,3 +172,4 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Parts check against JLCPCB stock (script): every IC available. ADS1299 636 in stock at $61.93; TPD4E1B06 switched to the SC-70-6 package (the SOT-5X3 one is out of stock); 3.3 V buck inductor still to choose.
 - Order dates: rev B **Mon 9 Nov**, rev C **Tue 8 Dec** (only if needed).
 - Fixed: these notes were briefly synced to Apple Notes from an older copy in the BrainTech folder; re-synced from this repo.
+- Update: I will design and build the board myself (Claude as tutor/reviewer). Plan rewritten as a 10-week guided build: learn → do → review each week; my own schematic (week 3), PCB (week 4), order **Sat 28 Nov**, bring-up and validation in December.
