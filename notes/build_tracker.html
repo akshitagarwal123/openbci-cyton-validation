@@ -1,0 +1,251 @@
+<title>BrainTech-8 Build Tracker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column, a status header, then ten week sections like pages of a lab notebook. */
+:root{
+  --bg:#f3f6f5;--surface:#ffffff;--ink:#132220;--muted:#5a6b67;--line:#d6dedb;
+  --accent:#0d7a63;--accent-soft:#e1f1ec;--copper:#a85a1e;--copper-soft:#f7ebe1;--late:#b3261e;
+  --display:"Archivo",system-ui,sans-serif;--body:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1514;--surface:#151f1e;--ink:#e4edeb;--muted:#93a4a0;--line:#26332f;
+  --accent:#3fbf9c;--accent-soft:#16302a;--copper:#e2955a;--copper-soft:#33241a;--late:#f2827a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1514;--surface:#151f1e;--ink:#e4edeb;--muted:#93a4a0;--line:#26332f;
+  --accent:#3fbf9c;--accent-soft:#16302a;--copper:#e2955a;--copper-soft:#33241a;--late:#f2827a;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
+.wrap{max-width:820px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+h1{font:800 clamp(26px,5vw,38px)/1.1 var(--display);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:6px 0 0}
+.status{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font:500 22px/1.2 var(--mono);font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.note{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:10px 14px}
+.weeks{display:flex;flex-direction:column;gap:10px}
+details.week{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.week[data-state="now"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center;padding:14px 16px}
+summary::-webkit-details-marker{display:none}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:12px}
+.num{font:800 15px var(--display);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);grid-row:span 2}
+.wtitle{font:600 16px var(--display);margin:0;min-width:0}
+.wmeta{font:400 12.5px var(--mono);color:var(--muted)}
+.chip{font:500 11.5px var(--mono);padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;grid-row:span 2}
+.chip.now{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.chip.done{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.chip.late{color:var(--late);border-color:var(--late)}
+.chip.milestone{background:var(--copper-soft);color:var(--copper);border-color:transparent}
+.body{padding:0 16px 18px 70px;display:flex;flex-direction:column;gap:16px}
+@media (max-width:560px){.body{padding-left:16px}}
+.goal{margin:0;color:var(--muted)}
+h3{font:600 12px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 6px}
+ul.tasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+ul.tasks label{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-radius:6px;cursor:pointer}
+ul.tasks label:hover{background:var(--bg)}
+ul.tasks input{margin-top:3px;width:17px;height:17px;accent-color:var(--accent);flex:none}
+ul.tasks input:checked+span{color:var(--muted);text-decoration:line-through}
+.tag{font:500 11px var(--mono);color:var(--copper);margin-left:6px}
+.quiz{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:12px}
+.q label{display:block;font-weight:500;margin-bottom:5px}
+.q textarea{width:100%;box-sizing:border-box;min-height:70px;font:14px/1.5 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical}
+.q textarea:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+button{font:500 14px var(--body);background:var(--accent);color:var(--surface);border:0;border-radius:8px;padding:8px 16px;cursor:pointer}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+button:disabled{opacity:.5;cursor:default}
+.saved{font:12.5px var(--mono);color:var(--muted)}
+.review{background:var(--accent-soft);border-radius:8px;padding:10px 14px;font-size:14px;white-space:pre-wrap}
+.review.empty{background:var(--bg);color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>BrainTech-8 build tracker</h1>
+    <p class="sub">Your own 8-channel EEG board, designed and built by you, validated against the Cyton by 31 Dec 2026.</p>
+  </header>
+  <section class="status" aria-label="Progress">
+    <div class="stat"><span>Tasks done</span><b id="s-tasks">0 / 0</b><div class="bar"><i id="s-bar"></i></div></div>
+    <div class="stat"><span>Current week</span><b id="s-week">–</b></div>
+    <div class="stat"><span>Board order</span><b id="s-order">–</b></div>
+    <div class="stat"><span>Days to 31 Dec</span><b id="s-days">–</b></div>
+  </section>
+  <p class="note" id="sync-note">Loading saved progress…</p>
+  <div class="weeks" id="weeks"></div>
+</div>
+
+<script>
+const WEEKS = [
+ {id:"w1",title:"Electronics basics and KiCad setup",start:"2026-10-24",end:"2026-10-31",
+  goal:"Understand voltage, current, resistance, grounds and RC filters; get your tools installed and ordered.",
+  tasks:["Read Ch 1, Introduction (p1–4)","Read 2.1–2.3 current and voltage (p5–18)","Read 2.5 resistance and 2.7 heat and power (p23–34)","Read 2.10 grounds (p40–48)","Read 2.11–2.17 Ohm's law, dividers, Kirchhoff (p49–74)","Read 2.20–2.22 AC, frequency, RMS, mains power (p80–94)","Read 2.23 capacitors, RC time constant, reactance (p94–113)","Install KiCad and LTspice","Run week01_rc_filter.py with three different R and C pairs","Simulate an RC low-pass in LTspice and compare its cutoff with the script","Finish one KiCad beginner tutorial (Phil's Lab) to a practice board with 0 DRC errors","Order an ESP32-S3 DevKitC-1","Order multimeter, soldering iron, solder, flux, tweezers and a practice kit"],
+  quiz:["EEG is measured as a voltage between two points. Why not at one point, and what job does the reference (SRB) do?","Skin–electrode resistance is 50 kΩ and 1 nA flows through it. What voltage appears, and how does it compare with a 10 µV alpha wave?","When the SRB ear clip came off, all your channels looked identical. Explain why.","Design an RC low-pass with a cutoff near 40 Hz using a 10 kΩ resistor. Which capacitor? How much of the 50 Hz mains signal still passes?","What does 'floating' mean, and why is a battery-powered, floating EEG board safer?","Your LTspice result: what cutoff did you measure, and how far was it from the calculated value?"]},
+ {id:"w2",title:"Op-amps, the Cyton, and ESP32 basics",start:"2026-11-01",end:"2026-11-07",
+  goal:"Understand how an EEG front end works by reading the Cyton schematic, and get the ESP32 sending data to BrainFlow.",
+  tasks:["Book Ch 8: op-amp golden rules, inverting and non-inverting amplifiers","Book Ch 8: instrumentation amplifiers and CMRR","Op Amps for Everyone: skim the basics and noise chapters","Simulate a non-inverting amplifier with gain 10 in LTspice","Read the ADS1299 datasheet overview and block diagram","Mark the Cyton schematic's blocks: protection, ADS1299, power, MCU, radio","Explain every Cyton block to Claude in a review session","ESP32: set up Arduino or PlatformIO and blink an LED","ESP32: join Wi-Fi and send fake 8-channel data","See your fake data arrive in BrainFlow"],
+  quiz:["State the op-amp golden rules. What is the gain of a non-inverting amplifier with Rf = 90 kΩ and Rg = 10 kΩ?","What is the difference between common-mode and differential signals? Why does EEG need a high CMRR? Use 50 Hz mains as your example.","What does a PGA do, and why does the Cyton run the ADS1299 at gain 24?","Why is there a resistor and a small capacitor between each electrode and the ADS1299 input?","What does the bias (driven right leg) electrode do?","Explain SPI in four lines (SCLK, MOSI, MISO, CS), and say what the ADS1299's DRDY pin tells the MCU."]},
+ {id:"w3",title:"Draw your schematic",start:"2026-11-08",end:"2026-11-14",
+  goal:"Your own complete schematic in KiCad, checked pin by pin against the ADS1299 datasheet.",
+  tasks:["ADS1299 datasheet: pin table, power supplies, required capacitors","ADS1299 datasheet: bias drive (Fig. 68), SRB1, input multiplexer","Learn power basics: LDO vs buck vs charge pump, LiPo charging","Create the KiCad project and set up symbol and footprint libraries","Draw power: USB-C, charger, battery, switch, 3.3 V buck, ±2.5 V analog","Draw the ADS1299 with every VCAP, VREF and decoupling capacitor","Draw 8 input channels plus SRB and BIAS with protection (TVS, 2.2 kΩ, 47 pF)","Draw the ESP32-S3: SPI, DRDY, START, RESET, PWDN, boot and reset buttons, LEDs","Add battery sense, USB-plugged detection and test points","Run ERC and fix every error","Review session with Claude: every pin against the datasheet","Compare with the Cyton and rev A; write down each difference and why"],
+  quiz:["List every ADS1299 power pin and the capacitor on it, with the datasheet section that says so.","Why do AVDD and AVSS (±2.5 V) come from LDOs instead of straight from the buck converter?","Why put 2 × 100 kΩ in series with the BIAS electrode?","What happens if the CLKSEL pin is left floating?","Trace the signal path from an electrode to Wi-Fi in one line, naming every part it passes through."]},
+ {id:"w4",title:"Lay out your PCB",start:"2026-11-15",end:"2026-11-21",
+  goal:"A routed 4-layer board with 0 DRC errors, decoupling caps at their pins and short analog inputs.",
+  tasks:["Learn: 4-layer stack-up, ground planes, return currents (Phil's Lab)","Assign footprints and check each against its part datasheet","Set the board outline, layer stack and JLCPCB design rules","Place the ADS1299 and its decoupling caps within 1–2 mm of their pins","Place the input protection in a straight row next to the input pins","Place the buck and charge pump far from the electrode inputs","Place the ESP32 at the board edge with its antenna keep-out","Route the analog inputs first: short and similar in length","Route SPI and power; keep the inner ground plane solid","Reach 0 DRC errors and check the 3D view","Review session with Claude"],
+  quiz:["Why use a solid ground plane, and what happens when a trace cuts through it?","Why must decoupling capacitors sit right next to their pins?","Why keep the buck converter away from the electrode inputs?","What is a via, and when can one cause problems?","Describe each layer of your 4-layer stack-up and what it carries."]},
+ {id:"w5",title:"Review, fix and order",start:"2026-11-22",end:"2026-11-28",milestone:"Order by Sat 28 Nov",
+  goal:"Outside review, fixes, manufacturing files, and the order placed with JLCPCB.",
+  tasks:["Post the design for outside review (NeuroTechX, OpenBCI forum, r/PrintedCircuitBoard)","Fix the review findings","Generate Gerbers, drill files, BOM and pick-and-place (CPL)","Map every BOM line to an LCSC part number and check stock","Upload to JLCPCB and check the assembly preview (rotation, pin 1)","Get the quote: 5 PCBs, 2 assembled","Place the order (by Sat 28 Nov)","Order electrodes, gel and a protected 1S LiPo"],
+  quiz:["What are Gerber, BOM and CPL files, and who uses each?","Why check component rotation in JLCPCB's assembly preview?","What is the difference between a Basic and an Extended part at JLCPCB, and why does it matter?","Name the three riskiest things on your board and how you would detect each one at bring-up."]},
+ {id:"w6",title:"Soldering practice and ADS1299 firmware",start:"2026-11-29",end:"2026-12-05",
+  goal:"Hands ready for bodge wires; firmware ready to talk to the real ADS1299.",
+  tasks:["Book Ch 7: soldering and multimeter use","Build the soldering practice kit","Practise soldering an 0603 part and a bodge wire on scrap board","Firmware: ADS1299 register map and power-up sequence","Firmware: SPI read of the ID register","Firmware: RDATAC loop and 24-bit to µV conversion","Firmware: Cyton packet format over Wi-Fi into BrainFlow"],
+  quiz:["Write the formula to convert a raw 24-bit ADS1299 value to µV at gain 24 with Vref = 4.5 V.","What is a cold solder joint, and how do you spot one?","Describe the ADS1299 power-up and reset sequence.","Describe the Cyton 33-byte packet: what is in each part?"]},
+ {id:"w7",title:"Validation suite and bring-up prep",start:"2026-12-06",end:"2026-12-12",
+  goal:"One command that tests your board and prints the pass table; a bench ready for the boards.",
+  tasks:["Port the Cyton validation scripts to your board","Run the suite on recorded Cyton data","Write the bring-up checklist: rails, SPI, test signal, noise, Wi-Fi","Prepare the bench: battery or current-limited supply, multimeter, cables","Track the shipment"],
+  quiz:["What is shorted-input noise, how do you measure it, and what number passes?","What does the internal test signal prove?","Why check the power rails before running any firmware?","Why measure packet loss over 10 minutes instead of 10 seconds?"]},
+ {id:"w8",title:"Bring up the board",start:"2026-12-13",end:"2026-12-19",
+  goal:"Your board streams 8 channels into BrainFlow with noise in spec.",
+  tasks:["Inspect the board under a magnifier","Measure resistance from every rail to GND (no shorts)","Power on from battery or a current-limited supply; measure 3.3 V, +2.5 V, −2.5 V","Flash the firmware over USB","Read the ADS1299 ID register (expect 0x3E)","Internal test signal on all 8 channels","Shorted-input noise ≤ 0.15 µV","Wi-Fi streaming into BrainFlow; 10-minute packet-loss test","Log every problem and its fix"],
+  quiz:["A rail reads 0 V. Give three possible causes and how you would check each.","The ID register reads 0x00 or 0xFF. What do you check?","Noise is 2 µV with a big 50 Hz peak. What are your next steps?"]},
+ {id:"w9",title:"Validate against the Cyton",start:"2026-12-20",end:"2026-12-26",
+  goal:"The 'comparable to Cyton' pass table filled in with real measurements.",
+  tasks:["Eyes-closed alpha: Cyton, then your board, same positions","ECG test","SSVEP at 12 and 15 Hz","Battery runtime ≥ 4 h","Fill in the pass table"],
+  quiz:["Your alpha ratio is 2× on your board but 4× on the Cyton. What could explain the difference?","Go through your pass table: what passed, what failed, and why?"]},
+ {id:"w10",title:"Demo and write-up",start:"2026-12-27",end:"2026-12-31",
+  goal:"A live demo and a public write-up of your board.",
+  tasks:["Fix remaining issues with bodge wires","Motor-imagery calibration and live_classify.py on your board","Record the demo video","Write the design story and the Cyton comparison table on GitHub","List the rev C changes for January"],
+  quiz:["What would you change in rev C, and why?","Write how you would explain your board to an interviewer in two minutes."]}
+];
+const ORDER_DATE = "2026-11-28", END_DATE = "2026-12-31";
+const done = {}, answers = {}, reviews = {};
+let db = null, local = false;
+
+const day = s => new Date(s + "T00:00:00");
+const today = () => { const d = new Date(); d.setHours(0,0,0,0); return d; };
+const fmt = s => day(s).toLocaleDateString(undefined, {day:"numeric", month:"short"});
+const taskId = (w, i) => `${w.id}-t${i + 1}`;
+
+function weekState(w) {
+  const n = w.tasks.filter((_, i) => done[taskId(w, i)]).length;
+  if (n === w.tasks.length) return "done";
+  const t = today();
+  if (t > day(w.end)) return "late";
+  if (t >= day(w.start)) return "now";
+  return "upcoming";
+}
+
+function build() {
+  const root = document.getElementById("weeks");
+  WEEKS.forEach((w, wi) => {
+    const d = document.createElement("details");
+    d.className = "week"; d.id = w.id;
+    d.innerHTML = `<summary><span class="num">${wi + 1}</span><h2 class="wtitle"></h2><span class="chip" id="${w.id}-chip"></span>
+      <span class="wmeta"><span>${fmt(w.start)} – ${fmt(w.end)}</span> · <span id="${w.id}-count"></span>${w.milestone ? ` · <span class="tag">${w.milestone}</span>` : ""}</span></summary>
+      <div class="body"><p class="goal"></p><div><h3>To do</h3><ul class="tasks"></ul></div>
+      <div class="quiz"><h3>End-of-week assignment</h3><div class="qs"></div>
+      <div class="row"><button type="button" id="${w.id}-save">Save answers</button><span class="saved" id="${w.id}-saved"></span></div>
+      <div><h3>Claude's review</h3><div class="review empty" id="${w.id}-review">No review yet. When you've saved your answers, tell Claude: "review week ${wi + 1}".</div></div></div></div>`;
+    d.querySelector(".wtitle").textContent = w.title;
+    d.querySelector(".goal").textContent = w.goal;
+    const ul = d.querySelector(".tasks");
+    w.tasks.forEach((t, i) => {
+      const id = taskId(w, i), li = document.createElement("li");
+      li.innerHTML = `<label><input type="checkbox" id="${id}"><span></span></label>`;
+      li.querySelector("span").textContent = t;
+      li.querySelector("input").addEventListener("change", e => saveTask(id, e.target.checked));
+      ul.appendChild(li);
+    });
+    const qs = d.querySelector(".qs");
+    w.quiz.forEach((q, i) => {
+      const div = document.createElement("div"); div.className = "q";
+      div.innerHTML = `<label for="${w.id}-q${i + 1}"></label><textarea id="${w.id}-q${i + 1}" placeholder="Your answer, in your own words"></textarea>`;
+      div.querySelector("label").textContent = `${i + 1}. ${q}`;
+      qs.appendChild(div);
+    });
+    d.querySelector(`#${w.id}-save`).addEventListener("click", () => saveAnswers(w));
+    root.appendChild(d);
+  });
+}
+
+function refresh() {
+  let total = 0, n = 0, current = null;
+  WEEKS.forEach((w, wi) => {
+    const k = w.tasks.filter((_, i) => done[taskId(w, i)]).length;
+    total += w.tasks.length; n += k;
+    w.tasks.forEach((_, i) => { const el = document.getElementById(taskId(w, i)); el.checked = !!done[taskId(w, i)]; });
+    const st = weekState(w), chip = document.getElementById(`${w.id}-chip`);
+    chip.className = "chip " + (st === "upcoming" ? "" : st);
+    chip.textContent = {done: "Done", now: "This week", late: "Behind", upcoming: "Upcoming"}[st];
+    document.getElementById(`${w.id}-count`).textContent = `${k}/${w.tasks.length} tasks`;
+    document.getElementById(w.id).dataset.state = st;
+    const t = today();
+    if (!current && t >= day(w.start) && t <= day(w.end)) current = wi + 1;
+    const r = reviews[w.id], rv = document.getElementById(`${w.id}-review`);
+    if (r && r.text) { rv.textContent = r.text; rv.classList.remove("empty"); }
+    const a = answers[w.id];
+    if (a) {
+      w.quiz.forEach((_, i) => { const ta = document.getElementById(`${w.id}-q${i + 1}`);
+        if (document.activeElement !== ta && !ta.dataset.dirty) ta.value = a[`q${i + 1}`] || ""; });
+      if (a.savedAt) document.getElementById(`${w.id}-saved`).textContent = "Saved " + new Date(a.savedAt).toLocaleString(undefined, {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
+    }
+  });
+  document.getElementById("s-tasks").textContent = `${n} / ${total}`;
+  document.getElementById("s-bar").style.width = (total ? 100 * n / total : 0) + "%";
+  document.getElementById("s-week").textContent = current ? `Week ${current}` : (today() < day(WEEKS[0].start) ? "Not started" : "Finished");
+  const toOrder = Math.round((day(ORDER_DATE) - today()) / 864e5);
+  document.getElementById("s-order").textContent = toOrder > 0 ? `in ${toOrder} days` : toOrder === 0 ? "today" : "date passed";
+  document.getElementById("s-days").textContent = Math.max(0, Math.round((day(END_DATE) - today()) / 864e5));
+}
+
+function loadLocal() {
+  try { Object.assign(done, JSON.parse(localStorage.getItem("bt8-done") || "{}")); Object.assign(answers, JSON.parse(localStorage.getItem("bt8-answers") || "{}")); } catch (e) {}
+}
+function saveLocal() {
+  try { localStorage.setItem("bt8-done", JSON.stringify(done)); localStorage.setItem("bt8-answers", JSON.stringify(answers)); } catch (e) {}
+}
+
+async function saveTask(id, value) {
+  done[id] = value; refresh();
+  if (local) return saveLocal();
+  try { await db.doc(`tasks/${id}`).set({done: value, at: new Date().toISOString()}); }
+  catch (e) { setNote("Couldn't save that tick. Check your connection and try again."); }
+}
+
+async function saveAnswers(w) {
+  const body = {savedAt: new Date().toISOString()};
+  w.quiz.forEach((_, i) => { const ta = document.getElementById(`${w.id}-q${i + 1}`); body[`q${i + 1}`] = ta.value; delete ta.dataset.dirty; });
+  answers[w.id] = body;
+  const btn = document.getElementById(`${w.id}-save`); btn.disabled = true;
+  try {
+    if (local) saveLocal(); else await db.doc(`answers/${w.id}`).set(body);
+    document.getElementById(`${w.id}-saved`).textContent = "Saved just now";
+  } catch (e) { document.getElementById(`${w.id}-saved`).textContent = "Not saved. Check your connection and try again."; }
+  btn.disabled = false;
+}
+
+function setNote(t) { document.getElementById("sync-note").textContent = t; }
+
+build();
+document.querySelectorAll("textarea").forEach(ta => ta.addEventListener("input", () => { ta.dataset.dirty = "1"; }));
+const now = WEEKS.find(w => today() >= day(w.start) && today() <= day(w.end)) || WEEKS[0];
+document.getElementById(now.id).open = true;
+refresh();
+
+(async () => {
+  db = window.claude ? await window.claude.use("db") : null;
+  if (!db) {
+    local = true; loadLocal(); refresh();
+    setNote("Progress is saved in this browser only. Open the tracker on claude.ai while signed in to keep it in one place that Claude can read.");
+    return;
+  }
+  setNote("Progress saves automatically. Claude can read your ticks and answers and writes the weekly review here.");
+  db.collection("tasks").onSnapshot(s => { s.docs.forEach(d => { done[d.id] = !!d.data().done; }); refresh(); }, () => setNote("Lost the connection to saved progress. Reload the page."));
+  db.collection("answers").onSnapshot(s => { s.docs.forEach(d => { answers[d.id] = d.data(); }); refresh(); }, () => {});
+  db.collection("reviews").onSnapshot(s => { s.docs.forEach(d => { reviews[d.id] = d.data(); }); refresh(); }, () => {});
+})();
+</script>
