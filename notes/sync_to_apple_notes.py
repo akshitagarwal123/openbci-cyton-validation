@@ -15,7 +15,7 @@ import subprocess
 import sys
 
 FOLDER = "BrainTech"
-FILES = ["daily_log.md", "validation_tracker.md"]
+FILES = ["daily_log.md", "validation_tracker.md", "build_plan.md", "hardware_learning_plan.md"]
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 

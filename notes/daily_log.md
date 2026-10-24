@@ -160,3 +160,15 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Wiring: for gel electrodes, short (20–40 cm) unshielded leads sewn into the cap and bundled into one ribbon are enough. Shielding only pays off with dry or high-impedance contacts, and then the shield should be driven, not grounded.
 - Board review against `circuit.py` (3258edc): proposed rev-A changes are 47 pF C0G input caps (now 1 nF), ≥100 kΩ in series with BIAS (now 2.2 kΩ), a 2x13 connector with pins for powering active electrodes, a shield drive and impedance excitation, a DNP shield-driver footprint, and a guard pour. Sent to the PCB design session to log; **no re-layout until approved**.
 - Next: decide on the PCB changes; buy matched wet electrodes (good/better/best tiers in the report).
+
+## 2026-10-20 — start of the from-scratch hardware track
+- Decided to build our own BCI from scratch and learn electronics bottom-up (computer science background). Rev A (16 ch) parked until we can debug hardware ourselves.
+- Wrote `notes/hardware_learning_plan.md`: learn → build roadmap, every build checked against the Cyton; Week 1 day by day for Practical Electronics for Inventors (Ch 1–2, 7, 8, 9 only, with page numbers); shopping list.
+- First exercise: `BrainTech/hw_learning/week01_rc_filter.py` (RC cutoff + frequency response).
+
+## 2026-10-24 — build sprint: BrainTech-8 by 31 Dec
+- New target: our own Cyton-class EEG board by **31 Dec** (69 days, two board spins). Plan: `notes/build_plan.md`. Learning plan paused until after the sprint.
+- Rev B scope: 8 ch on 1 × ADS1299 (cut down from the 16-ch rev A), ESP32-S3 Wi-Fi, LiPo, Cyton-compatible data. Adopted from the rev A review list: TPD4E1B06 low-leakage TVS, 47 pF C0G ±2 % input caps, 2 × 100 kΩ in series with BIAS, USB-plugged detection. Deferred: active-electrode power, shield driver, guard pour.
+- Parts check against JLCPCB stock (script): every IC available. ADS1299 636 in stock at $61.93; TPD4E1B06 switched to the SC-70-6 package (the SOT-5X3 one is out of stock); 3.3 V buck inductor still to choose.
+- Order dates: rev B **Mon 9 Nov**, rev C **Tue 8 Dec** (only if needed).
+- Fixed: these notes were briefly synced to Apple Notes from an older copy in the BrainTech folder; re-synced from this repo.
