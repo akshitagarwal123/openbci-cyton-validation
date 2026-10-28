@@ -10,8 +10,11 @@ Right header from the USB end: 5V, CMD, SD3, SD2, G13, **GND (row 6)**, G12, G14
 | 3 | j14 (G35, ADC in) | g30 | jumper |
 | 4 | j15 (G34, ADC out) | g34 | jumper |
 | 5 | h30 | h34 | 10 kΩ resistor (brown-black-orange) |
-| 6 | i34 | − rail, row 36 | 0.47 µF capacitor (474); electrolytic: long leg in i34 |
+| 6 | i34 | − rail, row 36 | capacitor: using **0.1 µF (104)** → cutoff ≈ 159 Hz with 10 kΩ |
 
 **Connected (same metal strip):** row 30 f–j = input node (G25, G35, resistor top); row 34 f–j = output node (resistor bottom, capacitor, G34); the whole − rail column (GND, capacitor); each pin's row f–j (pin + its jumper).
 **Not connected:** a–e vs f–j of the same row (centre gap); row 30 vs row 34 except through the resistor; − rail vs + rail; top and bottom of a rail if the rail is split in the middle.
 Row numbers shift if the ESP32 sits lower: count pins from the USB end and use that pin's own row.
+
+## Measuring it
+`esp32_bode/esp32_bode.ino` (upload with Arduino IDE, board "ESP32 Dev Module") sweeps 5 Hz–1 kHz; `esp32_bode/bode_plot.py --r 10000 --c 0.1e-6` plots measured vs theory and saves `bode_measured.png`.
