@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-10-24 — 2 of 89 tasks done._
+_Last synced: 2026-10-29 — 11 of 89 tasks done. Learning notes: [../learning](../learning/)._
 
 ## Parts on hand (24 Oct)
 
@@ -15,16 +15,16 @@ Still needed: TP4056 charger module **with protection** (never charge the 18650/
 
 Understand voltage, current, resistance, grounds and RC filters; get your tools installed and ordered.
 
-- [ ] Read Ch 1, Introduction (p1–4)
-- [ ] Read 2.1–2.3 current and voltage (p5–18)
-- [ ] Read 2.5 resistance and 2.7 heat and power (p23–34)
-- [ ] Read 2.10 grounds (p40–48)
-- [ ] Read 2.11–2.17 Ohm's law, dividers, Kirchhoff (p49–74)
-- [ ] Read 2.20–2.22 AC, frequency, RMS, mains power (p80–94)
-- [ ] Read 2.23 capacitors, RC time constant, reactance (p94–113)
-- [ ] Install KiCad and LTspice
+- [x] Read Ch 1, Introduction (p1–4)
+- [x] Read 2.1–2.3 current and voltage (p5–18)
+- [x] Read 2.5 resistance and 2.7 heat and power (p23–34)
+- [x] Read 2.10 grounds (p40–48)
+- [x] Read 2.11–2.17 Ohm's law, dividers, Kirchhoff (p49–74)
+- [x] Read 2.20–2.22 AC, frequency, RMS, mains power (p80–94)
+- [x] Read 2.23 capacitors, RC time constant, reactance (p94–113)
+- [x] Install KiCad and LTspice
 - [ ] Run week01_rc_filter.py with three different R and C pairs
-- [ ] Simulate an RC low-pass in LTspice and compare its cutoff with the script
+- [x] Simulate an RC low-pass in LTspice and compare its cutoff with the script
 - [ ] Finish one KiCad beginner tutorial (Phil's Lab) to a practice board with 0 DRC errors
 - [x] Get an ESP32 dev board (have: ESP32 DevKit V1)
 - [x] Get multimeter, soldering iron, solder, wick and flux (have)

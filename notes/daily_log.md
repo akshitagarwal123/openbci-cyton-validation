@@ -174,3 +174,7 @@ Short check-ins: what we did, what we learned, what's next. Newest first.
 - Fixed: these notes were briefly synced to Apple Notes from an older copy in the BrainTech folder; re-synced from this repo.
 - Update: I will design and build the board myself (Claude as tutor/reviewer). Plan rewritten as a 10-week guided build: learn → do → review each week; my own schematic (week 3), PCB (week 4), order **Sat 28 Nov**, bring-up and validation in December.
 - Added a build tracker page with week-by-week to-dos and end-of-week assignments: https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
+
+## 2026-10-27 → 29 — week 1: first simulation
+- Installed LTspice 26 (KiCad 10 already installed). First simulation: RC low-pass 10 kΩ / 0.47 µF → cutoff ≈ 34 Hz, −20 dB/decade, matches 1/(2πRC). Learned dB, reactance, and the "cutoff = where X_C equals R" idea.
+- ESP32 DevKit V1 on the breadboard; next: real Bode plot with the ESP32 DAC (G25) and ADC (G35/G34). Notes: `learning/week01/notes.md`.

@@ -1,0 +1,7 @@
+* RC low-pass, week 1 (same circuit as the LTspice schematic: V1 -> R1 -> out -> C1 -> GND)
+* Open in LTspice (File > Open) and Run; probe V(out). Expected cutoff 1/(2*pi*R*C) = 33.9 Hz.
+V1 in 0 AC 1
+R1 in out 10k
+C1 out 0 0.47u
+.ac dec 100 1 1k
+.end
