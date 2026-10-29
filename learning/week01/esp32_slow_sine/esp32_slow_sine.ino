@@ -1,12 +1,12 @@
 // Week 1: a very slow sine on G25 so a multimeter can follow it.
-// Default: one full wave every 10 s (0.1 Hz), from about 0.75 V up to 2.55 V and back.
+// Default: one full wave every 10 s (0.1 Hz), from about 0.25 V up to 3.1 V and back.
 // Also prints the voltage being output 5 times a second (Serial Monitor / Plotter, 115200 baud).
 // Type a frequency in Hz (0.02 to 2) and press Enter to change it.
 
 #include <math.h>
 
 const int DAC_PIN = 25;
-const int DAC_MID = 128, DAC_AMP = 110;       // bigger swing: about 0.35 V to 3.0 V
+const int DAC_MID = 128, DAC_AMP = 110;       // bigger swing: about 0.25 V to 3.1 V
 float freq = 0.1;                             // waves per second (0.1 = one wave every 10 s)
 double phase = 0;
 uint32_t lastT, lastPrint;
