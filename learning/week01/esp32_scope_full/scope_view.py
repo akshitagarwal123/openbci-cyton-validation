@@ -4,6 +4,7 @@ Live view of every sample from esp32_scope_full.ino: input (G35) and output (G34
 Usage (Arduino Serial Monitor/Plotter CLOSED):
     ~/Documents/Projects/BrainTech/.venv/bin/python scope_view.py            # 50 Hz
     ~/Documents/Projects/BrainTech/.venv/bin/python scope_view.py --freq 1000
+    ~/Documents/Projects/BrainTech/.venv/bin/python scope_view.py --time       # x-axis in ms
 """
 
 import argparse
@@ -17,6 +18,7 @@ import serial
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--freq", type=float, default=50, help="sine frequency in Hz (5 to 1000)")
+    ap.add_argument("--time", action="store_true", help="x-axis in milliseconds instead of sample number")
     ap.add_argument("--port", default=(glob.glob("/dev/cu.usbserial*") or [None])[0])
     args = ap.parse_args()
 
@@ -27,7 +29,7 @@ def main():
     fig, ax = plt.subplots(figsize=(9, 4.5))
     li, = ax.plot([], [], ".-", ms=3, label="input (G35)")
     lo, = ax.plot([], [], ".-", ms=3, label="output (G34)")
-    ax.set(xlabel="Time (ms)", ylabel="Volts", ylim=(0, 3.3))
+    ax.set(xlabel="Time (ms)" if args.time else "Sample number (one every 0.1 ms)", ylabel="Volts", ylim=(0, 3.3))
     ax.legend(loc="upper right")
     ax.grid(alpha=0.3)
 
@@ -42,7 +44,7 @@ def main():
             data = np.array(rows, dtype=float) * 3.3 / 4095
         except ValueError:
             continue
-        t = np.arange(n) / 10.0                    # 10 samples per ms
+        t = np.arange(n) / 10.0 if args.time else np.arange(n)   # 10 samples per ms
         li.set_data(t, data[:, 0])
         lo.set_data(t, data[:, 1])
         ax.set_xlim(0, t[-1])
