@@ -1,6 +1,6 @@
 // Week 1: a very slow sine on G25 so a multimeter can follow it.
 // Default: one full wave every 10 s (0.1 Hz), from about 0.25 V up to 3.1 V and back.
-// Also prints the voltage being output 5 times a second (Serial Monitor / Plotter, 115200 baud).
+// Also prints the voltage being output 50 times a second (Serial Monitor / Plotter, 115200 baud).
 // Type a frequency in Hz (0.02 to 2) and press Enter to change it.
 
 #include <math.h>
@@ -28,7 +28,7 @@ void loop() {
   if (phase >= 2 * M_PI) phase -= 2 * M_PI;
   int code = DAC_MID + (int)lround(DAC_AMP * sin(phase));
   dacWrite(DAC_PIN, code);
-  if (now - lastPrint >= 200) {
+  if (now - lastPrint >= 20) {                       // 50 reports per second: 25 points per wave even at 2 Hz
     lastPrint = now;
     Serial.printf("G25_volts:%.2f\n", code * 3.3 / 255);
   }
