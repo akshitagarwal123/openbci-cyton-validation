@@ -44,3 +44,23 @@ Lessons:
 - Use the lowest meter range that doesn't read "1".
 - Ammeter across a pin is a short circuit: 38 mA is at the ESP32 pin limit (~40 mA). Never across a battery.
 - Fix for driving loads: op-amp voltage follower (buffer), coming in week 2.
+
+## 30 Oct: breadboard RC low-pass filter works
+
+Final circuit: G25 → 1 kΩ → row 34 → 47 µF electrolytic (+ to row 34, stripe to GND). G35 reads input, G34 reads output.
+f_c = 1 / (2π × 1 kΩ × 47 µF) = 3.4 Hz. Measured with `esp32_scope/sweep.py`:
+
+| Freq | Output measured | Theory | Delay measured | Theory |
+|---|---|---|---|---|
+| 5 Hz | 58 % | 56 % | −56° | −56° |
+| 10 Hz | 30 % | 32 % | −67° | −71° |
+| 20 Hz | 18 % | 17 % | −86° | −80° |
+| 50 Hz | 8 % | 7 % | −99° | −86° |
+| 100 Hz | 5 % | 3 % | −93° | −88° |
+
+Debugging lessons (why it took several tries):
+1. Capacitor marked "100" is **10 pF**, not 0.1 µF (0.1 µF = "104"). f_c was ~159 kHz → no filtering.
+2. Capacitor's − leg was in a **split half of the power rail**, not GND → no current, output = input. Clue: 0 V DC across the capacitor.
+3. Wrong resistor (~500 kΩ instead of 1 kΩ) → f_c 0.007 Hz → output flat.
+4. DC meter readings: across R ≈ 0 (leak only), across C ≈ input average; they add up to the input (Kirchhoff).
+5. Input amplitude sags from 1.7 V to ~0.5 V under this load: G25 is weak; an op-amp buffer fixes this.
