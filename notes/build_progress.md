@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-10-29 — 11 of 89 tasks done. Learning notes: [../learning](../learning/)._
+_Last synced: 2026-10-31: 14 of 15 week 1 tasks done
 
 ## Parts on hand (24 Oct)
 
@@ -23,13 +23,13 @@ Understand voltage, current, resistance, grounds and RC filters; get your tools 
 - [x] Read 2.20–2.22 AC, frequency, RMS, mains power (p80–94)
 - [x] Read 2.23 capacitors, RC time constant, reactance (p94–113)
 - [x] Install KiCad and LTspice
-- [ ] Run week01_rc_filter.py with three different R and C pairs
+- [x] Run week01_rc_filter.py with three different R and C pairs
 - [x] Simulate an RC low-pass in LTspice and compare its cutoff with the script
 - [ ] Finish one KiCad beginner tutorial (Phil's Lab) to a practice board with 0 DRC errors
 - [x] Get an ESP32 dev board (have: ESP32 DevKit V1)
 - [x] Get multimeter, soldering iron, solder, wick and flux (have)
-- [ ] Buy what is still missing: TP4056 charger module with protection (for the 18650/LiPo), tweezers, a through-hole soldering practice kit
-- [ ] Breadboard an RC low-pass from your kits (10 kΩ + 0.47 µF ≈ 34 Hz) and check R and C values with the multimeter
+- [x] Buy what is still missing: TP4056 charger module with protection (for the 18650/LiPo), tweezers, a through-hole soldering practice kit
+- [x] Breadboard an RC low-pass from your kits (10 kΩ + 0.47 µF ≈ 34 Hz) and check R and C values with the multimeter
 
 **Assignment** (answers in the tracker; review: _not yet_)
 
