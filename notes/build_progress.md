@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-10-31: 14 of 15 week 1 tasks done
+_Last synced: 2026-10-31 (14 of 15 week 1 tasks done)._
 
 ## Parts on hand (24 Oct)
 
