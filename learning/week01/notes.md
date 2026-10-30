@@ -64,3 +64,19 @@ Debugging lessons (why it took several tries):
 3. Wrong resistor (~500 kΩ instead of 1 kΩ) → f_c 0.007 Hz → output flat.
 4. DC meter readings: across R ≈ 0 (leak only), across C ≈ input average; they add up to the input (Kirchhoff).
 5. Input amplitude sags from 1.7 V to ~0.5 V under this load: G25 is weak; an op-amp buffer fixes this.
+
+## 31 Oct: DC step into the RC filter (capacitor charging)
+
+Sketch `esp32_dc_step/` switches G25 from 0 V to steady DC (1.65 V target) and records input/output every 0.5 ms; `dc_step_plot.py` plots it (`dc_step.png`).
+RC = 1 kΩ × 47 µF = 47 ms.
+
+| t | input | output (across C) | across R |
+|---|---|---|---|
+| 0 ms | 1.51 V | 0.38 V | 1.13 V |
+| 47 ms (1 RC) | 1.51 V | 1.09 V | 0.43 V |
+| 100 ms | 1.52 V | 1.37 V | 0.15 V |
+| 250 ms (≈5 RC) | 1.52 V | 1.51 V | 0.01 V |
+
+- DC passes a low-pass filter 100% once the capacitor is charged; the current and the voltage across R fall to ~0.
+- Output started at 0.38 V, not 0 (capacitor not fully emptied / DAC and ADC not reaching true 0 V). Using that start, V = 1.52 − 1.14·e^(−t/47 ms) matches every point (47 ms → 1.10 V predicted, 1.09 V measured).
+- DC input read 1.52 V instead of 1.65 V: ESP32 ADC/DAC calibration error of ~0.1 V is normal.
