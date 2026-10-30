@@ -20,3 +20,27 @@
 - Wire the RC filter to the ESP32, run the DAC sweep, compare measured vs LTspice curve.
 - KiCad beginner tutorial → practice board with 0 DRC errors.
 - Week 1 assignment in the tracker.
+
+## 30 Oct: G25 as a 50 Hz source, and its internal resistance
+
+Sketch: `esp32_ac50/` (continuous 50 Hz sine on G25, 0.25–3.1 V around 1.65 V).
+
+| Measurement | Result |
+|---|---|
+| G25 to GND, DC V, no load | 1.64 V (meter shows the average of the 50 Hz sine) |
+| Resistor value (Ω 200 range) | 10.1 Ω (brown-black-black-gold). Ω 2000 range read "32": range too coarse |
+| G25 with 10 Ω load | 0.34 V |
+| G25 to GND through the ammeter (≈ short) | 34–38 mA |
+| R = V / I with 10 Ω in circuit | ≈ 10.5 Ω (matches 10.1 Ω) |
+
+G25 internal resistance (Thévenin):
+- From the sag: 10.1 × (1.65 / 0.34 − 1) ≈ 39 Ω
+- From open voltage ÷ short current: 1.64 / 0.034–0.038 ≈ 43–48 Ω
+- **≈ 40–50 Ω**
+
+Lessons:
+- A signal pin is not a power supply. Heavy loads (10 Ω) make it sag; light loads (10 kΩ) don't.
+- One open-circuit reading can't give internal resistance; you need a second, loaded reading.
+- Use the lowest meter range that doesn't read "1".
+- Ammeter across a pin is a short circuit: 38 mA is at the ESP32 pin limit (~40 mA). Never across a battery.
+- Fix for driving loads: op-amp voltage follower (buffer), coming in week 2.
