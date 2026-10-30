@@ -11,7 +11,10 @@ const int DAC_MID = 128, DAC_AMP = 70;        // sine around 1.65 V, about ±0.9
 const int POINTS = 50;                        // points per screen (the plotter shows about 50)
 const int MAX_N = 4000;
 
-float freq = 50;
+#ifndef START_HZ
+#define START_HZ 50                           // change at build time: -DSTART_HZ=100
+#endif
+float freq = START_HZ;
 double phase = 0;
 uint32_t nextT;
 int16_t bufIn[MAX_N], bufOut[MAX_N];
@@ -51,7 +54,8 @@ void loop() {
   for (int i = 0; i < n; i++) { tick(vin, vout); bufIn[i] = vin; bufOut[i] = vout; }
   for (int k = 0; k < POINTS; k++) {
     int i = (long)k * n / POINTS;
-    Serial.printf("input_V:%.3f,output_V:%.3f,freq_Hz_div1000:%.3f\n",
-                  bufIn[i] * 3.3 / 4095, bufOut[i] * 3.3 / 4095, freq / 1000);
+    float vi = bufIn[i] * 3.3 / 4095, vo = bufOut[i] * 3.3 / 4095;
+    Serial.printf("input_V:%.3f,output_V:%.3f,across_R_V:%.3f,freq_Hz_div1000:%.3f\n",
+                  vi, vo, vi - vo, freq / 1000);
   }
 }
