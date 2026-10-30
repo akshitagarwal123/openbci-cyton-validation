@@ -10,7 +10,10 @@
 const int DAC_PIN = 25;
 const float FS = 10000.0;                     // DAC updates per second
 const int DAC_MID = 128, DAC_AMP = 110;
-float freq = 50;
+#ifndef START_HZ
+#define START_HZ 50                           // change at build time: -DSTART_HZ=100
+#endif
+float freq = START_HZ;
 double phase = 0;
 uint32_t nextT, lastPrint;
 
