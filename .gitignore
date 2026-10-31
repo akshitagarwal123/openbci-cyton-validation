@@ -9,3 +9,8 @@ hardware/kicad/__pycache__/
 hardware/kicad/*.kicad_prl
 hardware/kicad/*-backups/
 hardware/kicad/fab/gerbers/
+
+# KiCad local files
+.history/
+~*.lck
+*.kicad_prl

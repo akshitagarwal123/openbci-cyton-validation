@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-10-31 (14 of 15 week 1 tasks done)._
+_Last synced: 2026-10-31 (15 of 15 week 1 tasks done)._
 
 ## Parts on hand (24 Oct)
 
@@ -25,7 +25,7 @@ Understand voltage, current, resistance, grounds and RC filters; get your tools 
 - [x] Install KiCad and LTspice
 - [x] Run week01_rc_filter.py with three different R and C pairs
 - [x] Simulate an RC low-pass in LTspice and compare its cutoff with the script
-- [ ] Finish one KiCad beginner tutorial (Phil's Lab) to a practice board with 0 DRC errors
+- [x] Finish one KiCad beginner tutorial (Phil's Lab) to a practice board with 0 DRC errors
 - [x] Get an ESP32 dev board (have: ESP32 DevKit V1)
 - [x] Get multimeter, soldering iron, solder, wick and flux (have)
 - [x] Buy what is still missing: TP4056 charger module with protection (for the 18650/LiPo), tweezers, a through-hole soldering practice kit
