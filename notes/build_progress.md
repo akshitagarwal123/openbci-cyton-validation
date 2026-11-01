@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-10-31 (15 of 15 week 1 tasks done)._
+_Last synced: 2026-11-02 (week 1: 15 of 15 tasks done, assignment reviewed)._
 
 ## Parts on hand (24 Oct)
 
@@ -31,7 +31,9 @@ Understand voltage, current, resistance, grounds and RC filters; get your tools 
 - [x] Buy what is still missing: TP4056 charger module with protection (for the 18650/LiPo), tweezers, a through-hole soldering practice kit
 - [x] Breadboard an RC low-pass from your kits (10 kΩ + 0.47 µF ≈ 34 Hz) and check R and C values with the multimeter
 
-**Assignment** (answers in the tracker; review: _not yet_)
+**Assignment** (answers in the tracker; review: 2 Nov, about 2.5 / 6)
+
+Review summary: Q2 correct. Q1, Q4, Q5, Q6 partly right. Q3 not yet. Main gap: SRB is the reference (every channel = electrode − SRB); BIAS is the electrode that drives current back to cancel shared body voltage. Revisit Q1 and Q3 after the week 2 reading.
 
 1. EEG is measured as a voltage between two points. Why not at one point, and what job does the reference (SRB) do?
 2. Skin–electrode resistance is 50 kΩ and 1 nA flows through it. What voltage appears, and how does it compare with a 10 µV alpha wave?
