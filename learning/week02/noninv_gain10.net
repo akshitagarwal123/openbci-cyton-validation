@@ -1,0 +1,12 @@
+*
+X§U1 N004 N001 N003 N005 N002 LT1057 ;§pnba In+)In-)V+)V-)OUT
+R1 N002 N001 90.9K tol=1 pwr=0.1
+R2 N001 0 10K tol=1 pwr=0.1
+V1 N004 0 SINE(0 0.2 100)
+V2 N003 0 4.5
+V3 0 N005 4.5
+.tran 30m
+* Library below included based on ModelFile attribute of instance X§U1 (C:\users\crossover\AppData\Local\LTspice\lib\sym\OpAmps\LT1057.asy)
+.lib LTC.lib
+.backanno
+.end

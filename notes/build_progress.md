@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-11-02 (week 1: 15 of 15 tasks done, assignment reviewed)._
+_Last synced: 2026-11-03 (week 1: 15 of 15 done, reviewed; week 2: 4 of 12 done)._
 
 ## Parts on hand (24 Oct)
 
@@ -46,10 +46,10 @@ Review summary: Q2 correct. Q1, Q4, Q5, Q6 partly right. Q3 not yet. Main gap: S
 
 Understand how an EEG front end works by reading the Cyton schematic, and get the ESP32 sending data to BrainFlow.
 
-- [ ] Book Ch 8: op-amp golden rules, inverting and non-inverting amplifiers
-- [ ] Book Ch 8: instrumentation amplifiers and CMRR
-- [ ] Op Amps for Everyone: skim the basics and noise chapters
-- [ ] Simulate a non-inverting amplifier with gain 10 in LTspice
+- [x] Book Ch 8: op-amp golden rules, inverting and non-inverting amplifiers
+- [x] Book Ch 8: instrumentation amplifiers and CMRR
+- [x] Op Amps for Everyone: skim the basics and noise chapters
+- [x] Simulate a non-inverting amplifier with gain 10 in LTspice
 - [ ] Read the ADS1299 datasheet overview and block diagram
 - [ ] Mark the Cyton schematic's blocks: protection, ADS1299, power, MCU, radio
 - [ ] Explain every Cyton block to Claude in a review session
