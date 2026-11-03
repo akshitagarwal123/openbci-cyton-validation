@@ -56,7 +56,7 @@ Understand how an EEG front end works by reading the Cyton schematic, and get th
 - [x] ESP32: set up Arduino or PlatformIO and blink an LED
 - [x] ESP32: join Wi-Fi and send fake 8-channel data
 - [x] See your fake data arrive in BrainFlow
-- [x] Breadboard a TL072 non-inverting amplifier, gain 10, on the 9 V battery; measure input and output DC with the multimeter (done with an LM358 on the ESP32's USB 5 V instead, since no battery; measured gain ≈ 10)
+- [x] Breadboard a TL072 non-inverting amplifier, gain 10, on the 9 V battery; measure input and output DC with the multimeter (done with an LM358 on the ESP32's USB 5 V instead, since no battery; measured Vin 0.18 V → Vout 1.96 V, gain ≈ 10.9)
 - [ ] AD8232 + ESP32: read your ECG with the ESP32 ADC and plot it in Python (laptop on battery, not charging)
 
 **Assignment** (answers in the tracker; review: _not yet_)

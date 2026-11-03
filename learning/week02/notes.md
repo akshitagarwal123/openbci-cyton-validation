@@ -79,7 +79,15 @@ No 9 V battery, so the TL072 was swapped for an **LM358** (same pinout, runs on 
 - Pin 2 → Rg 10k to GND, Rf 94k (47k + 47k) to pin 1: gain = 1 + 94/10 = 10.4 → Vout ≈ 2.3 V
 - Unused half: pin 5 → GND, pin 6 → pin 7
 
-**Result: the output measured about 10× the input.** ✅ The op amp holds pin 2 equal to pin 3, and the Rf/Rg divider sets how high the output must go to make that true.
+**Result: Vin (pin 3) = 0.18 V, Vout (pin 1) = 1.96 V → gain ≈ 10.9** (designed 10.4, about 5% off). ✅
+
+| | Designed | Measured |
+|---|---|---|
+| Vin (pin 3) | 0.22 V | 0.18 V |
+| Vout (pin 1) | 2.3 V | 1.96 V |
+| Gain | 10.4 | ≈ 10.9 |
+
+Why it's off: Vin is low, probably because the USB 5 V rail is nearer 4 V, or the divider resistors are off by their tolerance. The gain error comes from the 2-digit reading (0.175–0.185 V gives gain 10.6–11.2) plus the 5% tolerance on Rf/Rg. To check: measure pin 8, read pin 3 on the 2000m range, and measure Rf and Rg out of the circuit. The op amp holds pin 2 equal to pin 3, and the Rf/Rg divider sets how high the output must go to make that true.
 
 Note: the divider input comes from the same 5 V rail, so about 0.47 × any USB ripple shows up at the output (fine for a DC multimeter test).
 
