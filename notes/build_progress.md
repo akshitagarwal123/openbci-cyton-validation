@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-11-03 (week 1: 15 of 15 done, reviewed; week 2: 4 of 12 done)._
+_Last synced: 2026-11-03 (week 1: 15 of 15 done, reviewed; week 2: 5 of 12 done)._
 
 ## Parts on hand (24 Oct)
 
@@ -50,7 +50,7 @@ Understand how an EEG front end works by reading the Cyton schematic, and get th
 - [x] Book Ch 8: instrumentation amplifiers and CMRR
 - [x] Op Amps for Everyone: skim the basics and noise chapters
 - [x] Simulate a non-inverting amplifier with gain 10 in LTspice
-- [ ] Read the ADS1299 datasheet overview and block diagram
+- [x] Read the ADS1299 datasheet overview and block diagram
 - [ ] Mark the Cyton schematic's blocks: protection, ADS1299, power, MCU, radio
 - [ ] Explain every Cyton block to Claude in a review session
 - [ ] ESP32: set up Arduino or PlatformIO and blink an LED
