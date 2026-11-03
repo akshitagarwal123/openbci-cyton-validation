@@ -89,6 +89,8 @@ No 9 V battery, so the TL072 was swapped for an **LM358** (same pinout, runs on 
 
 Why it's off: Vin is low, probably because the USB 5 V rail is nearer 4 V, or the divider resistors are off by their tolerance. The gain error comes from the 2-digit reading (0.175–0.185 V gives gain 10.6–11.2) plus the 5% tolerance on Rf/Rg. To check: measure pin 8, read pin 3 on the 2000m range, and measure Rf and Rg out of the circuit. The op amp holds pin 2 equal to pin 3, and the Rf/Rg divider sets how high the output must go to make that true.
 
+![LM358 gain-10 amplifier on the breadboard, powered from the ESP32's USB 5 V](lm358_breadboard.jpg)
+
 Note: the divider input comes from the same 5 V rail, so about 0.47 × any USB ripple shows up at the output (fine for a DC multimeter test).
 
 Next: clipping test (4.7k → 22k gives Vin ≈ 0.86 V, ideal Vout ≈ 9 V, but the LM358 output stops near 3.5 V on 5 V, and pins 2 and 3 stop matching).
