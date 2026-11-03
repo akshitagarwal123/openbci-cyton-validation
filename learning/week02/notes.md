@@ -65,3 +65,7 @@ Lesson: broadcast Wi-Fi frames are never ACKed or retried and get buffered for s
 10 s test: **10,020 samples (1002/s), 0 lost**. Every channel's frequency and amplitude matched (e.g. ch1 10.0 Hz / 20.1 µV, ch8 30.0 Hz / 5.3 µV).
 
 ![BrainFlow fake data](esp32_brainflow_fake8/brainflow_fake8.png)
+
+**OpenBCI GUI** (v6.0.0-beta.1): CYTON (live) → Wifi (from Wifi Shield) → Static IP `192.168.1.12` → 8 channels, 1000 Hz → Start Session → Start Data Stream. All 8 traces move and the FFT shows peaks at 6, 8, 10, 12, 15, 20, 30 Hz. uVrms matches amplitude/√2 (ch1 14.2 ≈ 20/1.414).
+
+![OpenBCI GUI showing fake data](esp32_brainflow_fake8/openbci_gui_fake8.jpg)
