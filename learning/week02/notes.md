@@ -45,3 +45,23 @@ Parts: TL072, 9 V battery + snap, 2× 1 kΩ, 2× 100 µF electrolytic, 2× 0.1 �
 5. **Clipping test:** swap 4.7 kΩ → 22 kΩ (Vin ≈ 0.81 V). Vout stops near +3 V; pins 2 and 3 no longer match.
 
 Safety: battery only, nothing on the body. Chip hot → unplug (pins 4/8 swapped). Unplug the battery when done (the divider drains ~4.5 mA). If the TL072 misbehaves at ±4.5 V, try the LM358.
+
+## 3–4 Nov: ESP32 blink, Wi-Fi and BrainFlow
+
+**Blink** (`esp32_blink/`): the sketch runs, but this DevKit clone has **no LED on GPIO 2**. The blue LED near USB is the USB-serial (FT232R) data light: it flashes whenever `Serial.print` sends text. Still to do: prove GPIO 2 (right header pin 15) switches 3.3 V ↔ 0 V with the multimeter.
+
+**Wi-Fi + fake 8 channels** (`esp32_wifi_fake8/`): UDP, 250 SPS, 10 samples per packet, text `sampleNum,ch1..ch8` in µV.
+
+| Mode | Received | Lost |
+|---|---|---|
+| Broadcast to 192.168.1.255, −80 dBm | ~40 samples/s | **84%** |
+| Broadcast, −70 dBm | ~210 samples/s | 15–17% |
+| Unicast to the Mac 192.168.1.8 | ≈ 250 samples/s | ≈ 0% |
+
+Lesson: broadcast Wi-Fi frames are never ACKed or retried and get buffered for sleeping clients (bursts every ~200 ms). Unicast gets ACK + retries. Per-second rates above 250 are late packets landing in the next 1-s window.
+
+**BrainFlow** (`esp32_brainflow_fake8/`): the ESP32 emulates an OpenBCI Cyton + Wi-Fi Shield (`/board`, `/tcp`, `/command`, `/stream/start|stop`, 33-byte packets over TCP). BrainFlow `CYTON_WIFI_BOARD` sets 1000 Hz (`~4`).
+
+10 s test: **10,020 samples (1002/s), 0 lost**. Every channel's frequency and amplitude matched (e.g. ch1 10.0 Hz / 20.1 µV, ch8 30.0 Hz / 5.3 µV).
+
+![BrainFlow fake data](esp32_brainflow_fake8/brainflow_fake8.png)

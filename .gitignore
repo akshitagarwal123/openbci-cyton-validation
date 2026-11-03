@@ -17,3 +17,4 @@ hardware/kicad/fab/gerbers/
 
 # Week 2 Wi-Fi sketch: real Wi-Fi password, never commit
 learning/week02/esp32_wifi_fake8/secrets.h
+learning/week02/esp32_brainflow_fake8/secrets.h
