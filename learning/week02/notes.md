@@ -69,3 +69,18 @@ Lesson: broadcast Wi-Fi frames are never ACKed or retried and get buffered for s
 **OpenBCI GUI** (v6.0.0-beta.1): CYTON (live) → Wifi (from Wifi Shield) → Static IP `192.168.1.12` → 8 channels, 1000 Hz → Start Session → Start Data Stream. All 8 traces move and the FFT shows peaks at 6, 8, 10, 12, 15, 20, 30 Hz. uVrms matches amplitude/√2 (ch1 14.2 ≈ 20/1.414).
 
 ![OpenBCI GUI showing fake data](esp32_brainflow_fake8/openbci_gui_fake8.jpg)
+
+## 4 Nov: LM358 gain-10 amplifier (USB 5 V)
+
+No 9 V battery, so the TL072 was swapped for an **LM358** (same pinout, runs on a single 5 V supply) powered from the ESP32 DevKit's 5V pin (left pin 19) and GND.
+
+- Pin 8 → 5 V, with a 0.1 µF (104) decoupling cap to GND; pin 4 → GND
+- Pin 3 ← 100k/4.7k divider: Vin = 5 × 4.7/104.7 ≈ 0.22 V
+- Pin 2 → Rg 10k to GND, Rf 94k (47k + 47k) to pin 1: gain = 1 + 94/10 = 10.4 → Vout ≈ 2.3 V
+- Unused half: pin 5 → GND, pin 6 → pin 7
+
+**Result: the output measured about 10× the input.** ✅ The op amp holds pin 2 equal to pin 3, and the Rf/Rg divider sets how high the output must go to make that true.
+
+Note: the divider input comes from the same 5 V rail, so about 0.47 × any USB ripple shows up at the output (fine for a DC multimeter test).
+
+Next: clipping test (4.7k → 22k gives Vin ≈ 0.86 V, ideal Vout ≈ 9 V, but the LM358 output stops near 3.5 V on 5 V, and pins 2 and 3 stop matching).
