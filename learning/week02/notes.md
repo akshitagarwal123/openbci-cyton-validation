@@ -94,3 +94,18 @@ Why it's off: Vin is low, probably because the USB 5 V rail is nearer 4 V, or th
 Note: the divider input comes from the same 5 V rail, so about 0.47 × any USB ripple shows up at the output (fine for a DC multimeter test).
 
 Next: clipping test (4.7k → 22k gives Vin ≈ 0.86 V, ideal Vout ≈ 9 V, but the LM358 output stops near 3.5 V on 5 V, and pins 2 and 3 stop matching).
+
+## 4 Nov: ECG with the AD8232 + ESP32 ADC
+
+Folder: `esp32_ecg_ad8232/`. Laptop on battery, charger unplugged.
+
+- **Wiring:** AD8232 GND → GND (left pin 14), 3.3V → 3V3 (left pin 1), OUTPUT → GPIO 34 (left pin 5, ADC1), LO− → GPIO 33 (left pin 8), LO+ → GPIO 32 (left pin 7). SDN is not connected.
+- **Sketch:** samples at 250 Hz with `analogReadMilliVolts`, sends `millivolts,leadsOff` over USB serial at 115200 baud.
+- **`plot_ecg.py`:** live raw and filtered plots (0.5–40 Hz band-pass plus a 50 Hz notch), heart rate from the R peaks, and a "LEADS OFF" warning. Saves a CSV and a PNG when you close it.
+- **Electrodes:** red (RA) on the right chest, yellow (LA) on the left chest, green (RL) on the lower right ribs.
+
+**Result: the ECG worked.** ✅
+
+![AD8232 and ESP32 on the breadboard](esp32_ecg_ad8232/ecg_breadboard.jpg)
+
+![Electrode placement](esp32_ecg_ad8232/ecg_electrodes.jpg)

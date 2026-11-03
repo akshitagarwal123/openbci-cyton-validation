@@ -3,7 +3,7 @@
 Live tracker (tick tasks, answer assignments): https://claude.ai/artifact/HxVcUf9j7qhkBvV2hgPwsa
 This file is a snapshot of the tracker, updated by Claude after each review. Source of the page: `build_tracker.html`.
 
-_Last synced: 2026-11-04 (week 1: 15 of 15 done, reviewed; week 2: 9 of 12 done)._
+_Last synced: 2026-11-04 (week 1: 15 of 15 done, reviewed; week 2: 10 of 12 done)._
 
 ## Parts on hand (24 Oct)
 
@@ -57,7 +57,7 @@ Understand how an EEG front end works by reading the Cyton schematic, and get th
 - [x] ESP32: join Wi-Fi and send fake 8-channel data
 - [x] See your fake data arrive in BrainFlow
 - [x] Breadboard a TL072 non-inverting amplifier, gain 10, on the 9 V battery; measure input and output DC with the multimeter (done with an LM358 on the ESP32's USB 5 V instead, since no battery; measured Vin 0.18 V → Vout 1.96 V, gain ≈ 10.9)
-- [ ] AD8232 + ESP32: read your ECG with the ESP32 ADC and plot it in Python (laptop on battery, not charging)
+- [x] AD8232 + ESP32: read your ECG with the ESP32 ADC and plot it in Python (laptop on battery, not charging)
 
 **Assignment** (answers in the tracker; review: _not yet_)
 
