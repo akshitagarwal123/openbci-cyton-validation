@@ -16,6 +16,12 @@ const int   SAMPLE_RATE = 250;         // samples per second, same as the Cyton'
 const int   SAMPLES_PER_PACKET = 10;   // group 10 samples into one packet -> 25 packets per second
 const int   NUM_CH = 8;                // 8 channels, like one ADS1299
 
+// Where to send. "" = broadcast to every device on the Wi-Fi (simple, but broadcast packets are
+// never confirmed or resent, so many get lost). An IP = send to that one device (unicast):
+// Wi-Fi confirms each packet and resends lost ones, so almost nothing is lost.
+// Your Mac's IP: System Settings -> Wi-Fi -> Details, or run `ipconfig getifaddr en0`.
+const char *TARGET_IP = "192.168.1.8";
+
 // Each fake channel = a sine wave (frequency in Hz, amplitude in uV) + a little noise.
 // Real EEG bands: theta 4-8 Hz, alpha 8-12 Hz, beta 13-30 Hz.
 const float FREQ_HZ[NUM_CH] = {10, 10, 20, 6, 12, 8, 15, 30};   // wave speed of ch1..ch8
@@ -26,7 +32,7 @@ const float NOISE_UV = 2.0;                                      // random noise
 // Variables that live for the whole program
 // ---------------------------------------------------------------------------
 WiFiUDP udp;                 // the UDP "sender" object
-IPAddress target;            // where we send: the network's broadcast address (reaches the Mac)
+IPAddress target;            // where we send: the Mac's IP, or the broadcast address
 uint32_t sampleNum = 0;      // counts every sample, so the Mac can spot lost packets
 uint32_t nextSampleUs;       // the time (in microseconds) when the next sample is due
 String packet;               // text being built up for the next UDP packet
@@ -44,9 +50,13 @@ void connectWiFi() {
     delay(500);                     // wait half a second
     Serial.print(".");              // print a dot so you can see it is still trying
   }
-  // Broadcast address = the network address with the last part set to 255, e.g. 192.168.1.255.
-  // Every device on the network receives it, so we don't need to know the Mac's IP.
-  target = WiFi.broadcastIP();
+  if (strlen(TARGET_IP) > 0) {
+    target.fromString(TARGET_IP);   // unicast: send only to this device (e.g. the Mac)
+  } else {
+    // Broadcast address = the network address with the last part set to 255, e.g. 192.168.1.255.
+    // Every device on the network receives it, so we don't need to know the Mac's IP.
+    target = WiFi.broadcastIP();
+  }
   // Print our IP, the signal strength (dBm: -30 great, -80 weak) and where we send to.
   Serial.printf("\nConnected. ESP32 IP %s, signal %d dBm, sending to %s:%d\n",
                 WiFi.localIP().toString().c_str(), WiFi.RSSI(),
