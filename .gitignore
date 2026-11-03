@@ -14,3 +14,6 @@ hardware/kicad/fab/gerbers/
 .history/
 ~*.lck
 *.kicad_prl
+
+# Week 2 Wi-Fi sketch: real Wi-Fi password, never commit
+learning/week02/esp32_wifi_fake8/secrets.h
