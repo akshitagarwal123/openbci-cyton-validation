@@ -62,6 +62,7 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
     <button id="v-bot">Bottom side</button>
     <button id="v-edge">Edge on</button>
     <button id="lab" aria-pressed="true">Labels</button>
+    <button id="finish" aria-pressed="false">Copper routing</button>
     <div class="grow"><label for="find" hidden>Find a part</label><select id="find"><option value="">Find a part…</option></select></div>
   </div>
 
@@ -69,10 +70,10 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
     <div class="fact"><dt>Board</dt><dd>61.5 mm octagon<small>2.42 in across, about 1.6 mm thick</small></dd></div>
     <div class="fact"><dt>Copper layers</dt><dd>4<small>top, two inner, bottom</small></dd></div>
     <div class="fact"><dt>Parts placed</dt><dd id="f-parts">83</dd></div>
-    <div class="fact"><dt>Surface colours</dt><dd>CAD plot colours<small>red = top copper, cyan = bottom</small></dd></div>
+    <div class="fact"><dt>Surface</dt><dd id="f-finish">White solder mask<small>blue silkscreen, as shipped</small></dd></div>
   </dl>
 
-  <p class="note">Built from OpenBCI's published design files: the part positions and board outline from <a href="https://github.com/OpenBCI/V3_Hardware_Design_Files/tree/master/OpenBCI%20Cyton%20Designs/OBCI_Cyton_Plots">V3_Hardware_Design_Files</a> and the layer plots from the <a href="https://docs.openbci.com/Cyton/CytonSpecs/">Cyton specs page</a>. Positions and rotations are exact; part heights and package sizes are typical values, so treat the 3D shapes as close approximations. The side pin rows (J1, J3, J4) and J2 are shown as bare holes, as on the plot.</p>
+  <p class="note">Built from OpenBCI's published design files: the part positions and board outline from <a href="https://github.com/OpenBCI/V3_Hardware_Design_Files/tree/master/OpenBCI%20Cyton%20Designs/OBCI_Cyton_Plots">V3_Hardware_Design_Files</a> and the layer plots from the <a href="https://docs.openbci.com/Cyton/CytonSpecs/">Cyton specs page</a>. Positions and rotations are exact; part heights and package sizes are typical values, so treat the 3D shapes as close approximations. The side pin rows (J1, J3, J4) and J2 are left as bare holes, as on a shipped board. The white finish is drawn from the same placement data; switch on Copper routing to see the real layer plots.</p>
 </div>
 
 <script>window.addEventListener("error", e => { const l = document.getElementById("loading"); if (l && !l.hidden) l.textContent = "The 3D view couldn't start: " + (e.message || "a file didn't load"); });</script>
@@ -114,7 +115,7 @@ function look(p){
   if (c.includes("BATT")) return {w:8.0,d:6.0,h:6.0,col:"#e6dcc2"};
   if (c.includes("microSD")) return {w:14,d:11.5,h:1.8,col:"#c4c9ce",metal:true};
   if (c.includes("SMT_QUAD")) return {w:10.2,d:2.5,h:2.5,col:"#141414"};
-  if (c.includes("26WDP")) return {w:5.1,d:33,h:8.5,col:"#121212",header:true};
+  if (c.includes("26WDP")) return {w:5.1,d:33,h:2.5,col:"#121212",pins:true};
   return null;                                               // logo, bare pin rows: texture only
 }
 const LABELS = {U6:"ADS1299",U7:"PIC32 MCU",BLE1:"RFduino radio",U1:"Accelerometer",CONN1:"microSD",B1:"Battery plug",SW2:"Power switch",PL1:"Electrode header",U3:"LM2664",VR1:"TPS72325",U5:"LP5907",U4:"TLV700",X1:"Crystal",SW1:"PROG",SW3:"RST"};
@@ -145,10 +146,10 @@ const edge = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, {depth:T, bevelEnab
   new THREE.MeshStandardMaterial({color:0x1e2a24, roughness:0.8}));
 edge.position.z = -T / 2; board.add(edge);
 
-function faceGeo(){
+function faceGeo(uvFn = uvOf){
   const g = new THREE.ShapeGeometry(shape), pos = g.attributes.position, uv = g.attributes.uv;
   for (let i = 0; i < pos.count; i++){
-    const [u, v] = uvOf(pos.getX(i) / MIL + CX, pos.getY(i) / MIL + CY);
+    const [u, v] = uvFn(pos.getX(i) / MIL + CX, pos.getY(i) / MIL + CY);
     uv.setXY(i, u, v);
   }
   return g;
@@ -160,6 +161,82 @@ const topFace = new THREE.Mesh(faceGeo(), new THREE.MeshStandardMaterial({map:te
 topFace.position.z = T / 2 + 0.01; board.add(topFace);
 const bot = new THREE.Mesh(faceGeo(), new THREE.MeshStandardMaterial({map:tex("layerBottom_noMirror.jpg"), roughness:0.65, side:THREE.DoubleSide}));
 bot.scale.z = -1; bot.position.z = -T / 2 - 0.01; board.add(bot);   // same top-view frame, facing down
+
+// ---- "real board" finish: white solder mask + blue silkscreen, drawn from the placement data ----
+const SILK = "#1d5fae", MASK = "#f3f5f6", R2 = Math.SQRT1_2;
+const J1N = ["DVDD","GND","MISO","SCK","RST","CLK","MOSI","CS2"], J4N = ["D17","RST","D18","D11"], J3N = ["D13","D12","VDD","GND"];
+const J1P = J1N.map((_, k) => [543 + (k - 3.5) * 100 * R2, 1205 - (k - 3.5) * 100 * R2]);
+const J4P = J4N.map((_, k) => [2104, 889 - 100 * k]);
+const J3P = J3N.map((_, k) => [1912 + (1.5 - k) * 100 * R2, 375 + (1.5 - k) * 100 * R2]);
+const J2P = [[1611, 1533], [1611, 1433]];
+const PADS = [...J1P, ...J4P, ...J3P, ...J2P];
+for (let i = 0; i < 13; i++) PADS.push([617 + 100 * i, 2069], [617 + 100 * i, 2169]);
+const HOLES = [[124, 802], [124, 1622], [2299, 802], [2299, 1622]];
+function drawSilk(cv, side){
+  const N = cv.width, g = cv.getContext("2d"), sx = N / (X1 - X0), sy = N / (Y1 - Y0), mirror = side === "Bottom";
+  const P = (X, Y) => [(X - X0) * sx, (Y1 - Y) * sy];
+  g.fillStyle = MASK; g.fillRect(0, 0, N, N);
+  const text = (str, X, Y, o = {}) => {
+    const [x, y] = P(X, Y); g.save(); g.translate(x, y); g.rotate(-(o.rot || 0) * Math.PI / 180); if (mirror) g.scale(-1, 1);
+    g.fillStyle = o.color || SILK; g.font = `${o.bold ? 700 : 500} ${(o.size || 40) * sx}px Archivo, Arial, sans-serif`;
+    g.textAlign = o.align || "center"; g.textBaseline = "middle"; g.fillText(str, 0, 0); g.restore();
+  };
+  const box = (X, Y, w, d, rot) => {
+    const [x, y] = P(X, Y); g.save(); g.translate(x, y); g.rotate(-rot * Math.PI / 180);
+    g.strokeStyle = SILK; g.lineWidth = 6 * sx; g.strokeRect(-w * sx / 2, -d * sy / 2, w * sx, d * sy); g.restore();
+  };
+  for (const [X, Y] of HOLES){ const [x, y] = P(X, Y); g.fillStyle = "#2a2f33"; g.beginPath(); g.arc(x, y, 100 * sx, 0, 7); g.fill(); g.strokeStyle = "#d4d9dc"; g.lineWidth = 14 * sx; g.stroke(); }
+  for (const [X, Y] of PADS){ const [x, y] = P(X, Y); g.fillStyle = "#c9a44c"; g.beginPath(); g.arc(x, y, 34 * sx, 0, 7); g.fill(); g.fillStyle = "#3a3220"; g.beginPath(); g.arc(x, y, 18 * sx, 0, 7); g.fill(); }
+  for (const p of PARTS){
+    if (p.s !== side || p.n === "LOGO1" || p.n === "PL1") continue;
+    const L = look(p); if (!L) continue;
+    const w = L.w / MIL + 16, d = L.d / MIL + 16, a = p.r * Math.PI / 180;
+    box(p.x, p.y, w, d, p.r);
+    text(p.n, p.x, p.y + (Math.abs(w * Math.sin(a)) + Math.abs(d * Math.cos(a))) / 2 + 34, {size:34});
+  }
+  if (side === "Top"){
+    box(1217, 2119, 1330, 230, 0); text("PL1", 555, 2119, {size:36, rot:90});
+    ["AVSS","SRB","N1P","N2P","N3P","N4P","N5P","N6P","N7P","N8P","BIAS","AGND","AVDD"].forEach((t, i) => text(t, 617 + 100 * i, 1990, {size:42, rot:-90, align:"left", bold:true}));
+    box(543, 1205, 860, 115, -45); J1N.forEach((t, i) => text(t, J1P[i][0] + 60, J1P[i][1] + 60, {size:34, align:"left"})); text("J1", 860, 880, {size:34});
+    box(2104, 739, 115, 430, 0); J4N.forEach((t, i) => text(t, 2025, J4P[i][1], {size:34, align:"right"})); text("J4", 2200, 739, {size:34, rot:90});
+    box(1912, 375, 430, 115, 45); J3N.forEach((t, i) => text(t, J3P[i][0] - 55, J3P[i][1] + 55, {size:34, align:"right"})); text("J3", 2010, 200, {size:34});
+    box(1611, 1483, 115, 230, 0); text("BIAS_INV", 1690, 1600, {size:36, align:"left"}); text("AGND", 1690, 1365, {size:36, align:"left"}); text("J2", 1700, 1483, {size:32, align:"left"});
+    text("PROG", 2060, 1331, {size:52, align:"left", bold:true}); text("RST", 2060, 1002, {size:52, align:"left", bold:true});
+    text("BLE    OFF    PC", 2372, 1200, {size:34, rot:90});
+    text("V3 - 32", 250, 985, {size:80, bold:true, color:"#173e74"});
+    const [gx, gy] = P(500, 1770); g.save(); g.translate(gx, gy); g.fillStyle = SILK;
+    for (let k = 0; k < 8; k++){ g.rotate(Math.PI / 4); g.fillRect(-26 * sx, -118 * sx, 52 * sx, 60 * sx); }
+    g.beginPath(); g.arc(0, 0, 88 * sx, 0, 7); g.fill(); g.fillStyle = MASK; g.beginPath(); g.arc(0, 0, 34 * sx, 0, 7); g.fill(); g.fillRect(-14 * sx, 0, 28 * sx, 92 * sx); g.restore();
+    text("open source", 500, 1600, {size:62}); text("hardware", 500, 1535, {size:62});
+    const [bx, by] = P(470, 700); g.strokeStyle = SILK; g.lineWidth = 12 * sx;
+    for (const r of [150, 108]){ g.beginPath(); g.arc(bx, by, r * sx, 0, 7); g.stroke(); }
+    text("OpenBCI", 450, 350, {size:74, bold:true, color:"#173e74"});
+    text("chipKIT", 1330, 330, {size:66, bold:true, color:"#1b1b1b"});
+  } else {
+    text("www.openbci.com", 620, 1480, {size:74, rot:-45});
+  }
+}
+const realUV = (X, Y) => [(X - X0) / (X1 - X0), (Y - Y0) / (Y1 - Y0)];
+function silkMesh(side){
+  const cv = document.createElement("canvas"); cv.width = cv.height = 2048; drawSilk(cv, side);
+  const t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8;
+  const m = new THREE.Mesh(faceGeo(realUV), new THREE.MeshStandardMaterial({map:t, roughness:0.55, side:THREE.DoubleSide}));
+  if (side === "Bottom"){ m.scale.z = -1; m.position.z = -T / 2 - 0.012; } else m.position.z = T / 2 + 0.012;
+  board.add(m); return {m, cv, t, side};
+}
+const silkTop = silkMesh("Top"), silkBot = silkMesh("Bottom");
+document.fonts && document.fonts.ready.then(() => { for (const s of [silkTop, silkBot]){ drawSilk(s.cv, s.side); s.t.needsUpdate = true; } });
+let real = true;
+function setFinish(on){
+  real = on;
+  silkTop.m.visible = silkBot.m.visible = on; topFace.visible = bot.visible = !on;
+  edge.material.color.setHex(on ? 0xe9eced : 0x1e2a24);
+  document.getElementById("finish").setAttribute("aria-pressed", !on);
+  document.getElementById("f-finish").innerHTML = on ? "White solder mask<small>blue silkscreen, as shipped</small>" : "Copper layer plots<small>red = top copper, cyan = bottom</small>";
+  if (on) document.getElementById("loading").hidden = true;
+}
+setFinish(true);
+document.getElementById("finish").onclick = () => setFinish(!real);
 
 // ---- parts ----
 const pickables = [], byName = {};
@@ -180,10 +257,26 @@ for (const p of PARTS){
   grp.rotation.z = p.r * Math.PI / 180;
   const mat = new THREE.MeshStandardMaterial({color:L.col, roughness:L.metal ? 0.35 : 0.6, metalness:L.metal ? 0.7 : 0.05});
   let mats = mat;
-  if (L.header){ const holes = new THREE.MeshStandardMaterial({color:0xffffff, map:holesTexture(2, 13), roughness:0.7});
-    mats = [mat, mat, mat, mat, up > 0 ? holes : mat, up > 0 ? mat : holes]; }
   const body = new THREE.Mesh(new THREE.BoxGeometry(L.w, L.d, L.h), mats);
   grp.add(body);
+  if (L.pins){                                                  // 2 x 13 gold pins: 11.5 mm up, 2.5 mm tail under the board
+    const gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
+    const upPin = new THREE.BoxGeometry(0.64, 0.64, 11.5), tail = new THREE.BoxGeometry(0.64, 0.64, 2.5);
+    for (const px of [-1.27, 1.27]) for (let i = 0; i < 13; i++){
+      const a = new THREE.Mesh(upPin, gold); a.position.set(px, (i - 6) * 2.54, up * (-L.h / 2 + 5.75)); grp.add(a);
+      const b = new THREE.Mesh(tail, gold); b.position.set(px, (i - 6) * 2.54, -up * (L.h / 2 + T + 1.25)); grp.add(b);
+    }
+  }
+  const MARK = {U6:["ADS1299","TI  64C"], U7:["PIC32MX250","F128B"]};
+  if (MARK[p.n]){
+    const cv = document.createElement("canvas"); cv.width = 512; cv.height = Math.round(512 * L.d / L.w);
+    const g = cv.getContext("2d"); g.fillStyle = "#9aa0a6"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = `600 ${cv.height * 0.2}px IBM Plex Mono, monospace`;
+    MARK[p.n].forEach((t, i) => g.fillText(t, 256, cv.height * (0.4 + i * 0.25)));
+    const mt = new THREE.CanvasTexture(cv); mt.encoding = THREE.sRGBEncoding;
+    const mk = new THREE.Mesh(new THREE.PlaneGeometry(L.w * 0.92, L.d * 0.92), new THREE.MeshBasicMaterial({map:mt, transparent:true}));
+    mk.position.z = up * (L.h / 2 + 0.02); grp.add(mk);
+  }
   if (L.leads){ const lf = new THREE.Mesh(new THREE.BoxGeometry(L.leads, L.leads, 0.2), new THREE.MeshStandardMaterial({color:0xb9bec4, metalness:0.8, roughness:0.35}));
     lf.position.z = -up * (L.h / 2 - 0.1); grp.add(lf); }
   if (L.button){ const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.7, 20), new THREE.MeshStandardMaterial({color:0x202020, roughness:0.6}));
