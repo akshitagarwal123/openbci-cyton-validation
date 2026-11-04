@@ -102,12 +102,43 @@ def frame(t):
     return fig
 
 
+# Narration: (start s, length s, text). Each clip is padded with silence to fill its scene.
+NARRATION = [
+    (0, 8, "Every wire in the chip must stay between plus and minus two point five volts. The two inputs differ by one volt."),
+    (8, 12, "The amplifier multiplies that difference by four. One output rises to plus two volts, the other falls to minus two. Each wire stays safely inside the rails."),
+    (20, 12, "The A D C doesn't measure either wire alone. It measures the gap between them: four volts, which is eighty nine percent of its four point five volt full scale."),
+    (32, 13, "Now the input is a wave. The outputs mirror each other. Each wire swings only two point two five volts, yet together they span the A D C's full four point five."),
+]
+
+
+def narration(tmp):
+    """Make one 45 s WAV with each scene's voice clip starting at its scene."""
+    parts = []
+    for i, (t0, length, text) in enumerate(NARRATION):
+        aiff, wav = os.path.join(tmp, f"n{i}.aiff"), os.path.join(tmp, f"n{i}.wav")
+        subprocess.run(["say", "-v", "Samantha", "-r", "170", "-o", aiff, text], check=True)
+        d = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", aiff]).strip())
+        speed = max(1.0, d / (length - 0.4))                  # speed up slightly if a clip would overrun its scene
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", aiff, "-af", f"atempo={speed:.3f},apad", "-t", str(length),
+                        "-ar", "44100", "-ac", "1", wav], check=True)
+        parts.append(wav)
+    lst = os.path.join(tmp, "list.txt"); open(lst, "w").write("".join(f"file '{p}'\n" for p in parts))
+    out = os.path.join(tmp, "narration.wav")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", out], check=True)
+    return out
+
+
 def main():
+    import tempfile
+    tmp = tempfile.mkdtemp(); silent = os.path.join(tmp, "video.mp4")
     ff = subprocess.Popen(["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-",
-                           "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", OUT], stdin=subprocess.PIPE)
+                           "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", silent], stdin=subprocess.PIPE)
     for k in range(int(DUR * FPS)):
         fig = frame(k / FPS); fig.canvas.draw(); ff.stdin.write(fig.canvas.buffer_rgba().tobytes()); plt.close(fig)
-    ff.stdin.close(); ff.wait(); print("saved", OUT)
+    ff.stdin.close(); ff.wait()
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", silent, "-i", narration(tmp), "-c:v", "copy", "-c:a", "aac", "-b:a", "128k",
+                    "-shortest", "-movflags", "+faststart", OUT], check=True)
+    print("saved", OUT)
 
 
 if __name__ == "__main__":
