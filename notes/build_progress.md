@@ -59,7 +59,9 @@ Understand how an EEG front end works by reading the Cyton schematic, and get th
 - [x] Breadboard a TL072 non-inverting amplifier, gain 10, on the 9 V battery; measure input and output DC with the multimeter (done with an LM358 on the ESP32's USB 5 V instead, since no battery; measured Vin 0.18 V → Vout 1.96 V, gain ≈ 10.9)
 - [x] AD8232 + ESP32: read your ECG with the ESP32 ADC and plot it in Python (laptop on battery, not charging)
 
-**Assignment** (answers in the tracker; review: _not yet_)
+**Assignment** (answers in the tracker; review: 4 Nov, about 3 / 6)
+
+Review summary: Q5 good (BIAS now understood, which fixes the week 1 gap). Q2 mostly right. Q1, Q3, Q4 partly right. Q6 not answered. Main gaps: (1) the golden rules themselves: no current into the inputs, and with feedback the output makes V+ = V−; (2) gain 24 is limited by electrode DC offset (input range ±187 mV), not by the EEG itself, and more gain means lower noise; (3) the input RC (2.2 kΩ + 47 pF ≈ 1.5 MHz) is protection and an RF filter, not an EEG band filter. Answer Q6 and redo Q1.
 
 1. State the op-amp golden rules. What is the gain of a non-inverting amplifier with Rf = 90 kΩ and Rg = 10 kΩ?
 2. What is the difference between common-mode and differential signals? Why does EEG need a high CMRR? Use 50 Hz mains as your example.
