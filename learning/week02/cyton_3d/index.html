@@ -75,6 +75,7 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
   <p class="note">Built from OpenBCI's published design files: the part positions and board outline from <a href="https://github.com/OpenBCI/V3_Hardware_Design_Files/tree/master/OpenBCI%20Cyton%20Designs/OBCI_Cyton_Plots">V3_Hardware_Design_Files</a> and the layer plots from the <a href="https://docs.openbci.com/Cyton/CytonSpecs/">Cyton specs page</a>. Positions and rotations are exact; part heights and package sizes are typical values, so treat the 3D shapes as close approximations. The side pin rows (J1, J3, J4) and J2 are shown as bare holes, as on the plot.</p>
 </div>
 
+<script>window.addEventListener("error", e => { const l = document.getElementById("loading"); if (l && !l.hidden) l.textContent = "The 3D view couldn't start: " + (e.message || "a file didn't load"); });</script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
@@ -153,10 +154,10 @@ function faceGeo(){
   return g;
 }
 const loader = new THREE.TextureLoader();
-function tex(url){ const t = loader.load(url, () => { pending--; if (!pending) document.getElementById("loading").hidden = true; }); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t; }
+function tex(url){ const done = () => { pending--; if (!pending) document.getElementById("loading").hidden = true; }; const t = loader.load(url, done, undefined, done); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t; }
 let pending = 2;
-const top = new THREE.Mesh(faceGeo(), new THREE.MeshStandardMaterial({map:tex("layerTop.jpg"), roughness:0.65}));
-top.position.z = T / 2 + 0.01; board.add(top);
+const topFace = new THREE.Mesh(faceGeo(), new THREE.MeshStandardMaterial({map:tex("layerTop.jpg"), roughness:0.65}));
+topFace.position.z = T / 2 + 0.01; board.add(topFace);
 const bot = new THREE.Mesh(faceGeo(), new THREE.MeshStandardMaterial({map:tex("layerBottom_noMirror.jpg"), roughness:0.65, side:THREE.DoubleSide}));
 bot.scale.z = -1; bot.position.z = -T / 2 - 0.01; board.add(bot);   // same top-view frame, facing down
 
