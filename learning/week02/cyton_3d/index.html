@@ -1,0 +1,289 @@
+<title>Cyton Board 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a bench-lamp viewer — one large 3D stage, a tool row under it, then the board's facts in silkscreen yellow. Single dark look on purpose (PCB renders read best on black). */
+:root{
+  --bg:#0d1311; --panel:#151d1a; --line:#25312c; --fg:#e8efeb; --muted:#93a59d;
+  --accent:#f0e04a; --cyan:#7fe3e3;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--display);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:balance;letter-spacing:-.01em}
+.lede{color:var(--muted);max-width:65ch;line-height:1.55;margin:0;font-size:15px}
+#stage{position:relative;height:clamp(340px,64vh,720px);border:1px solid var(--line);border-radius:10px;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#1a2420 0%,var(--bg) 70%);touch-action:none}
+#stage canvas{display:block;width:100%;height:100%}
+#labels{position:absolute;inset:0;pointer-events:none}
+.lbl{position:absolute;transform:translate(-50%,-100%);font-family:var(--mono);font-size:11px;color:var(--bg);background:var(--accent);padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:-6px}
+.lbl::after{content:"";position:absolute;left:50%;bottom:-4px;width:1px;height:4px;background:var(--accent)}
+#tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:12px;line-height:1.5;max-width:260px}
+#tip b{color:var(--accent);font-weight:500}
+#loading{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);color:var(--muted);font-size:13px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools button,.tools select{font-family:var(--mono);font-size:13px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer}
+.tools button:hover,.tools select:hover{border-color:var(--muted)}
+.tools button:focus-visible,.tools select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tools button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.tools .grow{flex:1 1 200px;min-width:0}
+.tools select{width:100%}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fact{background:var(--panel);padding:12px 14px;min-width:0}
+.fact dt{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fact dd{margin:4px 0 0;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.fact dd small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
+.note{font-size:13px;color:var(--muted);line-height:1.55;max-width:80ch;margin:0}
+.note a{color:var(--cyan)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">OpenBCI Cyton · layout V4 rev C</div>
+    <h1>Cyton board in 3D</h1>
+    <p class="lede">Drag to turn the board all the way round, scroll or pinch to zoom. Hover or tap a part to see its name. Every part sits where OpenBCI's own placement file puts it, on the side it is soldered to.</p>
+  </header>
+
+  <div id="stage" aria-label="Rotatable 3D model of the OpenBCI Cyton board">
+    <div id="loading">Loading board…</div>
+    <div id="labels"></div>
+    <div id="tip" hidden></div>
+  </div>
+
+  <div class="tools" role="toolbar" aria-label="View controls">
+    <button id="spin" aria-pressed="true">Spin</button>
+    <button id="v-iso">3/4 view</button>
+    <button id="v-top">Top side</button>
+    <button id="v-bot">Bottom side</button>
+    <button id="v-edge">Edge on</button>
+    <button id="lab" aria-pressed="true">Labels</button>
+    <div class="grow"><label for="find" hidden>Find a part</label><select id="find"><option value="">Find a part…</option></select></div>
+  </div>
+
+  <dl class="facts">
+    <div class="fact"><dt>Board</dt><dd>61.5 mm octagon<small>2.42 in across, about 1.6 mm thick</small></dd></div>
+    <div class="fact"><dt>Copper layers</dt><dd>4<small>top, two inner, bottom</small></dd></div>
+    <div class="fact"><dt>Parts placed</dt><dd id="f-parts">83</dd></div>
+    <div class="fact"><dt>Surface colours</dt><dd>CAD plot colours<small>red = top copper, cyan = bottom</small></dd></div>
+  </dl>
+
+  <p class="note">Built from OpenBCI's published design files: the part positions and board outline from <a href="https://github.com/OpenBCI/V3_Hardware_Design_Files/tree/master/OpenBCI%20Cyton%20Designs/OBCI_Cyton_Plots">V3_Hardware_Design_Files</a> and the layer plots from the <a href="https://docs.openbci.com/Cyton/CytonSpecs/">Cyton specs page</a>. Positions and rotations are exact; part heights and package sizes are typical values, so treat the 3D shapes as close approximations. The side pin rows (J1, J3, J4) and J2 are shown as bare holes, as on the plot.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const PARTS = [{"n":"J2","c":"2WP","s":"Top","x":1611.0,"y":1483.0,"r":180.0},{"n":"J3","c":"4WP","s":"Top","x":1912.0,"y":375.0,"r":315.0},{"n":"J4","c":"4WP","s":"Top","x":2104.0,"y":739.0,"r":0.0},{"n":"PL1","c":"26WDP","s":"Top","x":1217.0,"y":2119.0,"r":270.0},{"n":"C1","c":"0603YC104KATDA","s":"Top","x":784.0,"y":1422.0,"r":270.0},{"n":"C8","c":"0603YC104KATDA","s":"Top","x":881.0,"y":174.0,"r":180.0},{"n":"C25","c":"0603YC104KATDA","s":"Bottom","x":1251.0,"y":870.0,"r":90.0},{"n":"C29","c":"0603YC104KATDA","s":"Bottom","x":1373.0,"y":1138.0,"r":270.0},{"n":"C31","c":"06033G104ZATDA","s":"Bottom","x":1349.0,"y":768.0,"r":180.0},{"n":"C33","c":"06033G104ZATDA","s":"Bottom","x":1464.0,"y":921.0,"r":270.0},{"n":"X1","c":"ABRACON_XTAL","s":"Top","x":1672.0,"y":795.0,"r":270.0},{"n":"U6","c":"ADS1299","s":"Top","x":1172.0,"y":1403.0,"r":270.0},{"n":"B1","c":"BATT","s":"Bottom","x":1993.0,"y":1477.0,"r":180.0},{"n":"C5","c":"C","s":"Top","x":873.0,"y":1433.0,"r":180.0},{"n":"C6","c":"C","s":"Top","x":846.0,"y":1370.0,"r":270.0},{"n":"C7","c":"C","s":"Top","x":846.0,"y":1236.0,"r":270.0},{"n":"C10","c":"C","s":"Top","x":941.0,"y":186.0,"r":180.0},{"n":"C12","c":"C","s":"Top","x":1351.0,"y":1108.0,"r":90.0},{"n":"C13","c":"C","s":"Bottom","x":1125.0,"y":1450.0,"r":0.0},{"n":"C14","c":"C","s":"Top","x":1351.0,"y":1068.0,"r":90.0},{"n":"C15","c":"C","s":"Top","x":1473.0,"y":1404.0,"r":0.0},{"n":"C16","c":"C","s":"Top","x":1508.0,"y":1550.0,"r":0.0},{"n":"C17","c":"C","s":"Bottom","x":1163.0,"y":1450.0,"r":0.0},{"n":"C18","c":"C","s":"Bottom","x":1181.0,"y":1386.0,"r":270.0},{"n":"C19","c":"C","s":"Top","x":1509.0,"y":1404.0,"r":0.0},{"n":"C20","c":"C","s":"Top","x":1646.0,"y":949.0,"r":90.0},{"n":"C21","c":"C","s":"Bottom","x":1181.0,"y":1348.0,"r":270.0},{"n":"C22","c":"C","s":"Bottom","x":1201.0,"y":1450.0,"r":0.0},{"n":"C23","c":"C","s":"Top","x":1700.0,"y":643.0,"r":270.0},{"n":"C24","c":"C","s":"Bottom","x":1239.0,"y":1450.0,"r":0.0},{"n":"C27","c":"C","s":"Bottom","x":1299.0,"y":1430.0,"r":270.0},{"n":"C28","c":"C","s":"Bottom","x":1299.0,"y":1392.0,"r":270.0},{"n":"C30","c":"C","s":"Bottom","x":1356.0,"y":923.0,"r":90.0},{"n":"C32","c":"C","s":"Bottom","x":1480.0,"y":1128.0,"r":90.0},{"n":"C35","c":"C","s":"Bottom","x":1561.0,"y":1127.0,"r":270.0},{"n":"C36","c":"C","s":"Bottom","x":1560.0,"y":1042.0,"r":180.0},{"n":"C38","c":"C","s":"Bottom","x":1830.0,"y":1092.0,"r":0.0},{"n":"C39","c":"C","s":"Bottom","x":1917.0,"y":1006.0,"r":90.0},{"n":"C40","c":"C","s":"Bottom","x":1916.0,"y":758.0,"r":90.0},{"n":"C37","c":"C 10uF","s":"Bottom","x":1618.0,"y":1186.0,"r":270.0},{"n":"C2","c":"C 100uF","s":"Top","x":771.0,"y":1307.0,"r":90.0},{"n":"C4","c":"C 100uF","s":"Bottom","x":789.0,"y":196.0,"r":315.0},{"n":"R1","c":"CAY16-F4 R-ARRAY","s":"Top","x":796.0,"y":1843.0,"r":180.0},{"n":"R2","c":"CAY16-F4 R-ARRAY","s":"Top","x":988.0,"y":1842.0,"r":180.0},{"n":"R3","c":"CAY16-F4 R-ARRAY","s":"Top","x":1180.0,"y":1843.0,"r":180.0},{"n":"R4","c":"CAY16-F4 R-ARRAY","s":"Top","x":1372.0,"y":1842.0,"r":180.0},{"n":"R6","c":"CAY16-F4 R-ARRAY","s":"Top","x":1566.0,"y":1842.0,"r":180.0},{"n":"LOGO1","c":"CHIPKIT","s":"Top","x":1414.0,"y":454.0,"r":0.0},{"n":"C3","c":"CKCL44X7R1H102M085AA","s":"Bottom","x":794.0,"y":1645.0,"r":0.0},{"n":"C9","c":"CKCL44X7R1H102M085AA","s":"Bottom","x":998.0,"y":1645.0,"r":0.0},{"n":"C11","c":"CKCL44X7R1H102M085AA","s":"Bottom","x":1176.0,"y":1645.0,"r":0.0},{"n":"C26","c":"CKCL44X7R1H102M085AA","s":"Bottom","x":1352.0,"y":1645.0,"r":0.0},{"n":"C34","c":"CKCL44X7R1H102M085AA","s":"Bottom","x":1540.0,"y":1645.0,"r":0.0},{"n":"SW2","c":"CUS-3B SP3T SLIDE SWITCH","s":"Bottom","x":2341.0,"y":1196.0,"r":90.0},{"n":"D1","c":"DI0603","s":"Top","x":1810.0,"y":702.0,"r":0.0},{"n":"D8","c":"DI0603","s":"Top","x":2247.0,"y":1261.0,"r":0.0},{"n":"D9","c":"DI0603","s":"Bottom","x":1992.0,"y":1111.0,"r":180.0},{"n":"U1","c":"LIS3DHTR ACCELEROMETER","s":"Top","x":885.0,"y":312.0,"r":180.0},{"n":"U3","c":"LM2664","s":"Bottom","x":1459.0,"y":784.0,"r":180.0},{"n":"U5","c":"LP5907","s":"Bottom","x":1935.0,"y":879.0,"r":180.0},{"n":"U7","c":"PIC32MX250F128B","s":"Top","x":1321.0,"y":780.0,"r":90.0},{"n":"J1","c":"PINHEAD-8","s":"Top","x":543.0,"y":1205.0,"r":315.0},{"n":"D2","c":"Quad TVS TPD4E1B06","s":"Bottom","x":769.0,"y":1961.0,"r":0.0},{"n":"D3","c":"Quad TVS TPD4E1B06","s":"Bottom","x":963.0,"y":1963.0,"r":0.0},{"n":"D4","c":"Quad TVS TPD4E1B06","s":"Bottom","x":1165.0,"y":1967.0,"r":0.0},{"n":"D5","c":"Quad TVS TPD4E1B06","s":"Bottom","x":1363.0,"y":1969.0,"r":0.0},{"n":"D6","c":"Quad TVS TPD4E1B06","s":"Bottom","x":1563.0,"y":1971.0,"r":0.0},{"n":"D7","c":"Quad TVS TPD4E1B06","s":"Bottom","x":1765.0,"y":1973.0,"r":0.0},{"n":"D10","c":"R","s":"Bottom","x":2152.0,"y":1098.0,"r":0.0},{"n":"R5","c":"R","s":"Top","x":1471.0,"y":1549.0,"r":180.0},{"n":"R7","c":"R","s":"Top","x":1808.0,"y":914.0,"r":0.0},{"n":"R8","c":"R","s":"Top","x":1863.0,"y":708.0,"r":0.0},{"n":"R9","c":"R","s":"Top","x":1927.0,"y":1467.0,"r":270.0},{"n":"R10","c":"R","s":"Top","x":2195.0,"y":1101.0,"r":180.0},{"n":"R11","c":"R","s":"Bottom","x":2197.0,"y":1098.0,"r":180.0},{"n":"BLE1","c":"RFD22301","s":"Bottom","x":1400.0,"y":305.0,"r":0.0},{"n":"CONN1","c":"SEEEDmicroSD","s":"Bottom","x":564.0,"y":561.0,"r":315.0},{"n":"PL2","c":"SMT_QUAD_04","s":"Bottom","x":308.0,"y":1237.0,"r":135.0},{"n":"U2","c":"SN74LVC1G32DCKR OR_GATE","s":"Top","x":1000.0,"y":565.0,"r":0.0},{"n":"SW1","c":"SW_TACT","s":"Top","x":1905.0,"y":1331.0,"r":0.0},{"n":"SW3","c":"SW_TACT","s":"Top","x":1909.0,"y":1002.0,"r":180.0},{"n":"U4","c":"TLV700xx LDO REG","s":"Bottom","x":1711.0,"y":1072.0,"r":90.0},{"n":"VR1","c":"TPS72325","s":"Bottom","x":1436.0,"y":1027.0,"r":90.0}];
+
+// ---- board geometry (units: mm, origin = board centre) ----
+const MIL = 0.0254, T = 1.6;
+const X0 = 3.5, X1 = 2419.5, Y0 = 5.5, Y1 = 2419.5;            // outline extents in mils
+const CX = (X0 + X1) / 2, CY = (Y0 + Y1) / 2;
+const OUTLINE = [[2419.5,1712.5],[1712.5,2419.5],[711.5,2419.5],[3.5,1711.5],[3.5,712.5],[710.5,5.5],[1711.5,5.5],[2419.5,713.5]];
+const mm = (x, y) => [(x - CX) * MIL, (y - CY) * MIL];
+// where the board sits inside the 1137×1127 layer plots (measured)
+const IMG = {w:1137, h:1127, px0:18, py0:19, s:0.4507};
+const uvOf = (xmil, ymil) => [(IMG.px0 + (xmil - X0) * IMG.s) / IMG.w, 1 - (IMG.py0 + (Y1 - ymil) * IMG.s) / IMG.h];
+
+// ---- what each package looks like: [width x, depth y, height, colour] before rotation ----
+function look(p){
+  const c = p.c, n = p.n;
+  if (c.includes("ADS1299")) return {w:10,d:10,h:1.2,col:"#1c1e22",leads:12};
+  if (c.includes("PIC32")) return {w:10.2,d:5.3,h:1.8,col:"#1c1e22"};
+  if (c.includes("RFD22301")) return {w:15,d:15,h:2.4,col:"#2e3a4f"};
+  if (c.includes("LIS3DH")) return {w:3,d:3,h:1,col:"#1c1e22"};
+  if (/LM2664|LP5907|TLV700|TPS72325/.test(c)) return {w:2.9,d:1.6,h:1.1,col:"#1c1e22"};
+  if (c.includes("OR_GATE")) return {w:2.0,d:1.25,h:0.95,col:"#1c1e22"};
+  if (c.includes("R-ARRAY")) return {w:3.2,d:1.6,h:0.55,col:"#141414"};
+  if (c.includes("TVS")) return {w:1.6,d:1.2,h:0.6,col:"#1c1e22"};
+  if (c.includes("100uF")) return {w:3.5,d:2.8,h:1.9,col:"#c99418"};
+  if (c.includes("10uF")) return {w:2.0,d:1.25,h:1.25,col:"#a8875f"};
+  if (c.includes("CKCL44")) return {w:2.0,d:1.25,h:0.85,col:"#a8875f"};
+  if (c === "C" || c.includes("104")) return {w:1.6,d:0.8,h:0.8,col:"#a8875f"};
+  if (c === "R") return {w:1.6,d:0.8,h:0.45,col:"#161616"};
+  if (c.includes("DI0603")) return {w:1.6,d:0.8,h:0.6,col: n === "D1" ? "#7fb2ff" : "#262626"};
+  if (c.includes("XTAL")) return {w:3.2,d:2.5,h:0.8,col:"#c4c9ce",metal:true};
+  if (c.includes("SW_TACT")) return {w:3.0,d:4.8,h:1.6,col:"#c4c9ce",metal:true,button:true};
+  if (c.includes("SLIDE")) return {w:9.0,d:3.6,h:3.4,col:"#c4c9ce",metal:true,lever:true};
+  if (c.includes("BATT")) return {w:8.0,d:6.0,h:6.0,col:"#e6dcc2"};
+  if (c.includes("microSD")) return {w:14,d:11.5,h:1.8,col:"#c4c9ce",metal:true};
+  if (c.includes("SMT_QUAD")) return {w:10.2,d:2.5,h:2.5,col:"#141414"};
+  if (c.includes("26WDP")) return {w:5.1,d:33,h:8.5,col:"#121212",header:true};
+  return null;                                               // logo, bare pin rows: texture only
+}
+const LABELS = {U6:"ADS1299",U7:"PIC32 MCU",BLE1:"RFduino radio",U1:"Accelerometer",CONN1:"microSD",B1:"Battery plug",SW2:"Power switch",PL1:"Electrode header",U3:"LM2664",VR1:"TPS72325",U5:"LP5907",U4:"TLV700",X1:"Crystal",SW1:"PROG",SW3:"RST"};
+
+// ---- scene ----
+const stage = document.getElementById("stage");
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+stage.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, 1, 1, 2000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 35; controls.maxDistance = 320;
+controls.autoRotate = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+controls.autoRotateSpeed = 1.6;
+scene.add(new THREE.HemisphereLight(0xeef4ff, 0x20262a, 0.9));
+const key = new THREE.DirectionalLight(0xffffff, 0.85); key.position.set(60, 120, 80); scene.add(key);
+const rim = new THREE.DirectionalLight(0xbfe9ff, 0.45); rim.position.set(-80, -90, -60); scene.add(rim);
+
+const board = new THREE.Group();
+board.rotation.x = -Math.PI / 2;                             // lay the board flat: its top faces up
+scene.add(board);
+
+const shape = new THREE.Shape(OUTLINE.map(([x, y]) => new THREE.Vector2(...mm(x, y))));
+const edge = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, {depth:T, bevelEnabled:false}),
+  new THREE.MeshStandardMaterial({color:0x1e2a24, roughness:0.8}));
+edge.position.z = -T / 2; board.add(edge);
+
+function faceGeo(){
+  const g = new THREE.ShapeGeometry(shape), pos = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < pos.count; i++){
+    const [u, v] = uvOf(pos.getX(i) / MIL + CX, pos.getY(i) / MIL + CY);
+    uv.setXY(i, u, v);
+  }
+  return g;
+}
+const loader = new THREE.TextureLoader();
+function tex(url){ const t = loader.load(url, () => { pending--; if (!pending) document.getElementById("loading").hidden = true; }); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t; }
+let pending = 2;
+const top = new THREE.Mesh(faceGeo(), new THREE.MeshStandardMaterial({map:tex("layerTop.jpg"), roughness:0.65}));
+top.position.z = T / 2 + 0.01; board.add(top);
+const bot = new THREE.Mesh(faceGeo(), new THREE.MeshStandardMaterial({map:tex("layerBottom_noMirror.jpg"), roughness:0.65, side:THREE.DoubleSide}));
+bot.scale.z = -1; bot.position.z = -T / 2 - 0.01; board.add(bot);   // same top-view frame, facing down
+
+// ---- parts ----
+const pickables = [], byName = {};
+function holesTexture(cols, rows){
+  const cv = document.createElement("canvas"); cv.width = cols * 32; cv.height = rows * 32;
+  const g = cv.getContext("2d"); g.fillStyle = "#151515"; g.fillRect(0, 0, cv.width, cv.height);
+  g.fillStyle = "#000";
+  for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) g.fillRect(i * 32 + 10, j * 32 + 10, 12, 12);
+  const t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; return t;
+}
+let topCount = 0, botCount = 0;
+for (const p of PARTS){
+  const L = look(p); if (!L) continue;
+  const [x, y] = mm(p.x, p.y), up = p.s === "Top" ? 1 : -1;
+  p.s === "Top" ? topCount++ : botCount++;
+  const grp = new THREE.Group();
+  grp.position.set(x, y, up * (T / 2 + L.h / 2));
+  grp.rotation.z = p.r * Math.PI / 180;
+  const mat = new THREE.MeshStandardMaterial({color:L.col, roughness:L.metal ? 0.35 : 0.6, metalness:L.metal ? 0.7 : 0.05});
+  let mats = mat;
+  if (L.header){ const holes = new THREE.MeshStandardMaterial({color:0xffffff, map:holesTexture(2, 13), roughness:0.7});
+    mats = [mat, mat, mat, mat, up > 0 ? holes : mat, up > 0 ? mat : holes]; }
+  const body = new THREE.Mesh(new THREE.BoxGeometry(L.w, L.d, L.h), mats);
+  grp.add(body);
+  if (L.leads){ const lf = new THREE.Mesh(new THREE.BoxGeometry(L.leads, L.leads, 0.2), new THREE.MeshStandardMaterial({color:0xb9bec4, metalness:0.8, roughness:0.35}));
+    lf.position.z = -up * (L.h / 2 - 0.1); grp.add(lf); }
+  if (L.button){ const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.7, 20), new THREE.MeshStandardMaterial({color:0x202020, roughness:0.6}));
+    cap.rotation.x = Math.PI / 2; cap.position.z = up * (L.h / 2 + 0.35); grp.add(cap); }
+  if (L.lever){ const lv = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.2, 1.4), new THREE.MeshStandardMaterial({color:0x202020}));
+    lv.position.set(0, -(L.d / 2 + 1.0), 0); grp.add(lv); }
+  board.add(grp);
+  const info = {p, grp, up, mats:[].concat(mats)};
+  grp.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
+  byName[p.n] = info;
+}
+document.getElementById("f-parts").innerHTML = (topCount + botCount) + `<small>${topCount} on top, ${botCount} underneath</small>`;
+
+// ---- labels ----
+const labelLayer = document.getElementById("labels"), labelEls = [];
+for (const [n, text] of Object.entries(LABELS)){
+  const info = byName[n]; if (!info) continue;
+  const el = document.createElement("div"); el.className = "lbl"; el.textContent = text; labelLayer.appendChild(el);
+  labelEls.push({el, info});
+}
+let showLabels = true;
+
+// ---- find a part ----
+const find = document.getElementById("find");
+Object.values(byName).sort((a, b) => a.p.n.localeCompare(b.p.n, undefined, {numeric:true})).forEach(({p}) => {
+  const o = document.createElement("option"); o.value = p.n; o.textContent = `${p.n} · ${p.c} (${p.s.toLowerCase()})`; find.appendChild(o);
+});
+let lit = null;
+function highlight(info){
+  if (lit) lit.mats.forEach(m => m.emissive && m.emissive.setHex(0x000000));
+  lit = info; if (info) info.mats.forEach(m => m.emissive && m.emissive.setHex(0x8a7d10));
+}
+
+// ---- camera moves ----
+let fly = null;
+function flyTo(pos, target = new THREE.Vector3()){ fly = {pos:pos.clone(), target:target.clone()}; }
+function setSpin(on){ controls.autoRotate = on; document.getElementById("spin").setAttribute("aria-pressed", on); }
+const VIEWS = {
+  iso:() => new THREE.Vector3(62, 58, 82),
+  top:() => new THREE.Vector3(0, 125, 0.01),
+  bot:() => new THREE.Vector3(0, -125, 0.01),
+  edge:() => new THREE.Vector3(0, 4, 120)
+};
+camera.position.copy(VIEWS.iso());
+document.getElementById("v-iso").onclick = () => flyTo(VIEWS.iso());
+document.getElementById("v-top").onclick = () => { setSpin(false); flyTo(VIEWS.top()); };
+document.getElementById("v-bot").onclick = () => { setSpin(false); flyTo(VIEWS.bot()); };
+document.getElementById("v-edge").onclick = () => flyTo(VIEWS.edge());
+document.getElementById("spin").onclick = () => setSpin(!controls.autoRotate);
+document.getElementById("lab").onclick = e => { showLabels = !showLabels; e.currentTarget.setAttribute("aria-pressed", showLabels); labelLayer.hidden = !showLabels; };
+find.onchange = () => {
+  const info = byName[find.value]; highlight(info || null); if (!info) return;
+  setSpin(false);
+  const w = new THREE.Vector3(); info.grp.getWorldPosition(w);
+  flyTo(new THREE.Vector3(w.x + 18, info.up * 55, w.z + 30), w);
+};
+
+// ---- hover / tap tooltip ----
+const tip = document.getElementById("tip"), ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+function pick(ev){
+  const r = renderer.domElement.getBoundingClientRect();
+  ptr.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const hit = ray.intersectObjects(pickables, false)[0];
+  if (!hit){ tip.hidden = true; return; }
+  const {p} = hit.object.userData.info;
+  tip.innerHTML = `<b>${p.n}</b> · ${p.s === "Top" ? "top side" : "underside"}<br>${p.c}${LABELS[p.n] ? "<br>" + LABELS[p.n] : ""}`;
+  tip.hidden = false;
+  const x = Math.min(ev.clientX - r.left + 14, r.width - tip.offsetWidth - 8), y = Math.min(ev.clientY - r.top + 14, r.height - tip.offsetHeight - 8);
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+renderer.domElement.addEventListener("pointermove", pick);
+renderer.domElement.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") pick(e); });
+renderer.domElement.addEventListener("pointerleave", () => tip.hidden = true);
+controls.addEventListener("start", () => { if (fly) fly = null; });
+
+// ---- size + loop ----
+function resize(){ const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+const up = new THREE.Vector3(), tmp = new THREE.Vector3(), toCam = new THREE.Vector3();
+function loop(){
+  requestAnimationFrame(loop);
+  if (fly){
+    camera.position.lerp(fly.pos, 0.09); controls.target.lerp(fly.target, 0.09);
+    if (camera.position.distanceTo(fly.pos) < 0.4) fly = null;
+  }
+  controls.update();
+  renderer.render(scene, camera);
+  if (showLabels){
+    up.set(0, 0, 1).applyQuaternion(board.getWorldQuaternion(new THREE.Quaternion()));
+    const w = stage.clientWidth, h = stage.clientHeight;
+    for (const {el, info} of labelEls){
+      info.grp.getWorldPosition(tmp);
+      toCam.copy(camera.position).sub(tmp);
+      const facing = up.dot(toCam) * info.up > 0;
+      tmp.addScaledVector(up, info.up * 3).project(camera);
+      if (!facing || tmp.z > 1){ el.hidden = true; continue; }
+      el.hidden = false;
+      el.style.left = ((tmp.x + 1) / 2 * w) + "px"; el.style.top = ((1 - tmp.y) / 2 * h) + "px";
+    }
+  }
+}
+loop();
+</script>
