@@ -18,6 +18,21 @@ Positions and rotations are exact. Part heights and package sizes are typical va
   brain signal, power, bias loop, motion, SD card, clock, buttons and switch. Back / Next, step dots, arrow keys, Esc.
 - "Show every flow at once" zooms out and draws all 7 flows.
 
-`test.js` is the automated test (run in headless Chrome): it selects all 84 parts, checks all 177 links,
+`test.js` is the automated test (run in headless Chrome): it selects every part, checks every link,
 runs all 37 tour steps, clicks the panel controls and clicks parts on the 3D board from the top and from underneath.
 Last run: all pass, no JavaScript errors.
+
+## Daisy module (5 Nov)
+
+The Daisy (second ADS1299, channels 9–16) is built from its own design files in the same repo:
+`daisy_positions.csv` (OBCI_V3-1_D component positions), `daisy_outline.gbr`, and the layer plots `daisyTop.jpg` / `daisyBottom.jpg`.
+Shifted by (−2, +858) mils, its J1 sits exactly on the Cyton's J1 (Daisy port) and its PL1 exactly on the Cyton's PL1.
+
+- "Daisy" button: lifted (exploded view), stacked (real spacing, resting on the header pins) or hidden.
+- Whichever board is in the way turns see-through: pick a Cyton part under the Daisy and the Daisy fades; pick a Daisy part on its underside and the Cyton fades.
+- 4 new flows: Daisy channels 9–16 (header → TVS → 2.2 kΩ → 1 nF → Daisy ADS1299 → Daisy bus → PIC32 → radio),
+  Daisy bus (SPI, CS2, shared 2.048 MHz clock, RESET), Daisy power (DVDD over J1, ±2.5 V through the header), Daisy bias.
+- Facts checked against the Daisy schematic and the Cyton firmware: CLKSEL tied to ground (runs on the Cyton chip's clock),
+  Daisy DRDY not wired out, START unused, CONFIG3 = 0b11101100 sent to both chips (both bias amplifiers on), Daisy ID 0x3E switches the firmware to 16 channels.
+
+Last test run: 123 parts, 259 links, 65 tour steps across 11 flows, 25 clicks on the 3D boards (both boards, both sides, including through the see-through board). All pass, no JavaScript errors.

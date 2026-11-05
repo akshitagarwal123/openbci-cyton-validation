@@ -72,9 +72,9 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">OpenBCI Cyton · layout V4 rev C</div>
-    <h1>Cyton board in 3D</h1>
-    <p class="lede">Click any part to see what it does, where its signal comes from and where it goes next. Or follow a flow, step by step: the brain signal, power, the bias loop and more, drawn in 3D right through the board. Drag to turn, scroll or pinch to zoom.</p>
+    <div class="eyebrow">OpenBCI Cyton · layout V4 rev C · with the Daisy module</div>
+    <h1>Cyton + Daisy in 3D</h1>
+    <p class="lede">Click any part to see what it does, where its signal comes from and where it goes next. Or follow a flow, step by step: the brain signal, power, the bias loop and more, drawn in 3D right through the board. The Daisy module floats above it, adding channels 9 to 16. Drag to turn, scroll or pinch to zoom.</p>
   </header>
 
   <div class="viewer">
@@ -99,6 +99,7 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
     <button id="v-edge">Edge on</button>
     <button id="lab" aria-pressed="true">Labels</button>
     <button id="finish" aria-pressed="false">Copper routing</button>
+    <button id="daisy" aria-pressed="true" title="Lifted, stacked like the real thing, or hidden">Daisy: lifted</button>
     <div class="grow"><label for="find" hidden>Find a part</label><select id="find"><option value="">Find a part…</option></select></div>
   </div>
 
@@ -106,10 +107,11 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
     <div class="fact"><dt>Board</dt><dd>61.5 mm octagon<small>2.42 in across, about 1.6 mm thick</small></dd></div>
     <div class="fact"><dt>Copper layers</dt><dd>4<small>top, two inner, bottom</small></dd></div>
     <div class="fact"><dt>Parts placed</dt><dd id="f-parts">83</dd></div>
+    <div class="fact"><dt>Daisy module</dt><dd id="f-daisy">61.4 × 39.7 mm<small>39 parts · second ADS1299, channels 9–16</small></dd></div>
     <div class="fact"><dt>Surface</dt><dd id="f-finish">White solder mask<small>blue silkscreen, as shipped</small></dd></div>
   </dl>
 
-  <p class="note">Built from OpenBCI's published design files: the part positions and board outline from <a href="https://github.com/OpenBCI/V3_Hardware_Design_Files/tree/master/OpenBCI%20Cyton%20Designs/OBCI_Cyton_Plots">V3_Hardware_Design_Files</a> and the layer plots from the <a href="https://docs.openbci.com/Cyton/CytonSpecs/">Cyton specs page</a>. Positions and rotations are exact; part heights and package sizes are typical values, so treat the 3D shapes as close approximations. The side pin rows (J1, J3, J4) and J2 are left as bare holes, as on a shipped board. The white finish is drawn from the same placement data; switch on Copper routing to see the real layer plots.</p>
+  <p class="note">The Daisy is built the same way, from its own files (OBCI_V3-1_D positions, outline and layer plots); it lines up exactly with the Cyton's Daisy port and electrode header. Built from OpenBCI's published design files: the part positions and board outline from <a href="https://github.com/OpenBCI/V3_Hardware_Design_Files/tree/master/OpenBCI%20Cyton%20Designs/OBCI_Cyton_Plots">V3_Hardware_Design_Files</a> and the layer plots from the <a href="https://docs.openbci.com/Cyton/CytonSpecs/">Cyton specs page</a>. Positions and rotations are exact; part heights and package sizes are typical values, so treat the 3D shapes as close approximations. The side pin rows (J1, J3, J4) and J2 are left as bare holes, as on a shipped board. The white finish is drawn from the same placement data; switch on Copper routing to see the real layer plots.</p>
 </div>
 
 <script>window.addEventListener("error", e => { const l = document.getElementById("loading"); if (l && !l.hidden) l.textContent = "The 3D view couldn't start: " + (e.message || "a file didn't load"); });</script>
@@ -270,6 +272,7 @@ function setFinish(on){
   document.getElementById("finish").setAttribute("aria-pressed", !on);
   document.getElementById("f-finish").innerHTML = on ? "White solder mask<small>blue silkscreen, as shipped</small>" : "Copper layer plots<small>red = top copper, cyan = bottom</small>";
   if (on) document.getElementById("loading").hidden = true;
+  if (window.__daisyReady) daisyFinish(on);
 }
 setFinish(true);
 document.getElementById("finish").onclick = () => setFinish(!real);
@@ -326,6 +329,159 @@ for (const p of PARTS){
 }
 document.getElementById("f-parts").innerHTML = (topCount + botCount) + `<small>${topCount} on top, ${botCount} underneath</small>`;
 
+
+// ================= Daisy module (OBCI_V3-1_D): a second ADS1299, stacked above the Cyton =================
+// Moving the Daisy by (-2, +858) mils puts its J1 exactly on the Cyton's J1 and its PL1 exactly on the Cyton's PL1.
+const DZ_DX = -2, DZ_DY = 858;
+const DZ_X0 = 4.5, DZ_X1 = 2420.5, DZ_Y0 = 3.09, DZ_Y1 = 1566.09;
+const DZ_OUT = [[2420.5,859.09],[1713.5,1566.09],[712.5,1566.09],[4.5,858.09],[4.5,710.09],[711.5,3.09],[1712.5,3.09],[2420.5,711.09]];
+const DZ_RAW = [["J2","2WP","Top",1613.0,663.0,180.0],["PL1","26WDP","Top",1219.0,1261.0,270.0],["C1","0603YC104KATDA","Top",786.0,564.0,270.0],["U1","ADS1299","Top",1174.0,545.0,270.0],["C3","C","Top",875.0,575.0,180.0],["C4","C","Top",848.0,512.0,270.0],["C5","C","Top",848.0,378.0,270.0],["C6","C","Top",1353.0,250.0,90.0],["C7","C","Top",1353.0,210.0,90.0],["C8","C","Top",1475.0,546.0,0.0],["C9","C","Top",1510.0,692.0,0.0],["C10","C","Top",1511.0,546.0,0.0],["C14","C","Bottom",1127.0,592.0,0.0],["C15","C","Bottom",1165.0,592.0,0.0],["C16","C","Bottom",1183.0,528.0,270.0],["C17","C","Bottom",1183.0,490.0,270.0],["C18","C","Bottom",1203.0,592.0,0.0],["C19","C","Bottom",1241.0,592.0,0.0],["C21","C","Bottom",1301.0,572.0,270.0],["C22","C","Bottom",1301.0,534.0,270.0],["C2","C 100uF","Top",773.0,449.0,90.0],["R1","CAY16-F4 R-ARRAY","Top",788.0,985.0,180.0],["R2","CAY16-F4 R-ARRAY","Top",983.0,985.0,180.0],["R3","CAY16-F4 R-ARRAY","Top",1182.0,985.0,180.0],["R4","CAY16-F4 R-ARRAY","Top",1383.0,985.0,180.0],["R6","CAY16-F4 R-ARRAY","Top",1568.0,985.0,180.0],["C11","CKCL44X7R1H102M085AA","Bottom",794.0,794.0,0.0],["C12","CKCL44X7R1H102M085AA","Bottom",1003.0,794.0,0.0],["C13","CKCL44X7R1H102M085AA","Bottom",1178.0,794.0,0.0],["C20","CKCL44X7R1H102M085AA","Bottom",1353.0,794.0,0.0],["C23","CKCL44X7R1H102M085AA","Bottom",1528.0,794.0,0.0],["J1","PINHEAD-8","Top",545.0,347.0,315.0],["D1","Quad TVS TPD4E1B06","Bottom",771.0,1103.0,0.0],["D2","Quad TVS TPD4E1B06","Bottom",965.0,1105.0,0.0],["D3","Quad TVS TPD4E1B06","Bottom",1167.0,1109.0,0.0],["D4","Quad TVS TPD4E1B06","Bottom",1365.0,1111.0,0.0],["D5","Quad TVS TPD4E1B06","Bottom",1565.0,1113.0,0.0],["D6","Quad TVS TPD4E1B06","Bottom",1767.0,1115.0,0.0],["R5","R","Top",1473.0,691.0,180.0]];
+const DZ_PARTS = DZ_RAW.map(([n, c, s, x, y, r]) => ({n:"Daisy " + n, short:n, c, s, x:x + DZ_DX, y:y + DZ_DY, r, dx:x, dy:y}));
+const DZ_LIFT = {lifted:30, stacked:T + 11.5};            // Daisy centre height above the Cyton centre, mm
+let daisyMode = "lifted";
+const daisy = new THREE.Group(); daisy.position.z = DZ_LIFT.lifted; board.add(daisy);
+const DZ_POLY = DZ_OUT.map(([x, y]) => [x + DZ_DX, y + DZ_DY]);
+function underDaisy(X, Y){                                    // is a Cyton point (mils) inside the Daisy's outline?
+  let inside = false;
+  for (let i = 0, j = DZ_POLY.length - 1; i < DZ_POLY.length; j = i++){
+    const [xi, yi] = DZ_POLY[i], [xj, yj] = DZ_POLY[j];
+    if ((yi > Y) !== (yj > Y) && X < (xj - xi) * (Y - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+const dzShape = new THREE.Shape(DZ_POLY.map(([x, y]) => new THREE.Vector2(...mm(x, y))));
+function faceGeoFor(shp, uvFn){
+  const g = new THREE.ShapeGeometry(shp), pos = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < pos.count; i++){ const [u, v] = uvFn(pos.getX(i) / MIL + CX, pos.getY(i) / MIL + CY); uv.setXY(i, u, v); }
+  return g;
+}
+const dzEdge = new THREE.Mesh(new THREE.ExtrudeGeometry(dzShape, {depth:T, bevelEnabled:false}), new THREE.MeshStandardMaterial({color:0xe9eced, roughness:0.8}));
+dzEdge.position.z = -T / 2; dzEdge.userData.occluder = true; daisy.add(dzEdge);
+edge.userData.occluder = true;
+const dzx = X => X - DZ_DX, dzy = Y => Y - DZ_DY;
+const dzTopUV = (X, Y) => [(42 + (dzx(X) - DZ_X0) * 0.7781) / 1992, 1 - (-4.2 + (DZ_Y1 - dzy(Y)) * 0.7781) / 1212];
+const dzBotUV = (X, Y) => [(12 + (dzx(X) - DZ_X0) * 0.3005) / 750, 1 - (10 + (DZ_Y1 - dzy(Y)) * 0.3005) / 493];
+const dzSilkUV = (X, Y) => [(dzx(X) - DZ_X0) / (DZ_X1 - DZ_X0), (dzy(Y) - DZ_Y0) / (DZ_Y1 - DZ_Y0)];
+pending += 2;
+const dzTopCu = new THREE.Mesh(faceGeoFor(dzShape, dzTopUV), new THREE.MeshStandardMaterial({map:tex("daisyTop.jpg"), roughness:0.65}));
+dzTopCu.position.z = T / 2 + 0.01; daisy.add(dzTopCu);
+const dzBotCu = new THREE.Mesh(faceGeoFor(dzShape, dzBotUV), new THREE.MeshStandardMaterial({map:tex("daisyBottom.jpg"), roughness:0.65, side:THREE.DoubleSide}));
+dzBotCu.scale.z = -1; dzBotCu.position.z = -T / 2 - 0.01; daisy.add(dzBotCu);
+
+const DZ_J1P = J1N.map((_, k) => [545 + (k - 3.5) * 100 * R2, 347 - (k - 3.5) * 100 * R2]);
+const DZ_PADS = [...DZ_J1P, [1613, 713], [1613, 613]];
+for (let i = 0; i < 13; i++) DZ_PADS.push([619 + 100 * i, 1211], [619 + 100 * i, 1311]);
+function drawDaisySilk(cv, side){
+  const W = cv.width, H = cv.height, s = W / (DZ_X1 - DZ_X0), g = cv.getContext("2d"), mirror = side === "Bottom";
+  const P = (X, Y) => [(X - DZ_X0) * s, (DZ_Y1 - Y) * s];
+  g.fillStyle = MASK; g.fillRect(0, 0, W, H);
+  const text = (str, X, Y, o = {}) => {
+    const [x, y] = P(X, Y); g.save(); g.translate(x, y); g.rotate(-(o.rot || 0) * Math.PI / 180); if (mirror) g.scale(-1, 1);
+    g.fillStyle = o.color || SILK; g.font = `${o.bold ? 700 : 500} ${(o.size || 40) * s}px Archivo, Arial, sans-serif`;
+    g.textAlign = o.align || "center"; g.textBaseline = "middle"; g.fillText(str, 0, 0); g.restore();
+  };
+  const box = (X, Y, w, d, rot) => {
+    const [x, y] = P(X, Y); g.save(); g.translate(x, y); g.rotate(-rot * Math.PI / 180);
+    g.strokeStyle = SILK; g.lineWidth = 6 * s; g.strokeRect(-w * s / 2, -d * s / 2, w * s, d * s); g.restore();
+  };
+  for (const [X, Y] of DZ_PADS){ const [x, y] = P(X, Y); g.fillStyle = "#c9a44c"; g.beginPath(); g.arc(x, y, 34 * s, 0, 7); g.fill(); g.fillStyle = "#3a3220"; g.beginPath(); g.arc(x, y, 18 * s, 0, 7); g.fill(); }
+  for (const p of DZ_PARTS){
+    if (p.s !== side || p.short === "PL1") continue;
+    const L = look(p); if (!L) continue;
+    const w = L.w / MIL + 16, d = L.d / MIL + 16, a = p.r * Math.PI / 180;
+    box(p.dx, p.dy, w, d, p.r);
+    text(p.short, p.dx, p.dy + (Math.abs(w * Math.sin(a)) + Math.abs(d * Math.cos(a))) / 2 + 34, {size:34});
+  }
+  if (side === "Top"){
+    box(1219, 1261, 1330, 230, 0); text("PL1", 557, 1261, {size:36, rot:90});
+    ["AVSS","SRB","N1P","N2P","N3P","N4P","N5P","N6P","N7P","N8P","BIAS","AGND","AVDD"].forEach((t, i) => text(t, 619 + 100 * i, 1132, {size:42, rot:-90, align:"left", bold:true}));
+    box(545, 347, 860, 115, -45); J1N.forEach((t, i) => text(t, DZ_J1P[i][0] + 60, DZ_J1P[i][1] + 60, {size:34, align:"left"})); text("J1", 300, 120, {size:34});
+    box(1613, 663, 115, 230, 0); text("BIAS", 1690, 760, {size:36, align:"left"}); text("AGND", 1690, 566, {size:36, align:"left"}); text("J2", 1700, 663, {size:32, align:"left"});
+    text("V3  DAISY MODULE", 1250, 80, {size:70, bold:true, color:"#173e74"});
+    const [gx, gy] = P(470, 990); g.save(); g.translate(gx, gy); g.fillStyle = SILK;
+    for (let k = 0; k < 8; k++){ g.rotate(Math.PI / 4); g.fillRect(-26 * s, -118 * s, 52 * s, 60 * s); }
+    g.beginPath(); g.arc(0, 0, 88 * s, 0, 7); g.fill(); g.fillStyle = MASK; g.beginPath(); g.arc(0, 0, 34 * s, 0, 7); g.fill(); g.fillRect(-14 * s, 0, 28 * s, 92 * s); g.restore();
+    text("open source", 470, 820, {size:62}); text("hardware", 470, 755, {size:62});
+  } else {
+    text("www.openbci.com", 690, 600, {size:74, rot:-45});
+  }
+}
+function dzSilkMesh(side){
+  const cv = document.createElement("canvas"); cv.width = 2048; cv.height = Math.round(2048 * (DZ_Y1 - DZ_Y0) / (DZ_X1 - DZ_X0)); drawDaisySilk(cv, side);
+  const t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8;
+  const m = new THREE.Mesh(faceGeoFor(dzShape, dzSilkUV), new THREE.MeshStandardMaterial({map:t, roughness:0.55, side:THREE.DoubleSide}));
+  if (side === "Bottom"){ m.scale.z = -1; m.position.z = -T / 2 - 0.012; } else m.position.z = T / 2 + 0.012;
+  daisy.add(m); return {m, cv, t, side};
+}
+const dzSilkTop = dzSilkMesh("Top"), dzSilkBot = dzSilkMesh("Bottom");
+document.fonts && document.fonts.ready.then(() => { for (const s of [dzSilkTop, dzSilkBot]){ drawDaisySilk(s.cv, s.side); s.t.needsUpdate = true; } });
+function daisyFinish(on){
+  dzSilkTop.m.visible = dzSilkBot.m.visible = on; dzTopCu.visible = dzBotCu.visible = !on;
+  dzEdge.material.color.setHex(on ? 0xe9eced : 0x1e2a24);
+}
+
+let dzTop = 0, dzBot = 0;
+for (const p of DZ_PARTS){
+  const L = look(p); if (!L) continue;
+  const [x, y] = mm(p.x, p.y), up = p.s === "Top" ? 1 : -1;
+  p.s === "Top" ? dzTop++ : dzBot++;
+  const grp = new THREE.Group();
+  grp.position.set(x, y, up * (T / 2 + L.h / 2)); grp.rotation.z = p.r * Math.PI / 180;
+  const mat = new THREE.MeshStandardMaterial({color:L.col, roughness:L.metal ? 0.35 : 0.6, metalness:L.metal ? 0.7 : 0.05});
+  grp.add(new THREE.Mesh(new THREE.BoxGeometry(L.w, L.d, L.h), mat));
+  if (L.pins){
+    const gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
+    const upPin = new THREE.BoxGeometry(0.64, 0.64, 11.5), tail = new THREE.BoxGeometry(0.64, 0.64, 2.5);
+    for (const px of [-1.27, 1.27]) for (let i = 0; i < 13; i++){
+      const a = new THREE.Mesh(upPin, gold); a.position.set(px, (i - 6) * 2.54, up * (-L.h / 2 + 5.75)); grp.add(a);
+      const b = new THREE.Mesh(tail, gold); b.position.set(px, (i - 6) * 2.54, -up * (L.h / 2 + T + 1.25)); grp.add(b);
+    }
+  }
+  if (p.short === "U1"){
+    const cv = document.createElement("canvas"); cv.width = 512; cv.height = Math.round(512 * L.d / L.w);
+    const g = cv.getContext("2d"); g.fillStyle = "#9aa0a6"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = `600 ${cv.height * 0.2}px IBM Plex Mono, monospace`;
+    ["ADS1299", "TI  64C"].forEach((t, i) => g.fillText(t, 256, cv.height * (0.4 + i * 0.25)));
+    const mt = new THREE.CanvasTexture(cv); mt.encoding = THREE.sRGBEncoding;
+    const mk = new THREE.Mesh(new THREE.PlaneGeometry(L.w * 0.92, L.d * 0.92), new THREE.MeshBasicMaterial({map:mt, transparent:true}));
+    mk.position.z = up * (L.h / 2 + 0.02); grp.add(mk);
+  }
+  if (L.leads){ const lf = new THREE.Mesh(new THREE.BoxGeometry(L.leads, L.leads, 0.2), new THREE.MeshStandardMaterial({color:0xb9bec4, metalness:0.8, roughness:0.35}));
+    lf.position.z = -up * (L.h / 2 - 0.1); grp.add(lf); }
+  daisy.add(grp);
+  const info = {p, grp, up, h:L.h, mats:[mat], daisy:true};
+  grp.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
+  byName[p.n] = info;
+}
+// Daisy J1: an 8-way socket underneath that plugs onto the Cyton's J1 pins
+const SOCK_H = 8.5;
+{
+  const p = DZ_PARTS.find(q => q.short === "J1"), [x, y] = mm(p.x, p.y), grp = new THREE.Group();
+  grp.position.set(x, y, -(T / 2 + SOCK_H / 2)); grp.rotation.z = -Math.PI / 4;
+  const mat = new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6});
+  grp.add(new THREE.Mesh(new THREE.BoxGeometry(20.6, 2.6, SOCK_H), mat));
+  const holeM = new THREE.MeshStandardMaterial({color:0x020202}), gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
+  for (let k = 0; k < 8; k++){
+    const h = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.1), holeM); h.position.set((k - 3.5) * 2.54, 0, -SOCK_H / 2 - 0.05); grp.add(h);
+    const t = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, T + 1.6), gold); t.position.set((k - 3.5) * 2.54, 0, SOCK_H / 2 + (T + 1.6) / 2); grp.add(t);
+  }
+  daisy.add(grp);
+  const info = {p, grp, up:-1, h:SOCK_H, mats:[mat], daisy:true};
+  grp.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
+  byName[p.n] = info;
+}
+{ // Daisy J2: two pads (BIAS_INV, AGND); a see-through box you can click
+  const p = DZ_PARTS.find(q => q.short === "J2"), [x, y] = mm(p.x, p.y), grp = new THREE.Group();
+  grp.position.set(x, y, T / 2 + 0.4);
+  const mat = new THREE.MeshStandardMaterial({color:0xffd166, emissive:0x000000, transparent:true, opacity:0, depthWrite:false});
+  const m = new THREE.Mesh(new THREE.BoxGeometry(3, 5.6, 0.8), mat); m.userData.ghostBox = true; grp.add(m); daisy.add(grp);
+  const info = {p, grp, up:1, h:0.8, mats:[mat], ghost:true, daisy:true};
+  m.userData.info = info; pickables.push(m); byName[p.n] = info;
+}
+Object.assign(LABELS, {"Daisy U1":"Daisy ADS1299", "Daisy PL1":"Daisy electrode header", "Daisy J1":"Daisy bus"});
+document.getElementById("f-daisy").innerHTML = `61.4 × 39.7 mm<small>${dzTop + dzBot + 2} parts · channels 9–16</small>`;
+window.__daisyReady = true; daisyFinish(real);
+
 // ---- labels ----
 const labelLayer = document.getElementById("labels"), labelEls = [];
 for (const [n, text] of Object.entries(LABELS)){
@@ -351,13 +507,13 @@ let fly = null;
 function flyTo(pos, target = new THREE.Vector3()){ fly = {pos:pos.clone(), target:target.clone()}; }
 function setSpin(on){ controls.autoRotate = on; document.getElementById("spin").setAttribute("aria-pressed", on); }
 const VIEWS = {
-  iso:() => new THREE.Vector3(62, 58, 82),
+  iso:() => daisyMode === "lifted" ? new THREE.Vector3(80, 92, 108) : new THREE.Vector3(62, 58, 82),
   top:() => new THREE.Vector3(0, 125, 0.01),
   bot:() => new THREE.Vector3(0, -125, 0.01),
   edge:() => new THREE.Vector3(0, 4, 120)
 };
-camera.position.copy(VIEWS.iso());
-document.getElementById("v-iso").onclick = () => flyTo(VIEWS.iso());
+camera.position.copy(VIEWS.iso()); controls.target.set(0, daisyMode === "lifted" ? 12 : 0, 0);
+document.getElementById("v-iso").onclick = () => flyTo(VIEWS.iso(), new THREE.Vector3(0, daisyMode === "lifted" ? 12 : 0, 0));
 document.getElementById("v-top").onclick = () => { setSpin(false); flyTo(VIEWS.top()); };
 document.getElementById("v-bot").onclick = () => { setSpin(false); flyTo(VIEWS.bot()); };
 document.getElementById("v-edge").onclick = () => flyTo(VIEWS.edge());
@@ -376,7 +532,7 @@ function pick(ev){
   const r = renderer.domElement.getBoundingClientRect();
   ptr.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ptr, camera);
-  const hit = ray.intersectObjects(pickables, false)[0];
+  const hit = pickHit();
   if (!hit){ tip.hidden = true; return; }
   const {p} = hit.object.userData.info;
   tip.innerHTML = `<b>${p.virtual ? p.c : p.n}</b> · ${p.virtual ? "off the board" : p.s === "Top" ? "top side" : "underside"}<br>${p.virtual ? "click to explore" : p.c + "<br>" + (window.cyton ? window.cyton.infoFor(p.n).s : "")}`;
@@ -393,7 +549,7 @@ controls.addEventListener("start", () => { if (fly) fly = null; });
 const BLOCKS = {
   conn:{name:"Connector", col:"#c9d2dc"}, prot:{name:"Protection", col:"#ff6b6b"}, ads:{name:"ADS1299 · EEG chip", col:"#a77bff"},
   pow:{name:"Power", col:"#ffb347"}, mcu:{name:"Microcontroller", col:"#5aa9ff"}, radio:{name:"Radio", col:"#f28fb0"},
-  extra:{name:"Extras", col:"#2ec4a0"}, off:{name:"Off the board", col:"#f0e04a"}, misc:{name:"Other", col:"#93a59d"}
+  extra:{name:"Extras", col:"#2ec4a0"}, daisy:{name:"Daisy · second ADS1299", col:"#4fd1ff"}, off:{name:"Off the board", col:"#f0e04a"}, misc:{name:"Other", col:"#93a59d"}
 };
 const TVS_R = {D2:"R1", D3:"R2", D4:"R3", D5:"R4", D6:"R6"};
 const R_C = {R1:"C3", R2:"C9", R3:"C11", R4:"C26", R6:"C34"};
@@ -407,7 +563,7 @@ const POW_CAPS = ["C29","C30","C31","C32","C33","C35","C36","C37","C38","C39","C
 const INFO = {
   HEAD:{b:"off", s:"your head", t:"Your head", d:"Your brain makes tiny voltages, 10 to 100 µV. Electrodes on your scalp pick them up, together with a much bigger hum from the mains that your whole body carries.", i:[], o:[["PL1","electrode wires"]]},
   PC:{b:"off", s:"dongle → PC", t:"USB dongle → computer", d:"The OpenBCI USB dongle receives the radio packets. BrainFlow or the OpenBCI GUI on your computer turn them back into µV and plot your EEG.", i:[["BLE1","radio packets"]], o:[]},
-  PL1:{b:"conn", s:"electrode header", t:"Electrode header", d:"Your electrode wires plug in here. Each channel has its own pins (N1P to N8P, and the N side underneath), plus SRB (the shared reference, usually your ear clip), BIAS, and supply pins. The pins go right through the board.", i:[["HEAD","electrodes on your head"],["R6","BIAS drive coming back out"]], o:[["D2","TVS diodes (underneath)"],["D3","TVS diodes (underneath)"]]},
+  PL1:{b:"conn", s:"electrode header", t:"Electrode header", d:"Your electrode wires plug in here. Each channel has its own pins (N1P to N8P, and the N side underneath), plus SRB (the shared reference, usually your ear clip), BIAS, and supply pins. The pins go right through the board.", i:[["HEAD","electrodes on your head"],["R6","BIAS drive coming back out"]], o:[["D2","TVS diodes (underneath)"],["D3","TVS diodes (underneath)"],["Daisy PL1","AVDD, AVSS, BIAS up to the Daisy"]]},
   U6:{b:"ads", s:"ADS1299", t:"ADS1299: the EEG chip", d:"The heart of the board. For each of the 8 channels it subtracts the reference, amplifies ×24 and converts to a 24-bit number, all channels at the same instant, 250 times a second. Then it rings DRDY so the PIC32 reads the sample over SPI. Its bias amplifier also drives the BIAS electrode.", i:[["C9","filtered electrode signals"],["U4","AVDD +2.5 V"],["VR1","AVSS −2.5 V"],["U5","DVDD 3.3 V"]], o:[["U7","samples over SPI + DRDY"],["R5","bias drive output"]]},
   R5:{b:"ads", s:"bias 1 MΩ", t:"R5: bias resistor (1 MΩ)", d:"Sits between the ADS1299's BIAS_OUT pin and the bias electrode. It limits the current into your body to about 2.5 µA, even in the worst case.", i:[["U6","BIAS_OUT"]], o:[["R6","2.2 kΩ on the BIAS line"]]},
   C16:{b:"ads", s:"bias 1 nF", t:"C16: 1 nF across R5", d:"Lets fast changes bypass R5, so the bias loop responds quickly and stays stable instead of ringing.", i:[["U6","BIAS_OUT"]], o:[["R6","BIAS line"]]},
@@ -453,6 +609,29 @@ for (const [c, r] of Object.entries(C_R)) INFO[c] = {b:"prot", s:"1 nF array", t
 for (const c of ADS_DEC) INFO[c] = {b:"ads", s:"ADS decoupling", t:`${c}: ADS1299 decoupling capacitor`, d:"A small energy tank right at an ADS1299 power pin (most sit directly underneath the chip). It supplies the chip's quick current gulps so its supply doesn't bounce into your EEG.", i:[["U4","AVDD"],["VR1","AVSS"],["U5","DVDD"]], o:[["U6","ADS1299 power pins"]]};
 for (const c of ADS_REF) INFO[c] = {b:"ads", s:"ADS reference/VCAP", t:`${c}: ADS1299 reference / VCAP capacitor`, d:"Keeps one of the ADS1299's internal nodes steady: its 4.5 V reference (the ruler every sample is compared against) or a VCAP pin." + (c === "C2" ? " C2 is the big 100 µF one, on VCAP1." : ""), i:[], o:[["U6","ADS1299"]]};
 for (const c of POW_CAPS) INFO[c] = {b:"pow", s:"power cap", t:`${c}: power-supply capacitor`, d:"An input or output capacitor of a nearby regulator" + (c === "C31" || c === "C33" ? ", here at the voltage inverter (U3)" : "") + ". It keeps that supply steady and the regulator stable.", i:[], o:[]};
+
+// ---- Daisy parts ----
+const DZ_LINES = {D1:"1N, 1P (channel 9), SRB2 and SRB1", D2:"2N, 2P, 3N and 3P (channels 10 and 11)", D3:"4N, 4P, 5N and 5P (channels 12 and 13)", D4:"6N, 6P, 7N and 7P (channels 14 and 15)", D5:"8N and 8P (channel 16)"};
+const DZ_TVS_R = {D1:"R1", D2:"R2", D3:"R3", D4:"R4", D5:"R6"}, DZ_R_C = {R1:"C11", R2:"C12", R3:"C13", R4:"C20", R6:"C23"};
+const DZ_R_TVS = Object.fromEntries(Object.entries(DZ_TVS_R).map(([d, r]) => [r, d]));
+const DZ_C_R = Object.fromEntries(Object.entries(DZ_R_C).map(([r, c]) => [c, r]));
+const dz = n => "Daisy " + n;
+Object.assign(INFO, {
+  [dz("U1")]:{b:"daisy", s:"Daisy ADS1299", t:"Daisy U1: the second ADS1299", d:"The same EEG chip as the Cyton's, adding channels 9 to 16: ×24 gain, 24-bit, all 8 channels at the same instant. It has no clock of its own: CLKSEL is tied to ground, so it runs on the Cyton ADS1299's 2.048 MHz clock (CLK pin) and shares its RESET line. That keeps both chips sampling in lock-step. The PIC32 picks it with CS2.", i:[[dz("C12"),"filtered electrode signals"],[dz("J1"),"SPI, CLK, RESET and DVDD"],[dz("PL1"),"AVDD and AVSS from the Cyton"]], o:[[dz("J1"),"samples back on MISO"],[dz("R5"),"bias drive"]]},
+  [dz("PL1")]:{b:"conn", s:"Daisy electrode header", t:"Daisy PL1: electrode header (channels 9–16)", d:"Same layout as the Cyton's header and sitting right on top of it. Its N1P to N8P pins are channels 9 to 16. Its AVDD, AVSS, AGND and BIAS pins line up with the Cyton's, which is how the Daisy gets its analog power. SRB is separate: for one shared reference, join the two SRB pins with a Y-splitter cable.", i:[["HEAD","8 more electrodes"],["PL1","AVDD, AVSS, AGND, BIAS from the Cyton"],[dz("R6"),"bias drive"]], o:[[dz("D1"),"TVS diodes (underneath)"],[dz("D2"),"TVS diodes (underneath)"],[dz("U1"),"analog power"]]},
+  [dz("J1")]:{b:"conn", s:"Daisy bus socket", t:"Daisy J1: the Daisy bus (8 pins)", d:"A socket underneath that plugs onto the Cyton's J1 pins. Eight wires: DVDD (3.3 V), GND, MISO, SCK, RST, CLK, MOSI and CS2. There is no DRDY wire: the Daisy's DRDY pin goes nowhere, because both chips share one clock and the PIC32 just listens to the Cyton's DRDY.", i:[["J1","Cyton's Daisy port"]], o:[[dz("U1"),"SPI, clock, reset, power"],["J1","MISO: Daisy samples"]]},
+  [dz("J2")]:{b:"conn", s:"Daisy BIAS_INV pins", t:"Daisy J2: BIAS_INV and AGND pins", d:"Like J2 on the Cyton: brings out the Daisy bias amplifier's minus input, for experiments.", i:[[dz("U1"),"BIAS_INV"]], o:[]},
+  [dz("R5")]:{b:"daisy", s:"bias 1 MΩ", t:"Daisy R5: bias feedback (1 MΩ)", d:"The Daisy chip's bias amplifier gets the same feedback pair as the Cyton's: R5 (1 MΩ) with C9 (1 nF) across it, from BIAS_OUT back to BIAS_IN.", i:[[dz("U1"),"BIAS_OUT"]], o:[[dz("R6"),"BIAS_DRV"]]},
+  [dz("C9")]:{b:"daisy", s:"bias 1 nF", t:"Daisy C9: 1 nF across R5", d:"Keeps the Daisy's bias loop stable, just like C16 on the Cyton.", i:[[dz("U1"),"BIAS_OUT"]], o:[[dz("R5"),"in parallel"]]},
+  [dz("D6")]:{b:"prot", s:"TVS diodes", t:"Daisy D6: TVS diodes (4 in one)", d:"Lightning rods for the header's AGND, AVDD and BIAS pins.", i:[[dz("PL1"),"header pins"]], o:[]},
+});
+for (const [d, r] of Object.entries(DZ_TVS_R)) INFO[dz(d)] = {b:"prot", s:"TVS diodes", t:`Daisy ${d}: TVS diodes (4 in one)`, d:`Lightning rods for the Daisy's ${DZ_LINES[d]}. Underneath, right below the header pins, exactly like on the Cyton.`, i:[[dz("PL1"),"header pins"]], o:[[dz(r),"2.2 kΩ resistors (on top)"]]};
+for (const [r, c] of Object.entries(DZ_R_C)) INFO[dz(r)] = {b:"prot", s:"2.2 kΩ array", t:`Daisy ${r}: 2.2 kΩ resistor array (4 in one)`, d:`Speed bumps for ${DZ_LINES[DZ_R_TVS[r]]}. With the 1 nF capacitors underneath they also filter out radio noise.` + (r === "R6" ? " One of R6's four resistors carries the Daisy's bias drive (BIAS_DRV) out to the BIAS pin." : ""), i:[[dz(DZ_R_TVS[r]),"TVS (underneath)"]].concat(r === "R6" ? [[dz("R5"),"bias drive"]] : []), o:[[dz(c),"1 nF capacitors (underneath)"]].concat(r === "R6" ? [[dz("PL1"),"BIAS pin"]] : [])};
+for (const [c, r] of Object.entries(DZ_C_R)) INFO[dz(c)] = {b:"prot", s:"1 nF array", t:`Daisy ${c}: 1 nF capacitor array (4 in one)`, d:`Radio filter for ${DZ_LINES[DZ_R_TVS[r]]}: drains Wi-Fi and phone noise to ground. Brain signals pass untouched.`, i:[[dz(r),"2.2 kΩ resistors"]], o:[[dz("U1"),"Daisy ADS1299 inputs"]]};
+for (const c of ["C6","C7","C14","C15","C16","C17","C18","C19","C21","C22"]) INFO[dz(c)] = {b:"daisy", s:"Daisy decoupling", t:`Daisy ${c}: decoupling capacitor`, d:"A small energy tank at one of the Daisy ADS1299's power pins (" + (c === "C6" || c === "C7" ? "DVDD, the 3.3 V from the Daisy bus" : "AVDD to AVSS, the ±2.5 V that comes up the header") + ").", i:[[c === "C6" || c === "C7" ? dz("J1") : dz("PL1"), c === "C6" || c === "C7" ? "DVDD" : "AVDD / AVSS"]], o:[[dz("U1"),"power pins"]]};
+const DZ_REFTXT = {C1:"VREFP to VREFN, 10 µF: holds the 4.5 V reference steady", C3:"VREFP to VREFN, 0.1 µF: the fast partner of C1", C2:"VCAP1, 100 µF: the big one", C4:"VCAP4, 1 µF", C5:"VCAP2, 1 µF", C8:"VCAP3, 0.1 µF", C10:"VCAP3, 1 µF"};
+for (const [c, t] of Object.entries(DZ_REFTXT)) INFO[dz(c)] = {b:"daisy", s:"reference / VCAP", t:`Daisy ${c}: reference / VCAP capacitor`, d:`${t}. The same job as on the Cyton: it keeps one of the chip's internal nodes steady.`, i:[], o:[[dz("U1"),"Daisy ADS1299"]]};
+INFO.J1 = {b:"conn", s:"Daisy port", t:"J1: Daisy port (8 pins)", d:"The Daisy module plugs onto these pins. It shares the SPI bus (MISO, MOSI, SCK), RESET, DVDD and GND, gets its own chip select (CS2), and gets the Cyton ADS1299's 2.048 MHz clock on CLK. The firmware turns that clock output on only when it finds a Daisy.", i:[["U7","SPI + CS2"],["U6","clock out (CLK)"],["U5","DVDD"]], o:[[dz("J1"),"Daisy bus socket"]]};
 
 function infoFor(n){
   if (INFO[n]) return INFO[n];
@@ -507,6 +686,41 @@ const TOURS = {
     ["BLE1","…and R11, D10 and R10 safely tell the radio to use Bluetooth."]]},
 };
 
+Object.assign(TOURS, {
+  daisy:{name:"Daisy: channels 9–16", col:"#4fd1ff", daisy:true, paths:[["HEAD","Daisy PL1","Daisy D2","Daisy R2","Daisy C12","Daisy U1","Daisy J1","J1","U7","BLE1","PC"]], steps:[
+    ["HEAD","With the Daisy, 8 more electrodes on your head become channels 9 to 16."],
+    ["Daisy PL1","Their wires plug into the Daisy's own header, which sits right on top of the Cyton's. Same pin layout: N1P to N8P here are channels 9 to 16."],
+    ["Daisy D2","Underneath the Daisy: TVS diodes catch static zaps. D2 guards channels 10 and 11."],
+    ["Daisy R2","Through the board to the top: 2.2 kΩ resistors limit current, exactly like on the Cyton."],
+    ["Daisy C12","Back underneath: 1 nF capacitors drain radio noise to ground."],
+    ["Daisy U1","The Daisy's ADS1299 amplifies ×24 and converts all 8 channels at once. It runs on the Cyton chip's clock, so both chips sample at the same instant."],
+    ["Daisy J1","When the PIC32 pulls CS2 low, this chip answers: its 27 bytes go out on MISO, down the 8-pin Daisy bus."],
+    ["J1","Down the pins into the Cyton's Daisy port…"],
+    ["U7","…to the PIC32. For every sample it reads 27 bytes from each chip: CS1 for the Cyton, CS2 for the Daisy. There's no Daisy DRDY wire. The Cyton's DRDY is enough, because the clocks are shared."],
+    ["BLE1","The radio link can't carry 16 channels 250 times a second, so the firmware sends Cyton and Daisy samples in alternating packets: 16 channels at 125 Hz."],
+    ["PC","The dongle receives both halves, and the OpenBCI GUI or BrainFlow joins them back into 16 channels."]]},
+  daisybus:{name:"Daisy bus", col:"#7aa2ff", daisy:true, paths:[["U7","J1","Daisy J1","Daisy U1"],["U6","J1"]], steps:[
+    ["U7","The PIC32 drives the shared SPI bus: SCK ticks, MOSI carries commands, MISO brings data back. CS2 picks the Daisy chip."],
+    ["U6","When the firmware finds a Daisy, it turns on the Cyton ADS1299's clock output, so its 2.048 MHz clock appears on the CLK pin."],
+    ["J1","Eight pins carry it all up: DVDD, GND, MISO, SCK, RST, CLK, MOSI and CS2."],
+    ["Daisy J1","The Daisy's socket plugs onto those pins."],
+    ["Daisy U1","At start-up the PIC32 reads the Daisy chip's ID register through CS2. If it answers 0x3E, the firmware switches to 16 channels and sends the same settings to both chips."]]},
+  daisypower:{name:"Daisy power", col:"#ffd36e", daisy:true, paths:[["U5","J1","Daisy J1","Daisy U1"],["U4","PL1","Daisy PL1","Daisy U1"],["VR1","PL1"]], steps:[
+    ["U5","The Daisy has no regulators of its own. DVDD (3.3 V) from the Cyton's U5…"],
+    ["J1","…goes up pin 1 of the Daisy bus."],
+    ["U4","AVDD (+2.5 V) from U4, and AVSS (−2.5 V) from VR1…"],
+    ["PL1","…reach the AVDD and AVSS pins of the Cyton's electrode header…"],
+    ["Daisy PL1","…which line up with the Daisy header's AVDD and AVSS pins."],
+    ["Daisy U1","So both ADS1299s run on the very same ±2.5 V rails. The Daisy's capacitors (C6 to C22) sit right at its power pins."]]},
+  daisybias:{name:"Daisy bias", col:"#ff9f7a", daisy:true, paths:[["Daisy U1","Daisy R5","Daisy R6","Daisy PL1","HEAD"],["Daisy D6","Daisy PL1"]], steps:[
+    ["Daisy U1","The Daisy chip has its own bias amplifier, and the firmware switches it on too: the same CONFIG3 setting goes to both chips. It averages channels 9 to 16."],
+    ["Daisy R5","R5 (1 MΩ) with C9 (1 nF) across it: the same feedback pair as R5 and C16 on the Cyton."],
+    ["Daisy R6","One resistor in the R6 array (2.2 kΩ) carries the drive, BIAS_DRV, toward the BIAS pin."],
+    ["Daisy D6","D6 underneath clamps static on the BIAS, AVDD and AGND pins."],
+    ["Daisy PL1","The Daisy's BIAS pin lines up with the Cyton's, so both bias amplifiers push on one bias electrode, each through its own 2.2 kΩ."],
+    ["HEAD","One bias electrode, driven by both chips, cancels the shared hum for all 16 channels."]]},
+});
+
 // ---- off-board nodes, header pin markers ----
 scene.updateMatrixWorld(true);
 const wpos = n => { const v = new THREE.Vector3(); byName[n].grp.getWorldPosition(v); return v; };
@@ -540,6 +754,13 @@ for (const [n, w, d] of [["J1", 20.5, 3], ["J2", 3, 5.6], ["J3", 10.5, 3], ["J4"
   const info = {p, grp, up:1, h:0.8, mats:[mat], ghost:true};
   m.userData.info = info; pickables.push(m); byName[n] = info;
 }
+for (const n of ["J1","J2","J3","J4"]) if (byName[n]) byName[n].grp.children[0].userData.ghostBox = true;
+{ // the Cyton's Daisy port: 8 gold pins on a plastic strip
+  const j = byName.J1, gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
+  const strip = new THREE.Mesh(new THREE.BoxGeometry(20.3, 2.5, 2.5), new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6}));
+  strip.position.z = 0.85; j.grp.add(strip); strip.userData.info = j; pickables.push(strip);
+  for (let k = 0; k < 8; k++){ const pin = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, 8.5), gold); pin.position.set((k - 3.5) * 2.54, 0, 3.85); j.grp.add(pin); pin.userData.info = j; pickables.push(pin); }
+}
 scene.updateMatrixWorld(true);
 let ghostLit = null;
 function setSel(info){
@@ -555,17 +776,27 @@ const VIA_MAT = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.8, r
 function anchor(n){
   const info = byName[n], v = wpos(n), s = info.p.virtual ? info.side : info.up;
   if (!info.p.virtual) v.addScaledVector(UPV, s * ((info.h || 1) / 2 + 0.9));
-  return {p:v, s};
+  return {p:v, s, lev:info.p.virtual ? null : info.daisy ? daisy.position.z : 0};
+}
+function arcCap(lev, s){                                     // keep arcs out of the gap between the boards
+  if (!daisyOn()) return 99;
+  const gap = daisy.position.z - T;
+  return (lev === 0 && s === 1) || (lev !== 0 && s === -1) ? Math.max(1.5, gap * 0.55) : 99;
 }
 function edgeCurve(a, b){
   const A = anchor(a), B = anchor(b), d = A.p.distanceTo(B.p);
+  const la = A.lev ?? B.lev ?? 0, lb = B.lev ?? A.lev ?? 0;
+  if (la !== lb){                                            // Cyton <-> Daisy: straight along the connector pins
+    const a1 = A.p.clone().addScaledVector(UPV, A.s * 1.5), b1 = B.p.clone().addScaledVector(UPV, B.s * 1.5);
+    return {curve:new THREE.CatmullRomCurve3([A.p, a1, b1, B.p]), via:null};
+  }
   if (A.s === B.s){
-    const mid = A.p.clone().lerp(B.p, 0.5).addScaledVector(UPV, A.s * (3 + d * 0.16));
+    const mid = A.p.clone().lerp(B.p, 0.5).addScaledVector(UPV, A.s * Math.min(3 + d * 0.16, arcCap(la, A.s)));
     return {curve:new THREE.CatmullRomCurve3([A.p, mid, B.p]), via:null};
   }
-  const via = A.p.clone().lerp(B.p, 0.5); via.y = 0;
-  const a1 = A.p.clone().lerp(via, 0.5); a1.y = A.s * (2.5 + d * 0.06);
-  const b1 = B.p.clone().lerp(via, 0.5); b1.y = B.s * (2.5 + d * 0.06);
+  const via = A.p.clone().lerp(B.p, 0.5); via.y = la;
+  const a1 = A.p.clone().lerp(via, 0.5); a1.y = la + A.s * Math.min(2.5 + d * 0.06, arcCap(la, A.s));
+  const b1 = B.p.clone().lerp(via, 0.5); b1.y = la + B.s * Math.min(2.5 + d * 0.06, arcCap(la, B.s));
   return {curve:new THREE.CatmullRomCurve3([A.p, a1, via, b1, B.p]), via};
 }
 const tourGroups = {};
@@ -582,7 +813,7 @@ function buildTour(key){
     g.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 0.45, 8, false), mat));
     const len = curve.getLength(), n = Math.max(2, Math.round(len / 9)), dots = [];
     for (let j = 0; j < n; j++){ const s = new THREE.Mesh(DOT_GEO, dmat); g.add(s); dots.push(s); }
-    if (via) for (const yy of [T_HALF + 0.04, -T_HALF - 0.04]){ const r = new THREE.Mesh(VIA_GEO, VIA_MAT); r.rotation.x = Math.PI / 2; r.position.set(via.x, yy, via.z); g.add(r); }
+    if (via) for (const yy of [T_HALF + 0.04, -T_HALF - 0.04]){ const r = new THREE.Mesh(VIA_GEO, VIA_MAT); r.rotation.x = Math.PI / 2; r.position.set(via.x, via.y + yy, via.z); g.add(r); }
     edges.push({a, b, curve, len, mat, dots});
   }
   g.visible = false; scene.add(g);
@@ -592,7 +823,7 @@ const STILL = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let activeTour = null, stepIdx = 0, allFlows = false, focusName = null;
 function showGroups(){
   for (const key of Object.keys(TOURS)){
-    const on = allFlows || key === activeTour;
+    const on = (allFlows && (!TOURS[key].daisy || daisyOn())) || key === activeTour;
     if (on) buildTour(key).g.visible = true; else if (tourGroups[key]) tourGroups[key].g.visible = false;
   }
 }
@@ -648,7 +879,8 @@ function renderPart(n){
 }
 function selectPart(n, fly = true){
   const info = byName[n]; if (!info) return;
-  setSel(info); focusName = n; renderPart(n);
+  if (info.daisy && !daisyOn()) setDaisyMode("lifted");
+  setSel(info); focusName = n; applyFade(n); renderPart(n);
   if (fly){ setSpin(false); flyToPart(n); }
   if (find.value !== n) find.value = byName[n] && [...find.options].some(o => o.value === n) ? n : "";
 }
@@ -679,7 +911,7 @@ panel.addEventListener("click", e => {
   else if (b.dataset.nav === "exit") exitTour();
   else if (b.classList.contains("dot")) goStep(+b.dataset.step);
 });
-document.getElementById("allflows").addEventListener("change", e => { allFlows = e.target.checked; showGroups(); if (allFlows && !activeTour){ setSpin(false); flyTo(new THREE.Vector3(90, 80, 125), new THREE.Vector3(0, 6, 0)); } });
+document.getElementById("allflows").addEventListener("change", e => { allFlows = e.target.checked; showGroups(); if (allFlows && !activeTour){ setSpin(false); const l = daisyMode === "lifted"; flyTo(l ? new THREE.Vector3(96, 104, 132) : new THREE.Vector3(90, 80, 125), new THREE.Vector3(0, l ? 14 : 6, 0)); } });
 document.addEventListener("keydown", e => {
   const tg = e.target; if (!activeTour || (tg && tg.closest && tg.closest("select, input"))) return;
   if (e.key === "ArrowRight") goStep(stepIdx + 1); else if (e.key === "ArrowLeft") goStep(stepIdx - 1); else if (e.key === "Escape") exitTour();
@@ -693,13 +925,72 @@ renderer.domElement.addEventListener("pointerup", e => {
   const r = renderer.domElement.getBoundingClientRect();
   ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(ptr, camera);
-  const hit = ray.intersectObjects(pickables.filter(o => o.visible !== false), false)[0];
+  const hit = pickHit();
   if (hit) selectPart(hit.object.userData.info.p.n);
 });
 for (const [n, text] of [["HEAD", "Your head"], ["PC", "USB dongle → PC"]]){
   const el = document.createElement("div"); el.className = "lbl"; el.textContent = text; labelLayer.appendChild(el); labelEls.push({el, info:byName[n]});
 }
-window.cyton = {selectPart, startTour, goStep, exitTour, TOURS, INFO, byName, infoFor, state:() => ({activeTour, stepIdx, focusName, allFlows})};
+
+// ---- Daisy: show / stack / hide, and see-through boards ----
+const PARTBOX_INTRO = partBox.innerHTML;
+function daisyOn(){ return daisyMode !== "off"; }
+let fadedD = false, fadedC = false, fadeLists = null;
+function inDaisy(o){ for (let q = o; q; q = q.parent) if (q === daisy) return true; return false; }
+function fadeMats(){
+  if (fadeLists) return fadeLists;
+  const d = new Set(), c = new Set();
+  board.traverse(o => {
+    if (!o.isMesh || o.userData.ghostBox) return;
+    for (const m of [].concat(o.material)){ if (!m.userData.base) m.userData.base = {t:m.transparent, o:m.opacity, dw:m.depthWrite}; (inDaisy(o) ? d : c).add(m); }
+  });
+  return fadeLists = {d:[...d], c:[...c]};
+}
+function setFadeList(list, f){
+  for (const m of list){ const b = m.userData.base;
+    if (f < 1){ m.transparent = true; m.opacity = b.o * f; m.depthWrite = false; } else { m.transparent = b.t; m.opacity = b.o; m.depthWrite = b.dw; }
+    m.needsUpdate = true; }
+}
+function applyFade(n){
+  const info = n && byName[n]; let fd = false, fc = false;
+  if (daisyOn() && info && !info.p.virtual){
+    if (!info.daisy && info.up === 1 && underDaisy(info.p.x, info.p.y)) fd = true;   // a Cyton part hidden under the Daisy
+    if (info.daisy && info.up === -1) fc = true;                                      // a Daisy part facing the Cyton
+  }
+  if (fd !== fadedD){ fadedD = fd; setFadeList(fadeMats().d, fd ? 0.08 : 1); }
+  if (fc !== fadedC){ fadedC = fc; setFadeList(fadeMats().c, fc ? 0.08 : 1); }
+}
+function pickHit(){
+  const list = pickables.filter(o => { const inf = o.userData.info; if (inf.daisy) return daisyOn() && !fadedD; return inf.p.virtual || !fadedC; });
+  if (daisyOn() && !fadedD) list.push(dzEdge);
+  if (!fadedC) list.push(edge);
+  const h = ray.intersectObjects(list, false)[0];
+  return h && !h.object.userData.occluder ? h : null;
+}
+function labelHidden(info){
+  if (info.daisy) return !daisyOn() || fadedD || (info.up === -1 && camera.position.y < 0 && !fadedC);
+  if (info.p.virtual) return false;
+  if (fadedC) return true;
+  return daisyOn() && !fadedD && info.up === 1 && underDaisy(info.p.x, info.p.y) && camera.position.y > daisy.position.z;
+}
+function setDaisyMode(m){
+  daisyMode = m; daisy.visible = m !== "off"; if (m !== "off") daisy.position.z = DZ_LIFT[m];
+  const b = document.getElementById("daisy");
+  b.textContent = m === "off" ? "Daisy: hidden" : m === "stacked" ? "Daisy: stacked" : "Daisy: lifted"; b.setAttribute("aria-pressed", m !== "off");
+  scene.updateMatrixWorld(true);
+  for (const k of Object.keys(tourGroups)){
+    const {g} = tourGroups[k]; scene.remove(g);
+    g.traverse(o => { if (o.geometry && o.geometry !== DOT_GEO && o.geometry !== VIA_GEO) o.geometry.dispose(); });
+    delete tourGroups[k];
+  }
+  if (m === "off"){
+    if (activeTour && TOURS[activeTour].daisy) exitTour();
+    if (focusName && byName[focusName].daisy){ setSel(null); focusName = null; partBox.innerHTML = PARTBOX_INTRO; if (find.value.startsWith("Daisy")) find.value = ""; }
+  }
+  showGroups(); applyFade(focusName);
+}
+document.getElementById("daisy").onclick = () => setDaisyMode(daisyMode === "lifted" ? "stacked" : daisyMode === "stacked" ? "off" : "lifted");
+window.cyton = {selectPart, startTour, goStep, exitTour, TOURS, INFO, byName, infoFor, state:() => ({activeTour, stepIdx, focusName, allFlows, daisyMode, fadedD, fadedC}), setDaisyMode, daisy};
 
 
 // ---- size + loop ----
@@ -723,7 +1014,7 @@ function loop(){
       toCam.copy(camera.position).sub(tmp);
       const facing = info.up === 0 ? camera.position.y * info.side > -5 : up.dot(toCam) * info.up > 0;
       tmp.addScaledVector(up, info.up * 3).project(camera);
-      if (!facing || tmp.z > 1){ el.hidden = true; continue; }
+      if (!facing || tmp.z > 1 || labelHidden(info)){ el.hidden = true; continue; }
       el.hidden = false;
       el.style.left = ((tmp.x + 1) / 2 * w) + "px"; el.style.top = ((1 - tmp.y) / 2 * h) + "px";
     }
