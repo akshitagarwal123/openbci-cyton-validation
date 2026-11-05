@@ -1,0 +1,111 @@
+1
+00:00:03,500 --> 00:00:05,121
+Now the digital side.
+
+2
+00:00:05,121 --> 00:00:10,834
+U7 is a PIC32 microcontroller: a tiny computer running OpenBCI's firmware.
+
+3
+00:00:10,834 --> 00:00:22,490
+Its job is to collect samples from the ADS1299 and the accelerometer, pack them into packets, and hand them to the radio, or write them to the SD card.
+
+4
+00:00:23,667 --> 00:00:32,393
+It keeps time with X1, an 8 megahertz crystal: a sliver of quartz that vibrates at an exact frequency.
+
+5
+00:00:32,393 --> 00:00:38,638
+The two tiny capacitors next to it, 18 pF each, help it start and settle.
+
+6
+00:00:38,638 --> 00:00:43,257
+The chip multiplies this beat up to run its processor.
+
+7
+00:00:43,257 --> 00:00:54,037
+Don't confuse it with the ADS1299's own clock: that one runs at 2.048 megahertz, inside the ADS1299, and it times the samples.
+
+8
+00:00:55,267 --> 00:01:01,688
+The microcontroller talks to the ADS1299 over SPI, a simple four-wire link.
+
+9
+00:01:01,688 --> 00:01:05,541
+The microcontroller drives a clock wire, SCK.
+
+10
+00:01:05,541 --> 00:01:11,878
+On each tick, one bit travels out on MOSI, and one bit comes back on MISO.
+
+11
+00:01:11,878 --> 00:01:16,844
+A fourth wire, chip-select, picks which chip is listening.
+
+12
+00:01:16,844 --> 00:01:25,235
+The SPI wires are shared with the accelerometer and the SD card, and each has its own chip-select:
+
+13
+00:01:25,235 --> 00:01:33,027
+CS1 for the ADS1299, CS3 for the SD card, CS4 for the accelerometer, and CS2 for the Daisy.
+
+14
+00:01:34,200 --> 00:01:38,013
+Every 4 milliseconds, the ADS1299 pulls DRDY low.
+
+15
+00:01:38,013 --> 00:01:42,994
+That's a doorbell, wired to an interrupt on the microcontroller.
+
+16
+00:01:42,994 --> 00:01:47,118
+It immediately pulls CS1 low and clocks out 27 bytes:
+
+17
+00:01:47,118 --> 00:01:51,710
+3 bytes of status, then 3 bytes for each of the 8 channels.
+
+18
+00:01:52,933 --> 00:01:55,809
+Two buttons control the microcontroller.
+
+19
+00:01:55,809 --> 00:01:59,764
+RST pulls its reset pin, MCLR, to ground to restart it.
+
+20
+00:01:59,764 --> 00:02:04,006
+A 470 kΩ resistor holds that pin high the rest of the time.
+
+21
+00:02:04,006 --> 00:02:10,261
+PROG, held while you reset, tells it to start its bootloader and wait for new firmware.
+
+22
+00:02:10,261 --> 00:02:13,640
+And the blue LED, D1, shows the board's status.
+
+23
+00:02:13,640 --> 00:02:22,843
+In the schematic, the microcontroller block shows all of this: chip-selects, crystal, buttons, and the serial link to the radio.
+
+24
+00:02:24,067 --> 00:02:33,684
+The PIC32 comes with a chipKIT bootloader, a small program that lets you load new firmware over USB through the dongle, using the Arduino software.
+
+25
+00:02:33,684 --> 00:02:44,087
+Its spare pins are brought out on the two black sockets, J3 and J4, so you can connect your own add-ons, like a button or a trigger signal from another device.
+
+26
+00:02:45,267 --> 00:02:46,553
+Chapter recap.
+
+27
+00:02:46,553 --> 00:02:51,516
+The PIC32 runs the firmware on an 8 megahertz crystal.
+
+28
+00:02:51,516 --> 00:03:07,417
+It talks SPI to the ADS1299, the accelerometer, the SD card and the Daisy, each with its own chip-select, and it reads 27 bytes from the ADS1299 every time data ready rings.

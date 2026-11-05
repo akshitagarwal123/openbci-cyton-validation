@@ -1,0 +1,63 @@
+1
+00:00:03,500 --> 00:00:15,354
+Each packet the microcontroller builds is 33 bytes long: a start byte, a sample number, 24 bytes of channel data, 6 bytes of accelerometer data, and a stop byte.
+
+2
+00:00:15,354 --> 00:00:21,980
+It sends each packet over a serial link to BLE1, an RFduino radio module on the underside.
+
+3
+00:00:23,200 --> 00:00:30,646
+The RFduino transmits each packet wirelessly to the OpenBCI USB dongle, plugged into your computer.
+
+4
+00:00:30,646 --> 00:00:34,256
+Every 4 milliseconds, a packet leaves the board.
+
+5
+00:00:34,256 --> 00:00:44,560
+On the computer, software such as the OpenBCI GUI or BrainFlow turns the 24-bit numbers back into microvolts, and plots your brain waves.
+
+6
+00:00:45,733 --> 00:00:56,656
+The radio can also do something clever: it can reprogram the microcontroller over the air, using the programming pins, so you can update the firmware without any cables.
+
+7
+00:00:56,656 --> 00:00:58,595
+And remember the slide switch?
+
+8
+00:00:58,595 --> 00:01:02,279
+In the BLE position, it tells the radio to use Bluetooth.
+
+9
+00:01:02,279 --> 00:01:12,943
+That signal comes straight from the battery, so it passes through D8 and a resistor, and a Zener diode, D10, clamps it to about 3 volts to protect the radio's input.
+
+10
+00:01:14,133 --> 00:01:16,518
+Let's do the maths on the data.
+
+11
+00:01:16,518 --> 00:01:22,210
+33 bytes per packet, 250 packets a second, makes 8,250 bytes every second.
+
+12
+00:01:22,210 --> 00:01:32,056
+The serial link between the microcontroller and the radio runs at 115,200 bits per second, which is about 11,500 bytes a second.
+
+13
+00:01:32,056 --> 00:01:36,748
+So the link is already about 70 percent full with 8 channels.
+
+14
+00:01:36,748 --> 00:01:44,363
+That's exactly why 16 channels can't simply be sent at 250 per second, as we'll see with the Daisy.
+
+15
+00:01:45,533 --> 00:01:46,567
+Chapter recap.
+
+16
+00:01:46,567 --> 00:01:55,653
+A 33-byte packet, 250 times a second, over a serial link to the RFduino, then by radio to the USB dongle and your computer.

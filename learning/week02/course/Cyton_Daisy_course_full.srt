@@ -1,0 +1,1119 @@
+1
+00:00:03,500 --> 00:00:04,042
+Welcome.
+
+2
+00:00:04,042 --> 00:00:11,294
+In this course we'll take the OpenBCI Cyton board, and its add-on, the Daisy module, apart, piece by piece.
+
+3
+00:00:11,294 --> 00:00:17,528
+Together they turn the tiny electrical activity of your brain into numbers on your computer:
+
+4
+00:00:17,528 --> 00:00:20,985
+8 channels with the Cyton alone, 16 with the Daisy.
+
+5
+00:00:20,985 --> 00:00:23,831
+You don't need any electronics background.
+
+6
+00:00:23,831 --> 00:00:33,590
+We'll use a 3D model built from OpenBCI's own design files, plus the real schematics, and follow the electricity as it flows through the boards.
+
+7
+00:00:34,800 --> 00:00:36,397
+Here's the big picture.
+
+8
+00:00:36,397 --> 00:00:46,186
+Electrodes on your scalp pick up voltages of just 10 to 100 microvolts, tens of thousands of times smaller than the voltage of an AA battery.
+
+9
+00:00:46,186 --> 00:00:56,669
+The Cyton protects those signals, amplifies them, turns them into numbers 250 times a second, and sends them by radio to a USB dongle on your computer.
+
+10
+00:00:56,669 --> 00:01:03,611
+We'll follow five flows: power, the brain signal, the bias loop, the digital control, and the radio.
+
+11
+00:01:03,611 --> 00:01:08,610
+Then we'll add the Daisy, and see how two boards stay perfectly in sync.
+
+12
+00:01:12,900 --> 00:01:18,159
+The Cyton is an octagon about 6 centimetres across, with parts on both sides.
+
+13
+00:01:18,159 --> 00:01:19,457
+Let's start on top.
+
+14
+00:01:19,457 --> 00:01:27,107
+Along the top edge is the electrode header, a double row of right-angle pins where your electrode wires plug in.
+
+15
+00:01:27,107 --> 00:01:33,050
+Just below it are small black resistor arrays, part of the protection on every channel.
+
+16
+00:01:34,267 --> 00:01:39,634
+In the middle sits the most important chip: the ADS1299 from Texas Instruments.
+
+17
+00:01:39,634 --> 00:01:45,817
+It's an 8-channel amplifier and analog-to-digital converter, designed specifically for EEG.
+
+18
+00:01:45,817 --> 00:01:52,747
+Around it are lots of small capacitors that keep its power supplies and its internal reference steady.
+
+19
+00:01:53,933 --> 00:02:01,206
+Below it is the PIC32 microcontroller, the board's brain, with its 8 megahertz crystal next to it.
+
+20
+00:02:01,206 --> 00:02:09,073
+Two small buttons, RST and PROG, let you restart it or load new firmware, and a blue LED shows its status.
+
+21
+00:02:10,267 --> 00:02:12,804
+Around the edges are black sockets.
+
+22
+00:02:12,804 --> 00:02:15,341
+J1, on the left, is the Daisy port.
+
+23
+00:02:15,341 --> 00:02:19,256
+J3 and J4 bring out spare pins of the microcontroller.
+
+24
+00:02:19,256 --> 00:02:29,767
+Near the bottom is a tiny accelerometer that measures head movement, and next to it an even tinier logic chip, an OR gate, that we'll meet later.
+
+25
+00:02:30,933 --> 00:02:32,529
+Now flip the board over.
+
+26
+00:02:32,529 --> 00:02:39,711
+On the underside are the battery plug, the power supply chips, the radio module, and the micro SD card slot.
+
+27
+00:02:39,711 --> 00:02:44,365
+Right under the electrode pins you'll also find more protection parts:
+
+28
+00:02:44,365 --> 00:02:46,493
+TVS diodes and capacitor arrays.
+
+29
+00:02:47,667 --> 00:02:51,792
+On one edge is the slide switch, with three positions:
+
+30
+00:02:51,792 --> 00:02:53,014
+PC, OFF and BLE.
+
+31
+00:02:53,014 --> 00:03:09,055
+The schematic, the circuit diagram OpenBCI published, groups all these parts into the same blocks: power supply, input protection, the ADS1299, the microcontroller, the radio, the SD card and the accelerometer.
+
+32
+00:03:09,055 --> 00:03:12,187
+We'll go through them one flow at a time.
+
+33
+00:03:13,400 --> 00:03:16,097
+A quick word on how to read a schematic.
+
+34
+00:03:16,097 --> 00:03:20,615
+Each chip is drawn as a box with its pins numbered around the edge.
+
+35
+00:03:20,615 --> 00:03:21,694
+Lines are wires.
+
+36
+00:03:21,694 --> 00:03:26,482
+A dot where lines cross means they're connected; no dot, no connection.
+
+37
+00:03:26,482 --> 00:03:38,283
+Instead of drawing every long wire, the schematic often uses names, like DVDD or MISO: every point with the same name is connected, even if it's on the other side of the page.
+
+38
+00:03:38,283 --> 00:03:45,161
+Parts have reference names, like U6 or R5, and the same name is printed next to the part on the board.
+
+39
+00:03:45,161 --> 00:03:48,600
+That's how you match the drawing to the real thing.
+
+40
+00:03:49,800 --> 00:03:57,710
+Underneath the white surface, the Cyton has four layers of copper: one on top, two inside, and one on the bottom.
+
+41
+00:03:57,710 --> 00:04:01,280
+The copper traces are the wires from the schematic.
+
+42
+00:04:01,280 --> 00:04:08,770
+Switch the 3D explorer to copper routing, and you can see them: red for the top layer, cyan for the bottom.
+
+43
+00:04:08,770 --> 00:04:13,810
+Tiny plated holes, called vias, carry signals from one layer to another.
+
+44
+00:04:15,000 --> 00:04:16,005
+Chapter recap.
+
+45
+00:04:16,005 --> 00:04:25,766
+On top: the electrode header, the protection resistors, the ADS1299, the PIC32 with its crystal, buttons and LED, and the black sockets.
+
+46
+00:04:25,766 --> 00:04:32,728
+Underneath: the battery plug, the power chips, the radio, the SD card, and more protection parts.
+
+47
+00:04:32,728 --> 00:04:36,460
+Every part has a name you can find in the schematic.
+
+48
+00:04:40,767 --> 00:04:44,637
+Everything starts at the battery plug, B1, on the underside.
+
+49
+00:04:44,637 --> 00:04:49,345
+The Cyton runs from a battery of 3 to 6 volts only, never from the mains.
+
+50
+00:04:49,345 --> 00:04:55,537
+That's a safety choice: anything connected to your head should be isolated from the wall socket.
+
+51
+00:04:56,733 --> 00:05:00,329
+The first part after the battery is D9, a diode.
+
+52
+00:05:00,329 --> 00:05:03,251
+A diode is a one-way valve for current.
+
+53
+00:05:03,251 --> 00:05:09,020
+If you plug the battery in backwards, D9 blocks it, and nothing gets damaged.
+
+54
+00:05:09,020 --> 00:05:12,391
+The price is a small drop of about 0.3 volts.
+
+55
+00:05:12,391 --> 00:05:14,563
+What comes out is called RAW.
+
+56
+00:05:15,733 --> 00:05:18,570
+RAW goes to U5, a 3.3 volt regulator.
+
+57
+00:05:18,570 --> 00:05:26,696
+A regulator takes a voltage that wanders, as the battery drains, and turns it into a perfectly steady one.
+
+58
+00:05:26,696 --> 00:05:38,041
+Its output, DVDD, powers all the digital parts: the microcontroller, the radio, the accelerometer, the SD card, and the digital side of the ADS1299.
+
+59
+00:05:38,041 --> 00:05:43,637
+A nice detail: the power switch doesn't carry the board's current at all.
+
+60
+00:05:43,637 --> 00:05:50,843
+It only drives U5's enable pin, which switches the regulator, and the whole board, on and off.
+
+61
+00:05:52,067 --> 00:05:57,044
+The ADS1299's analog side needs two more supplies.
+
+62
+00:05:57,044 --> 00:06:00,727
+U4 makes plus 2.5 volts, called AVDD.
+
+63
+00:06:00,727 --> 00:06:07,297
+It's fed from the already clean 3.3 volts, so AVDD is extra quiet.
+
+64
+00:06:08,467 --> 00:06:15,527
+The analog side also needs minus 2.5 volts, and a battery can't give you a negative voltage directly.
+
+65
+00:06:15,527 --> 00:06:16,645
+That's U3's job.
+
+66
+00:06:16,645 --> 00:06:27,410
+It's a charge pump: thousands of times a second, it charges a small capacitor from 3.3 volts, flips it upside down, and pours that charge into its output.
+
+67
+00:06:27,410 --> 00:06:29,927
+The result is about minus 3.3 volts.
+
+68
+00:06:31,133 --> 00:06:40,746
+That flipped voltage is a bit rippled, so VR1, a negative regulator, cleans it into a steady minus 2.5 volts, called AVSS.
+
+69
+00:06:40,746 --> 00:06:44,292
+Now the ADS1299 has plus and minus 2.5 volts:
+
+70
+00:06:44,292 --> 00:06:46,971
+5 volts in total, centred on zero.
+
+71
+00:06:46,971 --> 00:06:56,583
+Centring on zero means the brain signal, which swings both ways around zero, sits right in the middle of the chip's range.
+
+72
+00:06:57,800 --> 00:07:01,048
+Next to every regulator you'll see small capacitors.
+
+73
+00:07:01,048 --> 00:07:09,605
+Think of them as little water tanks: when a chip suddenly gulps current, the capacitor supplies it instantly, so the voltage doesn't dip.
+
+74
+00:07:09,605 --> 00:07:12,166
+Regulators also need them to stay stable.
+
+75
+00:07:12,166 --> 00:07:17,350
+In the schematic, this whole chain sits in the power supply block, at the top left.
+
+76
+00:07:18,533 --> 00:07:20,696
+Why so many separate supplies?
+
+77
+00:07:20,696 --> 00:07:23,004
+Because digital chips are noisy.
+
+78
+00:07:23,004 --> 00:07:32,305
+Every time the microcontroller or the radio switches, it pulls quick spikes of current, and those spikes ripple along its supply.
+
+79
+00:07:32,305 --> 00:07:40,669
+If the ADS1299's analog side shared that supply, the ripple would land right on top of your microvolt brain signals.
+
+80
+00:07:40,669 --> 00:07:50,908
+So the analog side gets its own, extra-clean rails, AVDD and AVSS, made by their own low-noise regulators, while the digital parts share DVDD.
+
+81
+00:07:50,908 --> 00:07:56,243
+Keeping analog and digital apart is one of the golden rules of EEG design.
+
+82
+00:07:57,467 --> 00:07:58,722
+Chapter recap.
+
+83
+00:07:58,722 --> 00:08:01,950
+Battery, then D9, the one-way valve.
+
+84
+00:08:01,950 --> 00:08:06,165
+Then U5 makes 3.3 volts for everything digital.
+
+85
+00:08:06,165 --> 00:08:15,043
+U4 makes plus 2.5 volts, and U3 with VR1 makes minus 2.5 volts, for the analog side of the ADS1299.
+
+86
+00:08:15,043 --> 00:08:19,437
+And capacitors everywhere, as little water tanks.
+
+87
+00:08:23,767 --> 00:08:26,248
+Now the main event: the brain signal.
+
+88
+00:08:26,248 --> 00:08:30,675
+Each EEG electrode measures the voltage at one spot on your scalp.
+
+89
+00:08:30,675 --> 00:08:41,071
+But a voltage only means something compared with another point, so every channel is measured against a shared reference electrode, usually on your earlobe.
+
+90
+00:08:41,071 --> 00:08:44,157
+That reference connects to the pin called SRB.
+
+91
+00:08:45,333 --> 00:08:48,311
+The electrode wires plug into the header.
+
+92
+00:08:48,311 --> 00:08:52,088
+Each channel has two pins, P and N, in the two rows.
+
+93
+00:08:52,088 --> 00:08:57,898
+Then there's SRB, the reference, and BIAS, which we'll meet in the next chapter.
+
+94
+00:08:57,898 --> 00:09:04,143
+At the two ends sit small sockets for the analog supplies, which the Daisy uses later.
+
+95
+00:09:05,333 --> 00:09:10,927
+From each pin, the signal first meets a TVS diode, on the underside, right below the pins.
+
+96
+00:09:10,927 --> 00:09:13,662
+TVS stands for transient voltage suppressor.
+
+97
+00:09:13,662 --> 00:09:15,651
+Normally it does nothing at all.
+
+98
+00:09:15,651 --> 00:09:26,093
+But if you touch the pins with a static charge of thousands of volts, it switches on in nanoseconds and dumps that zap to ground, before it can reach the delicate chip.
+
+99
+00:09:27,267 --> 00:09:30,677
+Next, through the board to the top: a 2.2 kΩ resistor.
+
+100
+00:09:30,677 --> 00:09:34,656
+Four resistors are packed into each of these tiny black arrays.
+
+101
+00:09:34,656 --> 00:09:41,477
+If something still gets past the diode, the resistor limits how much current can flow into the chip's input.
+
+102
+00:09:42,667 --> 00:09:47,226
+Then back underneath: a 1 nF capacitor from each line to ground.
+
+103
+00:09:47,226 --> 00:09:53,423
+Together with the 2.2 kΩ resistor, it forms a filter with a cutoff around 72 kilohertz.
+
+104
+00:09:53,423 --> 00:10:01,473
+Brain signals are below 100 hertz, so they pass untouched, but radio noise from Wi-Fi and phones is drained away.
+
+105
+00:10:01,473 --> 00:10:06,887
+Notice the zig-zag: diode underneath, resistor on top, capacitor underneath.
+
+106
+00:10:06,887 --> 00:10:09,737
+The signal hops through the board twice.
+
+107
+00:10:10,933 --> 00:10:13,590
+And now the signal reaches the ADS1299.
+
+108
+00:10:13,590 --> 00:10:24,490
+For each of the 8 channels, the chip first takes the difference between the electrode and the reference, so the hum your whole body carries largely cancels out.
+
+109
+00:10:24,490 --> 00:10:29,463
+Then a programmable gain amplifier multiplies that tiny difference by 24.
+
+110
+00:10:30,667 --> 00:10:32,740
+Why only 24, and not 1,000?
+
+111
+00:10:32,740 --> 00:10:39,419
+Because electrodes also carry a slowly drifting offset, up to a few hundred millivolts.
+
+112
+00:10:39,419 --> 00:10:47,327
+With a gain of 24, the chip's input range is plus or minus 187 millivolts, wide enough for that offset.
+
+113
+00:10:47,327 --> 00:10:53,469
+And its 24-bit converter is so fine that one step is only about 0.02 microvolts.
+
+114
+00:10:53,469 --> 00:10:59,227
+So we get both: room for the offset, and detail far below the brain signal.
+
+115
+00:11:00,400 --> 00:11:03,827
+Next comes the analog-to-digital converter.
+
+116
+00:11:03,827 --> 00:11:11,637
+All 8 channels are converted at exactly the same instant, 250 times a second, into 24-bit numbers.
+
+117
+00:11:11,637 --> 00:11:25,743
+The converter needs a ruler to measure against: a 4.5 volt reference made inside the chip, held steady by capacitors on its VREF and VCAP pins, including C2, the big 100 µF one.
+
+118
+00:11:25,743 --> 00:11:34,350
+When a new set of 8 samples is ready, the chip pulls a pin called DRDY, data ready, to say: come and get it.
+
+119
+00:11:35,533 --> 00:11:37,820
+The ADS1299 has a few more tricks.
+
+120
+00:11:37,820 --> 00:11:42,931
+In front of each channel is a set of switches, called the input multiplexer.
+
+121
+00:11:42,931 --> 00:11:45,285
+Normally it connects the electrode.
+
+122
+00:11:45,285 --> 00:11:59,407
+But the firmware can also short a channel's inputs together to measure the chip's own noise, feed in a built-in test square wave to check everything works, or measure the chip's temperature and supply voltages.
+
+123
+00:11:59,407 --> 00:12:10,033
+It also decides how the reference is used: with SRB2, the shared reference goes to each channel's P input separately, which is what the Cyton uses by default.
+
+124
+00:12:10,033 --> 00:12:13,193
+With SRB1, it goes to all the N inputs at once.
+
+125
+00:12:14,400 --> 00:12:17,112
+It can even check your electrodes.
+
+126
+00:12:17,112 --> 00:12:24,289
+The chip sends a tiny current, 6 nanoamps, through each electrode, wobbling at 31.2 hertz.
+
+127
+00:12:24,289 --> 00:12:33,381
+From the voltage that this creates, software works out how well each electrode touches your skin, using Ohm's law.
+
+128
+00:12:33,381 --> 00:12:37,049
+That's the impedance check in the OpenBCI GUI.
+
+129
+00:12:37,049 --> 00:12:43,190
+A good contact has low impedance; a poor one shows up as a big, noisy signal.
+
+130
+00:12:44,400 --> 00:12:51,535
+Finally, look at all the small capacitors gathered around the ADS1299, many of them right underneath it.
+
+131
+00:12:51,535 --> 00:12:59,973
+Every power pin of the chip gets its own: usually a 1 µF and a 0.1 µF side by side, placed as close to the pin as possible.
+
+132
+00:12:59,973 --> 00:13:03,815
+The big one stores energy, the small one reacts fastest.
+
+133
+00:13:03,815 --> 00:13:11,430
+Without them, the chip's own switching would make its supply bounce, and that bounce would show up in your EEG.
+
+134
+00:13:12,600 --> 00:13:13,893
+Chapter recap.
+
+135
+00:13:13,893 --> 00:13:25,065
+Electrode, then a TVS diode against static, a 2.2 kΩ resistor to limit current, and a 1 nF capacitor against radio noise.
+
+136
+00:13:25,065 --> 00:13:35,960
+Then the ADS1299: subtract the reference, multiply by 24, convert to 24 bits, 250 times a second, and ring data ready.
+
+137
+00:13:40,233 --> 00:13:42,565
+There's one problem left: mains hum.
+
+138
+00:13:42,565 --> 00:13:49,236
+The power lines in your walls create a 50 or 60 hertz field, and your body picks it up like an antenna.
+
+139
+00:13:49,236 --> 00:13:53,446
+That hum can be thousands of times bigger than your brain signal.
+
+140
+00:13:53,446 --> 00:13:57,203
+Subtracting the reference removes most of it, but not all.
+
+141
+00:13:57,203 --> 00:13:59,923
+The bias loop pushes it down even further.
+
+142
+00:14:01,133 --> 00:14:05,514
+Inside the ADS1299, the electrode signals are averaged together.
+
+143
+00:14:05,514 --> 00:14:10,920
+Brain signals differ from place to place, so they mostly cancel in the average.
+
+144
+00:14:10,920 --> 00:14:14,411
+What's left is the hum that every electrode shares.
+
+145
+00:14:14,411 --> 00:14:23,513
+A built-in bias amplifier then drives the opposite of that hum back into your body, through a separate electrode: the bias electrode.
+
+146
+00:14:24,733 --> 00:14:32,045
+On its way out, the bias drive passes R5, a 1 MΩ resistor, with C16, a 1 nF capacitor, across it.
+
+147
+00:14:32,045 --> 00:14:38,527
+R5 limits the current into your body to a couple of microamps, even in the worst case.
+
+148
+00:14:38,527 --> 00:14:42,522
+C16 lets faster changes, like the hum, get around R5.
+
+149
+00:14:42,522 --> 00:14:50,965
+One detail from the schematic: the amplifier's minus input, BIAS_INV, isn't wired to anything else on the board.
+
+150
+00:14:50,965 --> 00:14:55,713
+It's simply brought out to two pins, J2, so you can experiment.
+
+151
+00:14:56,933 --> 00:15:09,747
+Then the drive passes a 2.2 kΩ protection resistor and a TVS diode, like every other line, and leaves through the BIAS pin to the bias electrode, often on the other earlobe or the forehead.
+
+152
+00:15:09,747 --> 00:15:16,323
+The loop closes through you: the hum goes up on your body, and the amplifier pushes it back down.
+
+153
+00:15:16,323 --> 00:15:18,153
+Every channel gets cleaner.
+
+154
+00:15:19,333 --> 00:15:20,445
+Chapter recap.
+
+155
+00:15:20,445 --> 00:15:31,877
+The ADS1299 averages the electrodes to find the shared hum, inverts it, and drives it back into your body through R5, R6 and the bias electrode.
+
+156
+00:15:31,877 --> 00:15:34,893
+The hum on every channel gets smaller.
+
+157
+00:15:39,167 --> 00:15:40,788
+Now the digital side.
+
+158
+00:15:40,788 --> 00:15:46,500
+U7 is a PIC32 microcontroller: a tiny computer running OpenBCI's firmware.
+
+159
+00:15:46,500 --> 00:15:58,157
+Its job is to collect samples from the ADS1299 and the accelerometer, pack them into packets, and hand them to the radio, or write them to the SD card.
+
+160
+00:15:59,333 --> 00:16:08,059
+It keeps time with X1, an 8 megahertz crystal: a sliver of quartz that vibrates at an exact frequency.
+
+161
+00:16:08,059 --> 00:16:14,304
+The two tiny capacitors next to it, 18 pF each, help it start and settle.
+
+162
+00:16:14,304 --> 00:16:18,924
+The chip multiplies this beat up to run its processor.
+
+163
+00:16:18,924 --> 00:16:29,703
+Don't confuse it with the ADS1299's own clock: that one runs at 2.048 megahertz, inside the ADS1299, and it times the samples.
+
+164
+00:16:30,933 --> 00:16:37,355
+The microcontroller talks to the ADS1299 over SPI, a simple four-wire link.
+
+165
+00:16:37,355 --> 00:16:41,208
+The microcontroller drives a clock wire, SCK.
+
+166
+00:16:41,208 --> 00:16:47,544
+On each tick, one bit travels out on MOSI, and one bit comes back on MISO.
+
+167
+00:16:47,544 --> 00:16:52,510
+A fourth wire, chip-select, picks which chip is listening.
+
+168
+00:16:52,510 --> 00:17:00,902
+The SPI wires are shared with the accelerometer and the SD card, and each has its own chip-select:
+
+169
+00:17:00,902 --> 00:17:08,693
+CS1 for the ADS1299, CS3 for the SD card, CS4 for the accelerometer, and CS2 for the Daisy.
+
+170
+00:17:09,867 --> 00:17:13,680
+Every 4 milliseconds, the ADS1299 pulls DRDY low.
+
+171
+00:17:13,680 --> 00:17:18,661
+That's a doorbell, wired to an interrupt on the microcontroller.
+
+172
+00:17:18,661 --> 00:17:22,785
+It immediately pulls CS1 low and clocks out 27 bytes:
+
+173
+00:17:22,785 --> 00:17:27,377
+3 bytes of status, then 3 bytes for each of the 8 channels.
+
+174
+00:17:28,600 --> 00:17:31,476
+Two buttons control the microcontroller.
+
+175
+00:17:31,476 --> 00:17:35,430
+RST pulls its reset pin, MCLR, to ground to restart it.
+
+176
+00:17:35,430 --> 00:17:39,672
+A 470 kΩ resistor holds that pin high the rest of the time.
+
+177
+00:17:39,672 --> 00:17:45,928
+PROG, held while you reset, tells it to start its bootloader and wait for new firmware.
+
+178
+00:17:45,928 --> 00:17:49,307
+And the blue LED, D1, shows the board's status.
+
+179
+00:17:49,307 --> 00:17:58,510
+In the schematic, the microcontroller block shows all of this: chip-selects, crystal, buttons, and the serial link to the radio.
+
+180
+00:17:59,733 --> 00:18:09,351
+The PIC32 comes with a chipKIT bootloader, a small program that lets you load new firmware over USB through the dongle, using the Arduino software.
+
+181
+00:18:09,351 --> 00:18:19,753
+Its spare pins are brought out on the two black sockets, J3 and J4, so you can connect your own add-ons, like a button or a trigger signal from another device.
+
+182
+00:18:20,933 --> 00:18:22,220
+Chapter recap.
+
+183
+00:18:22,220 --> 00:18:27,183
+The PIC32 runs the firmware on an 8 megahertz crystal.
+
+184
+00:18:27,183 --> 00:18:43,083
+It talks SPI to the ADS1299, the accelerometer, the SD card and the Daisy, each with its own chip-select, and it reads 27 bytes from the ADS1299 every time data ready rings.
+
+185
+00:18:47,367 --> 00:18:59,220
+Each packet the microcontroller builds is 33 bytes long: a start byte, a sample number, 24 bytes of channel data, 6 bytes of accelerometer data, and a stop byte.
+
+186
+00:18:59,220 --> 00:19:05,847
+It sends each packet over a serial link to BLE1, an RFduino radio module on the underside.
+
+187
+00:19:07,067 --> 00:19:14,513
+The RFduino transmits each packet wirelessly to the OpenBCI USB dongle, plugged into your computer.
+
+188
+00:19:14,513 --> 00:19:18,123
+Every 4 milliseconds, a packet leaves the board.
+
+189
+00:19:18,123 --> 00:19:28,427
+On the computer, software such as the OpenBCI GUI or BrainFlow turns the 24-bit numbers back into microvolts, and plots your brain waves.
+
+190
+00:19:29,600 --> 00:19:40,523
+The radio can also do something clever: it can reprogram the microcontroller over the air, using the programming pins, so you can update the firmware without any cables.
+
+191
+00:19:40,523 --> 00:19:42,462
+And remember the slide switch?
+
+192
+00:19:42,462 --> 00:19:46,146
+In the BLE position, it tells the radio to use Bluetooth.
+
+193
+00:19:46,146 --> 00:19:56,810
+That signal comes straight from the battery, so it passes through D8 and a resistor, and a Zener diode, D10, clamps it to about 3 volts to protect the radio's input.
+
+194
+00:19:58,000 --> 00:20:00,385
+Let's do the maths on the data.
+
+195
+00:20:00,385 --> 00:20:06,077
+33 bytes per packet, 250 packets a second, makes 8,250 bytes every second.
+
+196
+00:20:06,077 --> 00:20:15,923
+The serial link between the microcontroller and the radio runs at 115,200 bits per second, which is about 11,500 bytes a second.
+
+197
+00:20:15,923 --> 00:20:20,615
+So the link is already about 70 percent full with 8 channels.
+
+198
+00:20:20,615 --> 00:20:28,230
+That's exactly why 16 channels can't simply be sent at 250 per second, as we'll see with the Daisy.
+
+199
+00:20:29,400 --> 00:20:30,434
+Chapter recap.
+
+200
+00:20:30,434 --> 00:20:39,520
+A 33-byte packet, 250 times a second, over a serial link to the RFduino, then by radio to the USB dongle and your computer.
+
+201
+00:20:43,833 --> 00:20:49,139
+The accelerometer, U1, measures how your head tilts and moves, in three directions.
+
+202
+00:20:49,139 --> 00:20:56,043
+Its readings go into the 6 aux bytes of each packet, so software can spot movement that might spoil the EEG.
+
+203
+00:20:57,267 --> 00:21:08,275
+It shares the SPI wires, but this chip can also speak another protocol, I²C, and busy SPI traffic could accidentally look like an I²C start signal to it.
+
+204
+00:21:08,275 --> 00:21:13,599
+So U2, a tiny OR gate, holds its data pin high whenever it isn't selected.
+
+205
+00:21:13,599 --> 00:21:19,787
+It's like an earplug that's only removed when the microcontroller wants to talk to it.
+
+206
+00:21:21,000 --> 00:21:28,295
+The micro SD card slot, on the underside, lets the board record without a computer at all.
+
+207
+00:21:28,295 --> 00:21:32,996
+It uses the same SPI wires, with its own chip-select, CS3.
+
+208
+00:21:32,996 --> 00:21:39,480
+C4, a big 100 µF capacitor, covers the card's bursts of current while it writes.
+
+209
+00:21:40,667 --> 00:21:41,713
+Chapter recap.
+
+210
+00:21:41,713 --> 00:21:47,544
+The accelerometer adds motion to every packet, with an OR gate as its earplug.
+
+211
+00:21:47,544 --> 00:21:51,207
+And the SD card lets the board record on its own.
+
+212
+00:21:55,500 --> 00:21:57,768
+Now let's add the Daisy module.
+
+213
+00:21:57,768 --> 00:22:03,915
+It's a second, smaller board that sits on top of the Cyton and adds 8 more channels:
+
+214
+00:22:03,915 --> 00:22:04,500
+9 to 16.
+
+215
+00:22:04,500 --> 00:22:14,013
+It has its own ADS1299, its own protection parts and its own electrode header, but no microcontroller, no radio and no regulators.
+
+216
+00:22:14,013 --> 00:22:16,720
+Everything else comes from the Cyton.
+
+217
+00:22:17,933 --> 00:22:20,176
+Here's the Daisy on its own.
+
+218
+00:22:20,176 --> 00:22:38,119
+On top: its electrode header along the top edge, five resistor arrays under it, the ADS1299 in the middle, the 8-pin Daisy bus on the left edge, and two pads, J2, for the bias amplifier's minus input, just like on the Cyton.
+
+219
+00:22:38,119 --> 00:22:38,000
+Underneath:
+
+220
+00:22:38,000 --> 00:22:46,049
+TVS diodes and capacitor arrays below the pins, and the ADS1299's decoupling capacitors.
+
+221
+00:22:46,049 --> 00:22:49,653
+Same building blocks, minus the digital side.
+
+222
+00:22:50,867 --> 00:22:57,710
+Both chips are identical, with identical settings: gain 24, 24-bit, 250 samples a second.
+
+223
+00:22:57,710 --> 00:23:04,477
+The Cyton's chip handles channels 1 to 8, and the Daisy's chip handles channels 9 to 16.
+
+224
+00:23:05,667 --> 00:23:13,831
+The extra electrodes plug into the Daisy's own right-angle header, which sits right above the Cyton's.
+
+225
+00:23:13,831 --> 00:23:16,632
+Each line gets the same protection:
+
+226
+00:23:16,632 --> 00:23:24,797
+TVS diode underneath, 2.2 kΩ resistor on top, 1 nF capacitor underneath, and then the Daisy's ADS1299.
+
+227
+00:23:26,000 --> 00:23:28,540
+The boards talk through 8 pins.
+
+228
+00:23:28,540 --> 00:23:33,619
+The Daisy's pins point down into J1, the Cyton's black socket:
+
+229
+00:23:33,619 --> 00:23:42,630
+3.3 volt power, ground, the three shared SPI wires, reset, a clock line, and CS2, the Daisy's own chip-select.
+
+230
+00:23:43,800 --> 00:23:46,179
+Analog power arrives another way.
+
+231
+00:23:46,179 --> 00:23:52,740
+At the two ends of the Cyton's electrode header sit small 2-hole sockets for AVSS and AVDD.
+
+232
+00:23:52,740 --> 00:24:01,680
+The Daisy's matching pins plug straight down into them, so both chips run on the very same plus and minus 2.5 volt supplies.
+
+233
+00:24:02,867 --> 00:24:05,473
+So how do two chips stay in sync?
+
+234
+00:24:05,473 --> 00:24:06,816
+First: one clock.
+
+235
+00:24:06,816 --> 00:24:12,978
+The Daisy's clock-select pin is tied to ground, so it has no clock of its own.
+
+236
+00:24:12,978 --> 00:24:23,484
+When the firmware finds a Daisy, it turns on the Cyton chip's clock output, and both chips count the very same 2.048 megahertz ticks.
+
+237
+00:24:23,484 --> 00:24:29,567
+8,192 ticks make one sample, so both finish every sample at the same instant.
+
+238
+00:24:30,733 --> 00:24:31,996
+Second: one start.
+
+239
+00:24:31,996 --> 00:24:40,482
+The microcontroller pulls both chip-selects low together and sends a single START command, which both chips hear at once.
+
+240
+00:24:40,482 --> 00:24:43,848
+A shared reset line restarts them together, too.
+
+241
+00:24:43,848 --> 00:24:47,985
+At start-up, it also reads the Daisy chip's ID through CS2.
+
+242
+00:24:47,985 --> 00:24:52,193
+If the answer is 0x3E, the firmware switches to 16 channels.
+
+243
+00:24:53,400 --> 00:24:54,876
+Third: one doorbell.
+
+244
+00:24:54,876 --> 00:24:58,937
+The Daisy's data-ready pin isn't connected to anything.
+
+245
+00:24:58,937 --> 00:25:09,420
+When the Cyton chip rings data ready, the Daisy's sample is ready too, so the microcontroller reads 27 bytes with CS1, then 27 bytes with CS2.
+
+246
+00:25:10,600 --> 00:25:15,065
+The radio link can't carry 16 channels 250 times a second.
+
+247
+00:25:15,065 --> 00:25:24,689
+So the firmware averages each pair of samples and takes turns: odd packets carry channels 1 to 8, even packets carry 9 to 16.
+
+248
+00:25:24,689 --> 00:25:31,310
+Each channel arrives 125 times a second, and the software stitches them back together.
+
+249
+00:25:32,533 --> 00:25:33,999
+Two practical notes.
+
+250
+00:25:33,999 --> 00:25:38,910
+The Daisy has its own SRB and BIAS pins, separate from the Cyton's.
+
+251
+00:25:38,910 --> 00:25:45,361
+For one reference across all 16 channels, join the two SRB pins with a Y-splitter cable.
+
+252
+00:25:45,361 --> 00:25:54,963
+The Daisy's bias drive goes to its own BIAS pin: you can leave it unused, and let the Cyton's bias electrode serve all 16 channels.
+
+253
+00:25:56,133 --> 00:25:57,257
+Chapter recap.
+
+254
+00:25:57,257 --> 00:26:01,512
+The Daisy adds a second ADS1299 for channels 9 to 16.
+
+255
+00:26:01,512 --> 00:26:10,344
+It gets 3.3 volts and SPI through the 8-pin Daisy bus, and plus and minus 2.5 volts through two small sockets.
+
+256
+00:26:10,344 --> 00:26:18,613
+One clock, one start, and one doorbell keep both chips in step, and the radio takes turns between them.
+
+257
+00:26:22,900 --> 00:26:27,222
+Let's put it all together, with every flow running at once.
+
+258
+00:26:27,222 --> 00:26:31,690
+Power: battery, D9, 3.3 volts, then plus and minus 2.5 volts.
+
+259
+00:26:31,690 --> 00:26:35,499
+Signal: electrode, protection, amplifier, converter.
+
+260
+00:26:35,499 --> 00:26:38,428
+Bias: the hum, inverted and pushed back.
+
+261
+00:26:38,428 --> 00:26:42,018
+Control: the microcontroller, SPI and data ready.
+
+262
+00:26:42,018 --> 00:26:45,973
+Radio: a packet every 4 milliseconds to your computer.
+
+263
+00:26:45,973 --> 00:26:51,320
+And the Daisy, locked in step with one clock, one start and one doorbell.
+
+264
+00:26:52,533 --> 00:26:56,666
+Now follow one single sample through its 4 milliseconds.
+
+265
+00:26:56,666 --> 00:27:02,716
+Your brain makes a tiny voltage; the electrode picks it up, together with the hum.
+
+266
+00:27:02,716 --> 00:27:08,989
+The TVS diode, the resistor and the capacitor let it through, cleaned of radio noise.
+
+267
+00:27:08,989 --> 00:27:14,228
+The ADS1299 subtracts the reference, multiplies by 24, and converts it.
+
+268
+00:27:14,228 --> 00:27:15,703
+It rings data ready.
+
+269
+00:27:15,703 --> 00:27:21,459
+The PIC32 reads 27 bytes, adds the accelerometer, and builds a 33-byte packet.
+
+270
+00:27:21,459 --> 00:27:23,894
+The radio sends it to the dongle.
+
+271
+00:27:23,894 --> 00:27:32,528
+And on your computer, each number is multiplied by about 0.02 microvolts, to give you back the voltage on your scalp.
+
+272
+00:27:32,528 --> 00:27:36,143
+Then, 4 milliseconds later, it all happens again.
+
+273
+00:27:37,333 --> 00:27:43,166
+For your own board, BrainTech-8, the same flows apply, with a few changes.
+
+274
+00:27:43,166 --> 00:27:49,394
+An ESP32-S3 replaces both the PIC32 and the radio, since it has Wi-Fi built in.
+
+275
+00:27:49,394 --> 00:27:57,907
+Its Wi-Fi bursts draw around 350 milliamps, so the 3.3 volt supply has to be much stronger than the Cyton's.
+
+276
+00:27:57,907 --> 00:28:10,913
+You're also planning 47 pF capacitors on the inputs instead of 1 nF, two 100 kΩ resistors in series with the bias electrode, and a lithium battery with USB charging.
+
+277
+00:28:10,913 --> 00:28:20,293
+Everything else, the protection, the ADS1299 with its capacitors, and the bias loop, you now understand from the Cyton.
+
+278
+00:28:21,467 --> 00:28:25,321
+That's the Cyton and the Daisy, from battery to brain waves.
+
+279
+00:28:25,321 --> 00:28:33,992
+Keep the 3D explorer open while you draw your own schematic: click any part to see where its signal comes from, and where it goes next.
+
+280
+00:28:33,992 --> 00:28:35,727
+Good luck with BrainTech-8.

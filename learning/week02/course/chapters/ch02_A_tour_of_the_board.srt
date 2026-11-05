@@ -1,0 +1,143 @@
+1
+00:00:03,500 --> 00:00:08,759
+The Cyton is an octagon about 6 centimetres across, with parts on both sides.
+
+2
+00:00:08,759 --> 00:00:10,057
+Let's start on top.
+
+3
+00:00:10,057 --> 00:00:17,707
+Along the top edge is the electrode header, a double row of right-angle pins where your electrode wires plug in.
+
+4
+00:00:17,707 --> 00:00:23,650
+Just below it are small black resistor arrays, part of the protection on every channel.
+
+5
+00:00:24,867 --> 00:00:30,234
+In the middle sits the most important chip: the ADS1299 from Texas Instruments.
+
+6
+00:00:30,234 --> 00:00:36,417
+It's an 8-channel amplifier and analog-to-digital converter, designed specifically for EEG.
+
+7
+00:00:36,417 --> 00:00:43,347
+Around it are lots of small capacitors that keep its power supplies and its internal reference steady.
+
+8
+00:00:44,533 --> 00:00:51,806
+Below it is the PIC32 microcontroller, the board's brain, with its 8 megahertz crystal next to it.
+
+9
+00:00:51,806 --> 00:00:59,673
+Two small buttons, RST and PROG, let you restart it or load new firmware, and a blue LED shows its status.
+
+10
+00:01:00,867 --> 00:01:03,404
+Around the edges are black sockets.
+
+11
+00:01:03,404 --> 00:01:05,941
+J1, on the left, is the Daisy port.
+
+12
+00:01:05,941 --> 00:01:09,856
+J3 and J4 bring out spare pins of the microcontroller.
+
+13
+00:01:09,856 --> 00:01:20,367
+Near the bottom is a tiny accelerometer that measures head movement, and next to it an even tinier logic chip, an OR gate, that we'll meet later.
+
+14
+00:01:21,533 --> 00:01:23,129
+Now flip the board over.
+
+15
+00:01:23,129 --> 00:01:30,311
+On the underside are the battery plug, the power supply chips, the radio module, and the micro SD card slot.
+
+16
+00:01:30,311 --> 00:01:34,965
+Right under the electrode pins you'll also find more protection parts:
+
+17
+00:01:34,965 --> 00:01:37,093
+TVS diodes and capacitor arrays.
+
+18
+00:01:38,267 --> 00:01:42,392
+On one edge is the slide switch, with three positions:
+
+19
+00:01:42,392 --> 00:01:43,614
+PC, OFF and BLE.
+
+20
+00:01:43,614 --> 00:01:59,655
+The schematic, the circuit diagram OpenBCI published, groups all these parts into the same blocks: power supply, input protection, the ADS1299, the microcontroller, the radio, the SD card and the accelerometer.
+
+21
+00:01:59,655 --> 00:02:02,787
+We'll go through them one flow at a time.
+
+22
+00:02:04,000 --> 00:02:06,697
+A quick word on how to read a schematic.
+
+23
+00:02:06,697 --> 00:02:11,215
+Each chip is drawn as a box with its pins numbered around the edge.
+
+24
+00:02:11,215 --> 00:02:12,294
+Lines are wires.
+
+25
+00:02:12,294 --> 00:02:17,082
+A dot where lines cross means they're connected; no dot, no connection.
+
+26
+00:02:17,082 --> 00:02:28,883
+Instead of drawing every long wire, the schematic often uses names, like DVDD or MISO: every point with the same name is connected, even if it's on the other side of the page.
+
+27
+00:02:28,883 --> 00:02:35,761
+Parts have reference names, like U6 or R5, and the same name is printed next to the part on the board.
+
+28
+00:02:35,761 --> 00:02:39,200
+That's how you match the drawing to the real thing.
+
+29
+00:02:40,400 --> 00:02:48,310
+Underneath the white surface, the Cyton has four layers of copper: one on top, two inside, and one on the bottom.
+
+30
+00:02:48,310 --> 00:02:51,880
+The copper traces are the wires from the schematic.
+
+31
+00:02:51,880 --> 00:02:59,370
+Switch the 3D explorer to copper routing, and you can see them: red for the top layer, cyan for the bottom.
+
+32
+00:02:59,370 --> 00:03:04,410
+Tiny plated holes, called vias, carry signals from one layer to another.
+
+33
+00:03:05,600 --> 00:03:06,605
+Chapter recap.
+
+34
+00:03:06,605 --> 00:03:16,366
+On top: the electrode header, the protection resistors, the ADS1299, the PIC32 with its crystal, buttons and LED, and the black sockets.
+
+35
+00:03:16,366 --> 00:03:23,328
+Underneath: the battery plug, the power chips, the radio, the SD card, and more protection parts.
+
+36
+00:03:23,328 --> 00:03:27,060
+Every part has a name you can find in the schematic.

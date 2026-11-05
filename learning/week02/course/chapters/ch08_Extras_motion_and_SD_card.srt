@@ -1,0 +1,43 @@
+1
+00:00:03,500 --> 00:00:08,806
+The accelerometer, U1, measures how your head tilts and moves, in three directions.
+
+2
+00:00:08,806 --> 00:00:15,710
+Its readings go into the 6 aux bytes of each packet, so software can spot movement that might spoil the EEG.
+
+3
+00:00:16,933 --> 00:00:27,942
+It shares the SPI wires, but this chip can also speak another protocol, I²C, and busy SPI traffic could accidentally look like an I²C start signal to it.
+
+4
+00:00:27,942 --> 00:00:33,266
+So U2, a tiny OR gate, holds its data pin high whenever it isn't selected.
+
+5
+00:00:33,266 --> 00:00:39,453
+It's like an earplug that's only removed when the microcontroller wants to talk to it.
+
+6
+00:00:40,667 --> 00:00:47,961
+The micro SD card slot, on the underside, lets the board record without a computer at all.
+
+7
+00:00:47,961 --> 00:00:52,662
+It uses the same SPI wires, with its own chip-select, CS3.
+
+8
+00:00:52,662 --> 00:00:59,147
+C4, a big 100 µF capacitor, covers the card's bursts of current while it writes.
+
+9
+00:01:00,333 --> 00:01:01,380
+Chapter recap.
+
+10
+00:01:01,380 --> 00:01:07,210
+The accelerometer adds motion to every packet, with an OR gate as its earplug.
+
+11
+00:01:07,210 --> 00:01:10,873
+And the SD card lets the board record on its own.

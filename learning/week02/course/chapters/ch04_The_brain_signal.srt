@@ -1,0 +1,199 @@
+1
+00:00:03,500 --> 00:00:05,982
+Now the main event: the brain signal.
+
+2
+00:00:05,982 --> 00:00:10,408
+Each EEG electrode measures the voltage at one spot on your scalp.
+
+3
+00:00:10,408 --> 00:00:20,805
+But a voltage only means something compared with another point, so every channel is measured against a shared reference electrode, usually on your earlobe.
+
+4
+00:00:20,805 --> 00:00:23,890
+That reference connects to the pin called SRB.
+
+5
+00:00:25,067 --> 00:00:28,044
+The electrode wires plug into the header.
+
+6
+00:00:28,044 --> 00:00:31,821
+Each channel has two pins, P and N, in the two rows.
+
+7
+00:00:31,821 --> 00:00:37,631
+Then there's SRB, the reference, and BIAS, which we'll meet in the next chapter.
+
+8
+00:00:37,631 --> 00:00:43,877
+At the two ends sit small sockets for the analog supplies, which the Daisy uses later.
+
+9
+00:00:45,067 --> 00:00:50,661
+From each pin, the signal first meets a TVS diode, on the underside, right below the pins.
+
+10
+00:00:50,661 --> 00:00:53,396
+TVS stands for transient voltage suppressor.
+
+11
+00:00:53,396 --> 00:00:55,385
+Normally it does nothing at all.
+
+12
+00:00:55,385 --> 00:01:05,827
+But if you touch the pins with a static charge of thousands of volts, it switches on in nanoseconds and dumps that zap to ground, before it can reach the delicate chip.
+
+13
+00:01:07,000 --> 00:01:10,410
+Next, through the board to the top: a 2.2 kΩ resistor.
+
+14
+00:01:10,410 --> 00:01:14,389
+Four resistors are packed into each of these tiny black arrays.
+
+15
+00:01:14,389 --> 00:01:21,210
+If something still gets past the diode, the resistor limits how much current can flow into the chip's input.
+
+16
+00:01:22,400 --> 00:01:26,959
+Then back underneath: a 1 nF capacitor from each line to ground.
+
+17
+00:01:26,959 --> 00:01:33,157
+Together with the 2.2 kΩ resistor, it forms a filter with a cutoff around 72 kilohertz.
+
+18
+00:01:33,157 --> 00:01:41,207
+Brain signals are below 100 hertz, so they pass untouched, but radio noise from Wi-Fi and phones is drained away.
+
+19
+00:01:41,207 --> 00:01:46,621
+Notice the zig-zag: diode underneath, resistor on top, capacitor underneath.
+
+20
+00:01:46,621 --> 00:01:49,470
+The signal hops through the board twice.
+
+21
+00:01:50,667 --> 00:01:53,324
+And now the signal reaches the ADS1299.
+
+22
+00:01:53,324 --> 00:02:04,224
+For each of the 8 channels, the chip first takes the difference between the electrode and the reference, so the hum your whole body carries largely cancels out.
+
+23
+00:02:04,224 --> 00:02:09,197
+Then a programmable gain amplifier multiplies that tiny difference by 24.
+
+24
+00:02:10,400 --> 00:02:12,473
+Why only 24, and not 1,000?
+
+25
+00:02:12,473 --> 00:02:19,152
+Because electrodes also carry a slowly drifting offset, up to a few hundred millivolts.
+
+26
+00:02:19,152 --> 00:02:27,060
+With a gain of 24, the chip's input range is plus or minus 187 millivolts, wide enough for that offset.
+
+27
+00:02:27,060 --> 00:02:33,202
+And its 24-bit converter is so fine that one step is only about 0.02 microvolts.
+
+28
+00:02:33,202 --> 00:02:38,960
+So we get both: room for the offset, and detail far below the brain signal.
+
+29
+00:02:40,133 --> 00:02:43,560
+Next comes the analog-to-digital converter.
+
+30
+00:02:43,560 --> 00:02:51,370
+All 8 channels are converted at exactly the same instant, 250 times a second, into 24-bit numbers.
+
+31
+00:02:51,370 --> 00:03:05,476
+The converter needs a ruler to measure against: a 4.5 volt reference made inside the chip, held steady by capacitors on its VREF and VCAP pins, including C2, the big 100 µF one.
+
+32
+00:03:05,476 --> 00:03:14,083
+When a new set of 8 samples is ready, the chip pulls a pin called DRDY, data ready, to say: come and get it.
+
+33
+00:03:15,267 --> 00:03:17,553
+The ADS1299 has a few more tricks.
+
+34
+00:03:17,553 --> 00:03:22,664
+In front of each channel is a set of switches, called the input multiplexer.
+
+35
+00:03:22,664 --> 00:03:25,018
+Normally it connects the electrode.
+
+36
+00:03:25,018 --> 00:03:39,140
+But the firmware can also short a channel's inputs together to measure the chip's own noise, feed in a built-in test square wave to check everything works, or measure the chip's temperature and supply voltages.
+
+37
+00:03:39,140 --> 00:03:49,766
+It also decides how the reference is used: with SRB2, the shared reference goes to each channel's P input separately, which is what the Cyton uses by default.
+
+38
+00:03:49,766 --> 00:03:52,927
+With SRB1, it goes to all the N inputs at once.
+
+39
+00:03:54,133 --> 00:03:56,845
+It can even check your electrodes.
+
+40
+00:03:56,845 --> 00:04:04,022
+The chip sends a tiny current, 6 nanoamps, through each electrode, wobbling at 31.2 hertz.
+
+41
+00:04:04,022 --> 00:04:13,114
+From the voltage that this creates, software works out how well each electrode touches your skin, using Ohm's law.
+
+42
+00:04:13,114 --> 00:04:16,783
+That's the impedance check in the OpenBCI GUI.
+
+43
+00:04:16,783 --> 00:04:22,923
+A good contact has low impedance; a poor one shows up as a big, noisy signal.
+
+44
+00:04:24,133 --> 00:04:31,268
+Finally, look at all the small capacitors gathered around the ADS1299, many of them right underneath it.
+
+45
+00:04:31,268 --> 00:04:39,706
+Every power pin of the chip gets its own: usually a 1 µF and a 0.1 µF side by side, placed as close to the pin as possible.
+
+46
+00:04:39,706 --> 00:04:43,548
+The big one stores energy, the small one reacts fastest.
+
+47
+00:04:43,548 --> 00:04:51,163
+Without them, the chip's own switching would make its supply bounce, and that bounce would show up in your EEG.
+
+48
+00:04:52,333 --> 00:04:53,626
+Chapter recap.
+
+49
+00:04:53,626 --> 00:05:04,798
+Electrode, then a TVS diode against static, a 2.2 kΩ resistor to limit current, and a 1 nF capacitor against radio noise.
+
+50
+00:05:04,798 --> 00:05:15,693
+Then the ADS1299: subtract the reference, multiply by 24, convert to 24 bits, 250 times a second, and ring data ready.

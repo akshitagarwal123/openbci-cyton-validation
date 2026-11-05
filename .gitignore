@@ -23,3 +23,6 @@ learning/week02/esp32_brainflow_fake8/secrets.h
 .env
 .env.local
 .env.*.local
+
+# course video: full file is over GitHub's 100 MB limit (chapters are committed)
+learning/week02/course/Cyton_Daisy_course_full.mp4

@@ -1,0 +1,95 @@
+1
+00:00:03,500 --> 00:00:07,822
+Let's put it all together, with every flow running at once.
+
+2
+00:00:07,822 --> 00:00:12,290
+Power: battery, D9, 3.3 volts, then plus and minus 2.5 volts.
+
+3
+00:00:12,290 --> 00:00:16,099
+Signal: electrode, protection, amplifier, converter.
+
+4
+00:00:16,099 --> 00:00:19,028
+Bias: the hum, inverted and pushed back.
+
+5
+00:00:19,028 --> 00:00:22,618
+Control: the microcontroller, SPI and data ready.
+
+6
+00:00:22,618 --> 00:00:26,573
+Radio: a packet every 4 milliseconds to your computer.
+
+7
+00:00:26,573 --> 00:00:31,920
+And the Daisy, locked in step with one clock, one start and one doorbell.
+
+8
+00:00:33,133 --> 00:00:37,266
+Now follow one single sample through its 4 milliseconds.
+
+9
+00:00:37,266 --> 00:00:43,316
+Your brain makes a tiny voltage; the electrode picks it up, together with the hum.
+
+10
+00:00:43,316 --> 00:00:49,589
+The TVS diode, the resistor and the capacitor let it through, cleaned of radio noise.
+
+11
+00:00:49,589 --> 00:00:54,828
+The ADS1299 subtracts the reference, multiplies by 24, and converts it.
+
+12
+00:00:54,828 --> 00:00:56,303
+It rings data ready.
+
+13
+00:00:56,303 --> 00:01:02,059
+The PIC32 reads 27 bytes, adds the accelerometer, and builds a 33-byte packet.
+
+14
+00:01:02,059 --> 00:01:04,494
+The radio sends it to the dongle.
+
+15
+00:01:04,494 --> 00:01:13,128
+And on your computer, each number is multiplied by about 0.02 microvolts, to give you back the voltage on your scalp.
+
+16
+00:01:13,128 --> 00:01:16,743
+Then, 4 milliseconds later, it all happens again.
+
+17
+00:01:17,933 --> 00:01:23,766
+For your own board, BrainTech-8, the same flows apply, with a few changes.
+
+18
+00:01:23,766 --> 00:01:29,994
+An ESP32-S3 replaces both the PIC32 and the radio, since it has Wi-Fi built in.
+
+19
+00:01:29,994 --> 00:01:38,507
+Its Wi-Fi bursts draw around 350 milliamps, so the 3.3 volt supply has to be much stronger than the Cyton's.
+
+20
+00:01:38,507 --> 00:01:51,513
+You're also planning 47 pF capacitors on the inputs instead of 1 nF, two 100 kΩ resistors in series with the bias electrode, and a lithium battery with USB charging.
+
+21
+00:01:51,513 --> 00:02:00,893
+Everything else, the protection, the ADS1299 with its capacitors, and the bias loop, you now understand from the Cyton.
+
+22
+00:02:02,067 --> 00:02:05,921
+That's the Cyton and the Daisy, from battery to brain waves.
+
+23
+00:02:05,921 --> 00:02:14,592
+Keep the 3D explorer open while you draw your own schematic: click any part to see where its signal comes from, and where it goes next.
+
+24
+00:02:14,592 --> 00:02:16,327
+Good luck with BrainTech-8.

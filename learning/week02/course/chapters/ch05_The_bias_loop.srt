@@ -1,0 +1,79 @@
+1
+00:00:03,500 --> 00:00:05,832
+There's one problem left: mains hum.
+
+2
+00:00:05,832 --> 00:00:12,503
+The power lines in your walls create a 50 or 60 hertz field, and your body picks it up like an antenna.
+
+3
+00:00:12,503 --> 00:00:16,713
+That hum can be thousands of times bigger than your brain signal.
+
+4
+00:00:16,713 --> 00:00:20,470
+Subtracting the reference removes most of it, but not all.
+
+5
+00:00:20,470 --> 00:00:23,190
+The bias loop pushes it down even further.
+
+6
+00:00:24,400 --> 00:00:28,780
+Inside the ADS1299, the electrode signals are averaged together.
+
+7
+00:00:28,780 --> 00:00:34,187
+Brain signals differ from place to place, so they mostly cancel in the average.
+
+8
+00:00:34,187 --> 00:00:37,677
+What's left is the hum that every electrode shares.
+
+9
+00:00:37,677 --> 00:00:46,780
+A built-in bias amplifier then drives the opposite of that hum back into your body, through a separate electrode: the bias electrode.
+
+10
+00:00:48,000 --> 00:00:55,312
+On its way out, the bias drive passes R5, a 1 MΩ resistor, with C16, a 1 nF capacitor, across it.
+
+11
+00:00:55,312 --> 00:01:01,794
+R5 limits the current into your body to a couple of microamps, even in the worst case.
+
+12
+00:01:01,794 --> 00:01:05,789
+C16 lets faster changes, like the hum, get around R5.
+
+13
+00:01:05,789 --> 00:01:14,231
+One detail from the schematic: the amplifier's minus input, BIAS_INV, isn't wired to anything else on the board.
+
+14
+00:01:14,231 --> 00:01:18,980
+It's simply brought out to two pins, J2, so you can experiment.
+
+15
+00:01:20,200 --> 00:01:33,013
+Then the drive passes a 2.2 kΩ protection resistor and a TVS diode, like every other line, and leaves through the BIAS pin to the bias electrode, often on the other earlobe or the forehead.
+
+16
+00:01:33,013 --> 00:01:39,590
+The loop closes through you: the hum goes up on your body, and the amplifier pushes it back down.
+
+17
+00:01:39,590 --> 00:01:41,420
+Every channel gets cleaner.
+
+18
+00:01:42,600 --> 00:01:43,711
+Chapter recap.
+
+19
+00:01:43,711 --> 00:01:55,143
+The ADS1299 averages the electrodes to find the shared hum, inverts it, and drives it back into your body through R5, R6 and the bias electrode.
+
+20
+00:01:55,143 --> 00:01:58,160
+The hum on every channel gets smaller.

@@ -1,0 +1,179 @@
+1
+00:00:03,500 --> 00:00:05,768
+Now let's add the Daisy module.
+
+2
+00:00:05,768 --> 00:00:11,915
+It's a second, smaller board that sits on top of the Cyton and adds 8 more channels:
+
+3
+00:00:11,915 --> 00:00:12,500
+9 to 16.
+
+4
+00:00:12,500 --> 00:00:22,013
+It has its own ADS1299, its own protection parts and its own electrode header, but no microcontroller, no radio and no regulators.
+
+5
+00:00:22,013 --> 00:00:24,720
+Everything else comes from the Cyton.
+
+6
+00:00:25,933 --> 00:00:28,176
+Here's the Daisy on its own.
+
+7
+00:00:28,176 --> 00:00:46,119
+On top: its electrode header along the top edge, five resistor arrays under it, the ADS1299 in the middle, the 8-pin Daisy bus on the left edge, and two pads, J2, for the bias amplifier's minus input, just like on the Cyton.
+
+8
+00:00:46,119 --> 00:00:46,000
+Underneath:
+
+9
+00:00:46,000 --> 00:00:54,049
+TVS diodes and capacitor arrays below the pins, and the ADS1299's decoupling capacitors.
+
+10
+00:00:54,049 --> 00:00:57,653
+Same building blocks, minus the digital side.
+
+11
+00:00:58,867 --> 00:01:05,710
+Both chips are identical, with identical settings: gain 24, 24-bit, 250 samples a second.
+
+12
+00:01:05,710 --> 00:01:12,477
+The Cyton's chip handles channels 1 to 8, and the Daisy's chip handles channels 9 to 16.
+
+13
+00:01:13,667 --> 00:01:21,831
+The extra electrodes plug into the Daisy's own right-angle header, which sits right above the Cyton's.
+
+14
+00:01:21,831 --> 00:01:24,632
+Each line gets the same protection:
+
+15
+00:01:24,632 --> 00:01:32,797
+TVS diode underneath, 2.2 kΩ resistor on top, 1 nF capacitor underneath, and then the Daisy's ADS1299.
+
+16
+00:01:34,000 --> 00:01:36,540
+The boards talk through 8 pins.
+
+17
+00:01:36,540 --> 00:01:41,619
+The Daisy's pins point down into J1, the Cyton's black socket:
+
+18
+00:01:41,619 --> 00:01:50,630
+3.3 volt power, ground, the three shared SPI wires, reset, a clock line, and CS2, the Daisy's own chip-select.
+
+19
+00:01:51,800 --> 00:01:54,179
+Analog power arrives another way.
+
+20
+00:01:54,179 --> 00:02:00,740
+At the two ends of the Cyton's electrode header sit small 2-hole sockets for AVSS and AVDD.
+
+21
+00:02:00,740 --> 00:02:09,680
+The Daisy's matching pins plug straight down into them, so both chips run on the very same plus and minus 2.5 volt supplies.
+
+22
+00:02:10,867 --> 00:02:13,473
+So how do two chips stay in sync?
+
+23
+00:02:13,473 --> 00:02:14,816
+First: one clock.
+
+24
+00:02:14,816 --> 00:02:20,978
+The Daisy's clock-select pin is tied to ground, so it has no clock of its own.
+
+25
+00:02:20,978 --> 00:02:31,484
+When the firmware finds a Daisy, it turns on the Cyton chip's clock output, and both chips count the very same 2.048 megahertz ticks.
+
+26
+00:02:31,484 --> 00:02:37,567
+8,192 ticks make one sample, so both finish every sample at the same instant.
+
+27
+00:02:38,733 --> 00:02:39,996
+Second: one start.
+
+28
+00:02:39,996 --> 00:02:48,482
+The microcontroller pulls both chip-selects low together and sends a single START command, which both chips hear at once.
+
+29
+00:02:48,482 --> 00:02:51,848
+A shared reset line restarts them together, too.
+
+30
+00:02:51,848 --> 00:02:55,985
+At start-up, it also reads the Daisy chip's ID through CS2.
+
+31
+00:02:55,985 --> 00:03:00,193
+If the answer is 0x3E, the firmware switches to 16 channels.
+
+32
+00:03:01,400 --> 00:03:02,876
+Third: one doorbell.
+
+33
+00:03:02,876 --> 00:03:06,937
+The Daisy's data-ready pin isn't connected to anything.
+
+34
+00:03:06,937 --> 00:03:17,420
+When the Cyton chip rings data ready, the Daisy's sample is ready too, so the microcontroller reads 27 bytes with CS1, then 27 bytes with CS2.
+
+35
+00:03:18,600 --> 00:03:23,065
+The radio link can't carry 16 channels 250 times a second.
+
+36
+00:03:23,065 --> 00:03:32,689
+So the firmware averages each pair of samples and takes turns: odd packets carry channels 1 to 8, even packets carry 9 to 16.
+
+37
+00:03:32,689 --> 00:03:39,310
+Each channel arrives 125 times a second, and the software stitches them back together.
+
+38
+00:03:40,533 --> 00:03:41,999
+Two practical notes.
+
+39
+00:03:41,999 --> 00:03:46,910
+The Daisy has its own SRB and BIAS pins, separate from the Cyton's.
+
+40
+00:03:46,910 --> 00:03:53,361
+For one reference across all 16 channels, join the two SRB pins with a Y-splitter cable.
+
+41
+00:03:53,361 --> 00:04:02,963
+The Daisy's bias drive goes to its own BIAS pin: you can leave it unused, and let the Cyton's bias electrode serve all 16 channels.
+
+42
+00:04:04,133 --> 00:04:05,257
+Chapter recap.
+
+43
+00:04:05,257 --> 00:04:09,512
+The Daisy adds a second ADS1299 for channels 9 to 16.
+
+44
+00:04:09,512 --> 00:04:18,344
+It gets 3.3 volts and SPI through the 8-pin Daisy bus, and plus and minus 2.5 volts through two small sockets.
+
+45
+00:04:18,344 --> 00:04:26,613
+One clock, one start, and one doorbell keep both chips in step, and the radio takes turns between them.

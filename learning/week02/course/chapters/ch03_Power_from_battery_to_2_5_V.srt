@@ -1,0 +1,155 @@
+1
+00:00:03,500 --> 00:00:07,370
+Everything starts at the battery plug, B1, on the underside.
+
+2
+00:00:07,370 --> 00:00:12,078
+The Cyton runs from a battery of 3 to 6 volts only, never from the mains.
+
+3
+00:00:12,078 --> 00:00:18,270
+That's a safety choice: anything connected to your head should be isolated from the wall socket.
+
+4
+00:00:19,467 --> 00:00:23,063
+The first part after the battery is D9, a diode.
+
+5
+00:00:23,063 --> 00:00:25,984
+A diode is a one-way valve for current.
+
+6
+00:00:25,984 --> 00:00:31,753
+If you plug the battery in backwards, D9 blocks it, and nothing gets damaged.
+
+7
+00:00:31,753 --> 00:00:35,124
+The price is a small drop of about 0.3 volts.
+
+8
+00:00:35,124 --> 00:00:37,297
+What comes out is called RAW.
+
+9
+00:00:38,467 --> 00:00:41,303
+RAW goes to U5, a 3.3 volt regulator.
+
+10
+00:00:41,303 --> 00:00:49,429
+A regulator takes a voltage that wanders, as the battery drains, and turns it into a perfectly steady one.
+
+11
+00:00:49,429 --> 00:01:00,775
+Its output, DVDD, powers all the digital parts: the microcontroller, the radio, the accelerometer, the SD card, and the digital side of the ADS1299.
+
+12
+00:01:00,775 --> 00:01:06,371
+A nice detail: the power switch doesn't carry the board's current at all.
+
+13
+00:01:06,371 --> 00:01:13,577
+It only drives U5's enable pin, which switches the regulator, and the whole board, on and off.
+
+14
+00:01:14,800 --> 00:01:19,777
+The ADS1299's analog side needs two more supplies.
+
+15
+00:01:19,777 --> 00:01:23,460
+U4 makes plus 2.5 volts, called AVDD.
+
+16
+00:01:23,460 --> 00:01:30,030
+It's fed from the already clean 3.3 volts, so AVDD is extra quiet.
+
+17
+00:01:31,200 --> 00:01:38,260
+The analog side also needs minus 2.5 volts, and a battery can't give you a negative voltage directly.
+
+18
+00:01:38,260 --> 00:01:39,379
+That's U3's job.
+
+19
+00:01:39,379 --> 00:01:50,144
+It's a charge pump: thousands of times a second, it charges a small capacitor from 3.3 volts, flips it upside down, and pours that charge into its output.
+
+20
+00:01:50,144 --> 00:01:52,660
+The result is about minus 3.3 volts.
+
+21
+00:01:53,867 --> 00:02:03,479
+That flipped voltage is a bit rippled, so VR1, a negative regulator, cleans it into a steady minus 2.5 volts, called AVSS.
+
+22
+00:02:03,479 --> 00:02:07,025
+Now the ADS1299 has plus and minus 2.5 volts:
+
+23
+00:02:07,025 --> 00:02:09,704
+5 volts in total, centred on zero.
+
+24
+00:02:09,704 --> 00:02:19,317
+Centring on zero means the brain signal, which swings both ways around zero, sits right in the middle of the chip's range.
+
+25
+00:02:20,533 --> 00:02:23,781
+Next to every regulator you'll see small capacitors.
+
+26
+00:02:23,781 --> 00:02:32,338
+Think of them as little water tanks: when a chip suddenly gulps current, the capacitor supplies it instantly, so the voltage doesn't dip.
+
+27
+00:02:32,338 --> 00:02:34,899
+Regulators also need them to stay stable.
+
+28
+00:02:34,899 --> 00:02:40,083
+In the schematic, this whole chain sits in the power supply block, at the top left.
+
+29
+00:02:41,267 --> 00:02:43,430
+Why so many separate supplies?
+
+30
+00:02:43,430 --> 00:02:45,737
+Because digital chips are noisy.
+
+31
+00:02:45,737 --> 00:02:55,038
+Every time the microcontroller or the radio switches, it pulls quick spikes of current, and those spikes ripple along its supply.
+
+32
+00:02:55,038 --> 00:03:03,402
+If the ADS1299's analog side shared that supply, the ripple would land right on top of your microvolt brain signals.
+
+33
+00:03:03,402 --> 00:03:13,641
+So the analog side gets its own, extra-clean rails, AVDD and AVSS, made by their own low-noise regulators, while the digital parts share DVDD.
+
+34
+00:03:13,641 --> 00:03:18,977
+Keeping analog and digital apart is one of the golden rules of EEG design.
+
+35
+00:03:20,200 --> 00:03:21,455
+Chapter recap.
+
+36
+00:03:21,455 --> 00:03:24,684
+Battery, then D9, the one-way valve.
+
+37
+00:03:24,684 --> 00:03:28,898
+Then U5 makes 3.3 volts for everything digital.
+
+38
+00:03:28,898 --> 00:03:37,776
+U4 makes plus 2.5 volts, and U3 with VR1 makes minus 2.5 volts, for the analog side of the ADS1299.
+
+39
+00:03:37,776 --> 00:03:42,170
+And capacitors everywhere, as little water tanks.

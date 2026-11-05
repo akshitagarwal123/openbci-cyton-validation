@@ -1,0 +1,43 @@
+1
+00:00:03,500 --> 00:00:04,042
+Welcome.
+
+2
+00:00:04,042 --> 00:00:11,294
+In this course we'll take the OpenBCI Cyton board, and its add-on, the Daisy module, apart, piece by piece.
+
+3
+00:00:11,294 --> 00:00:17,528
+Together they turn the tiny electrical activity of your brain into numbers on your computer:
+
+4
+00:00:17,528 --> 00:00:20,985
+8 channels with the Cyton alone, 16 with the Daisy.
+
+5
+00:00:20,985 --> 00:00:23,831
+You don't need any electronics background.
+
+6
+00:00:23,831 --> 00:00:33,590
+We'll use a 3D model built from OpenBCI's own design files, plus the real schematics, and follow the electricity as it flows through the boards.
+
+7
+00:00:34,800 --> 00:00:36,397
+Here's the big picture.
+
+8
+00:00:36,397 --> 00:00:46,186
+Electrodes on your scalp pick up voltages of just 10 to 100 microvolts, tens of thousands of times smaller than the voltage of an AA battery.
+
+9
+00:00:46,186 --> 00:00:56,669
+The Cyton protects those signals, amplifies them, turns them into numbers 250 times a second, and sends them by radio to a USB dongle on your computer.
+
+10
+00:00:56,669 --> 00:01:03,611
+We'll follow five flows: power, the brain signal, the bias loop, the digital control, and the radio.
+
+11
+00:01:03,611 --> 00:01:08,610
+Then we'll add the Daisy, and see how two boards stay perfectly in sync.
