@@ -131,6 +131,20 @@ const IMG = {w:1137, h:1127, px0:18, py0:19, s:0.4507};
 const uvOf = (xmil, ymil) => [(IMG.px0 + (xmil - X0) * IMG.s) / IMG.w, 1 - (IMG.py0 + (Y1 - ymil) * IMG.s) / IMG.h];
 
 // ---- what each package looks like: [width x, depth y, height, colour] before rotation ----
+// Right-angle 2 x 11 header (SRB to AGND), as shipped: legs go up from the two rows of holes, bend, and the pins
+// point outward past the board edge through a black plastic body. grp sits on the body's centre.
+const RAH_OUT = 6.6;                                          // header centre -> plastic body centre, mm (towards the edge)
+function rightAngleHeader(grp){
+  const gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
+  for (let i = 1; i <= 11; i++){
+    const x = (i - 6) * 2.54;
+    for (const [yr, zh] of [[-1.27 - RAH_OUT, 3.81], [1.27 - RAH_OUT, 1.27]]){
+      const zr = zh - 2.54, zb = -2.54 - T - 1.5;
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, zr - zb + 0.32), gold); leg.position.set(x, yr, (zr + zb) / 2); grp.add(leg);
+      const yEnd = 7.3, arm = new THREE.Mesh(new THREE.BoxGeometry(0.64, yEnd - yr, 0.64), gold); arm.position.set(x, (yr + yEnd) / 2, zr); grp.add(arm);
+    }
+  }
+}
 function look(p){
   const c = p.c, n = p.n;
   if (c.includes("ADS1299")) return {w:10,d:10,h:1.2,col:"#1c1e22",tqfp:true};
@@ -153,7 +167,7 @@ function look(p){
   if (c.includes("BATT")) return {w:8.0,d:6.0,h:6.0,col:"#e6dcc2"};
   if (c.includes("microSD")) return {w:14,d:11.5,h:1.8,col:"#c4c9ce",metal:true};
   if (c.includes("SMT_QUAD")) return {w:10.2,d:2.5,h:2.5,col:"#141414"};
-  if (c.includes("26WDP")) return {w:5.1,d:33,h:2.5,col:"#121212",pins:true};
+  if (c.includes("26WDP")) return {w:27.9,d:2.5,h:5.08,col:"#121212",rah:true};
   return null;                                               // logo, bare pin rows: texture only
 }
 const LABELS = {U6:"ADS1299",U7:"PIC32 MCU",BLE1:"RFduino radio",U1:"Accelerometer",CONN1:"microSD",B1:"Battery plug",SW2:"Power switch",PL1:"Electrode header",U3:"LM2664",VR1:"TPS72325",U5:"LP5907",U4:"TLV700",X1:"Crystal",SW1:"PROG",SW3:"RST"};
@@ -311,15 +325,10 @@ for (const p of PARTS){
   grp.rotation.z = p.r * Math.PI / 180;
   const mat = new THREE.MeshStandardMaterial({color:L.col, roughness:L.metal ? 0.35 : 0.6, metalness:L.metal ? 0.7 : 0.05});
   let mats = mat;
+  if (L.rah){ grp.rotation.z = 0; grp.position.y += RAH_OUT; }
   const body = new THREE.Mesh(new THREE.BoxGeometry(L.w, L.d, L.h), mats);
   grp.add(body);
-  if (L.pins){                                                  // 2 x 13 gold pins: 11.5 mm up, 2.5 mm tail under the board
-    const gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
-    const upPin = new THREE.BoxGeometry(0.64, 0.64, 11.5), tail = new THREE.BoxGeometry(0.64, 0.64, 2.5);
-    for (const px of [-1.27, 1.27]) for (let i = 0; i < 13; i++){
-      const a = new THREE.Mesh(upPin, gold); a.position.set(px, (i - 6) * 2.54, up * (-L.h / 2 + 5.75)); grp.add(a);
-      const b = new THREE.Mesh(tail, gold); b.position.set(px, (i - 6) * 2.54, -up * (L.h / 2 + T + 1.25)); grp.add(b);
-    }
+  if (L.rah){ rightAngleHeader(grp);
   }
   const MARK = {U6:["ADS1299","TI  64C"], U7:["PIC32MX250","F128B"]};
   if (MARK[p.n]){
@@ -362,7 +371,7 @@ const DZ_X0 = 4.5, DZ_X1 = 2420.5, DZ_Y0 = 3.09, DZ_Y1 = 1566.09;
 const DZ_OUT = [[2420.5,859.09],[1713.5,1566.09],[712.5,1566.09],[4.5,858.09],[4.5,710.09],[711.5,3.09],[1712.5,3.09],[2420.5,711.09]];
 const DZ_RAW = [["J2","2WP","Top",1613.0,663.0,180.0],["PL1","26WDP","Top",1219.0,1261.0,270.0],["C1","0603YC104KATDA","Top",786.0,564.0,270.0],["U1","ADS1299","Top",1174.0,545.0,270.0],["C3","C","Top",875.0,575.0,180.0],["C4","C","Top",848.0,512.0,270.0],["C5","C","Top",848.0,378.0,270.0],["C6","C","Top",1353.0,250.0,90.0],["C7","C","Top",1353.0,210.0,90.0],["C8","C","Top",1475.0,546.0,0.0],["C9","C","Top",1510.0,692.0,0.0],["C10","C","Top",1511.0,546.0,0.0],["C14","C","Bottom",1127.0,592.0,0.0],["C15","C","Bottom",1165.0,592.0,0.0],["C16","C","Bottom",1183.0,528.0,270.0],["C17","C","Bottom",1183.0,490.0,270.0],["C18","C","Bottom",1203.0,592.0,0.0],["C19","C","Bottom",1241.0,592.0,0.0],["C21","C","Bottom",1301.0,572.0,270.0],["C22","C","Bottom",1301.0,534.0,270.0],["C2","C 100uF","Top",773.0,449.0,90.0],["R1","CAY16-F4 R-ARRAY","Top",788.0,985.0,180.0],["R2","CAY16-F4 R-ARRAY","Top",983.0,985.0,180.0],["R3","CAY16-F4 R-ARRAY","Top",1182.0,985.0,180.0],["R4","CAY16-F4 R-ARRAY","Top",1383.0,985.0,180.0],["R6","CAY16-F4 R-ARRAY","Top",1568.0,985.0,180.0],["C11","CKCL44X7R1H102M085AA","Bottom",794.0,794.0,0.0],["C12","CKCL44X7R1H102M085AA","Bottom",1003.0,794.0,0.0],["C13","CKCL44X7R1H102M085AA","Bottom",1178.0,794.0,0.0],["C20","CKCL44X7R1H102M085AA","Bottom",1353.0,794.0,0.0],["C23","CKCL44X7R1H102M085AA","Bottom",1528.0,794.0,0.0],["J1","PINHEAD-8","Top",545.0,347.0,315.0],["D1","Quad TVS TPD4E1B06","Bottom",771.0,1103.0,0.0],["D2","Quad TVS TPD4E1B06","Bottom",965.0,1105.0,0.0],["D3","Quad TVS TPD4E1B06","Bottom",1167.0,1109.0,0.0],["D4","Quad TVS TPD4E1B06","Bottom",1365.0,1111.0,0.0],["D5","Quad TVS TPD4E1B06","Bottom",1565.0,1113.0,0.0],["D6","Quad TVS TPD4E1B06","Bottom",1767.0,1115.0,0.0],["R5","R","Top",1473.0,691.0,180.0]];
 const DZ_PARTS = DZ_RAW.map(([n, c, s, x, y, r]) => ({n:"Daisy " + n, short:n, c, s, x:x + DZ_DX, y:y + DZ_DY, r, dx:x, dy:y}));
-const DZ_LIFT = {lifted:30, stacked:T + 11.5};            // Daisy centre height above the Cyton centre, mm
+const DZ_LIFT = {lifted:30, stacked:T + 8.5};               // stacked: the Daisy rests on the Cyton's 8.5 mm sockets            // Daisy centre height above the Cyton centre, mm
 let daisyMode = "lifted";
 const daisy = new THREE.Group(); daisy.position.z = DZ_LIFT.lifted; board.add(daisy);
 const DZ_POLY = DZ_OUT.map(([x, y]) => [x + DZ_DX, y + DZ_DY]);
@@ -454,15 +463,9 @@ for (const p of DZ_PARTS){
   const grp = new THREE.Group();
   grp.position.set(x, y, up * (T / 2 + L.h / 2)); grp.rotation.z = p.r * Math.PI / 180;
   const mat = new THREE.MeshStandardMaterial({color:L.col, roughness:L.metal ? 0.35 : 0.6, metalness:L.metal ? 0.7 : 0.05});
+  if (L.rah){ grp.rotation.z = 0; grp.position.y += RAH_OUT; }
   grp.add(new THREE.Mesh(new THREE.BoxGeometry(L.w, L.d, L.h), mat));
-  if (L.pins){
-    const gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
-    const upPin = new THREE.BoxGeometry(0.64, 0.64, 11.5), tail = new THREE.BoxGeometry(0.64, 0.64, 2.5);
-    for (const px of [-1.27, 1.27]) for (let i = 0; i < 13; i++){
-      const a = new THREE.Mesh(upPin, gold); a.position.set(px, (i - 6) * 2.54, up * (-L.h / 2 + 5.75)); grp.add(a);
-      const b = new THREE.Mesh(tail, gold); b.position.set(px, (i - 6) * 2.54, -up * (L.h / 2 + T + 1.25)); grp.add(b);
-    }
-  }
+  if (L.rah) rightAngleHeader(grp);
   if (p.short === "U1"){
     const cv = document.createElement("canvas"); cv.width = 512; cv.height = Math.round(512 * L.d / L.w);
     const g = cv.getContext("2d"); g.fillStyle = "#9aa0a6"; g.textAlign = "center"; g.textBaseline = "middle";
@@ -489,13 +492,13 @@ for (const p of DZ_PARTS){
   grp.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
   byName[p.n] = info;
 }
-// Daisy J1: 8 male pins pointing down (on a black spacer) that plug into the Cyton's J1 socket
-const PIN_DOWN = 6, SPACER = 2.5;
+// Daisy J1: 8 male pins pointing down that plug into the Cyton's J1 socket
+const PIN_DOWN = 6, SPACER = 0;
 {
   const p = DZ_PARTS.find(q => q.short === "J1"), [x, y] = mm(p.x, p.y), grp = new THREE.Group();
   grp.position.set(x, y, -T / 2); grp.rotation.z = -Math.PI / 4;
   const mat = new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6});
-  const sp = new THREE.Mesh(new THREE.BoxGeometry(20.3, 2.5, SPACER), mat); sp.position.z = -SPACER / 2; grp.add(sp);
+  const sp = new THREE.Mesh(new THREE.BoxGeometry(20.3, 2.5, 0.4), mat); sp.position.z = -0.2; grp.add(sp);
   const gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
   for (let k = 0; k < 8; k++){
     const pin = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, SPACER + PIN_DOWN), gold); pin.position.set((k - 3.5) * 2.54, 0, -(SPACER + PIN_DOWN) / 2); grp.add(pin);
@@ -599,7 +602,7 @@ const POW_CAPS = ["C29","C30","C31","C32","C33","C35","C36","C37","C38","C39","C
 const INFO = {
   HEAD:{b:"off", s:"your head", t:"Your head", d:"Your brain makes tiny voltages, 10 to 100 µV. Electrodes on your scalp pick them up, together with a much bigger hum from the mains that your whole body carries.", i:[], o:[["PL1","electrode wires"]]},
   PC:{b:"off", s:"dongle → PC", t:"USB dongle → computer", d:"The OpenBCI USB dongle receives the radio packets. BrainFlow or the OpenBCI GUI on your computer turn them back into µV and plot your EEG.", i:[["BLE1","radio packets"]], o:[]},
-  PL1:{b:"conn", s:"electrode header", t:"Electrode header", d:"Your electrode wires plug in here. Each channel has its own pins (N1P to N8P, and the N side underneath), plus SRB (the shared reference, usually your ear clip), BIAS, and supply pins. The pins go right through the board.", i:[["HEAD","electrodes on your head"],["R6","BIAS drive coming back out"]], o:[["D2","TVS diodes (underneath)"],["D3","TVS diodes (underneath)"],["Daisy PL1","AVDD, AVSS, BIAS up to the Daisy"]]},
+  PL1:{b:"conn", s:"electrode header", t:"Electrode header", d:"Your electrode wires plug in here. Each channel has its own pins (N1P to N8P, and the N side underneath), plus SRB (the shared reference, usually your ear clip), BIAS. It is a right-angle header: the pins point sideways, out past the board edge, so the wires plug in from the side. The AVSS and AVDD ends have small 2-hole sockets instead, which pass analog power up to a Daisy.", i:[["HEAD","electrodes on your head"],["R6","BIAS drive coming back out"]], o:[["D2","TVS diodes (underneath)"],["D3","TVS diodes (underneath)"],["Daisy PL1","AVDD and AVSS up to the Daisy"]]},
   U6:{b:"ads", s:"ADS1299", t:"ADS1299: the EEG chip", d:"The heart of the board. For each of the 8 channels it subtracts the reference, amplifies ×24 and converts to a 24-bit number, all channels at the same instant, 250 times a second. Then it rings DRDY so the PIC32 reads the sample over SPI. Its bias amplifier also drives the BIAS electrode.", i:[["C9","filtered electrode signals"],["U4","AVDD +2.5 V"],["VR1","AVSS −2.5 V"],["U5","DVDD 3.3 V"]], o:[["U7","samples over SPI + DRDY"],["R5","bias drive output"]]},
   R5:{b:"ads", s:"bias 1 MΩ", t:"R5: bias resistor (1 MΩ)", d:"Sits between the ADS1299's BIAS_OUT pin and the bias electrode. It limits the current into your body to about 2.5 µA, even in the worst case.", i:[["U6","BIAS_OUT"]], o:[["R6","2.2 kΩ on the BIAS line"]]},
   C16:{b:"ads", s:"bias 1 nF", t:"C16: 1 nF across R5", d:"Lets fast changes bypass R5, so the bias loop responds quickly and stays stable instead of ringing.", i:[["U6","BIAS_OUT"]], o:[["R6","BIAS line"]]},
@@ -654,7 +657,7 @@ const DZ_C_R = Object.fromEntries(Object.entries(DZ_R_C).map(([r, c]) => [c, r])
 const dz = n => "Daisy " + n;
 Object.assign(INFO, {
   [dz("U1")]:{b:"daisy", s:"Daisy ADS1299", t:"Daisy U1: the second ADS1299", d:"The same EEG chip as the Cyton's, adding channels 9 to 16: ×24 gain, 24-bit, all 8 channels at the same instant. It has no clock of its own: CLKSEL is tied to ground, so it runs on the Cyton ADS1299's 2.048 MHz clock (CLK pin) and shares its RESET line. That keeps both chips sampling in lock-step. The PIC32 picks it with CS2.", i:[[dz("C12"),"filtered electrode signals"],[dz("J1"),"SPI, CLK, RESET and DVDD"],[dz("PL1"),"AVDD and AVSS from the Cyton"]], o:[[dz("J1"),"samples back on MISO"],[dz("R5"),"bias drive"]]},
-  [dz("PL1")]:{b:"conn", s:"Daisy electrode header", t:"Daisy PL1: electrode header (channels 9–16)", d:"Same layout as the Cyton's header and sitting right on top of it. Its N1P to N8P pins are channels 9 to 16. Its AVDD, AVSS, AGND and BIAS pins line up with the Cyton's, which is how the Daisy gets its analog power. SRB is separate: for one shared reference, join the two SRB pins with a Y-splitter cable.", i:[["HEAD","8 more electrodes"],["PL1","AVDD, AVSS, AGND, BIAS from the Cyton"],[dz("R6"),"bias drive"]], o:[[dz("D1"),"TVS diodes (underneath)"],[dz("D2"),"TVS diodes (underneath)"],[dz("U1"),"analog power"]]},
+  [dz("PL1")]:{b:"conn", s:"Daisy electrode header", t:"Daisy PL1: electrode header (channels 9–16)", d:"Same right-angle header as the Cyton's, right above it: N1P to N8P are channels 9 to 16. At the two ends, the AVSS and AVDD pads have pins pointing down into the Cyton's small 2-hole sockets: that is how the Daisy gets its ±2.5 V (ground comes through the Daisy bus). SRB and BIAS are the Daisy's own pins: for one shared reference, join the two SRB pins with a Y-splitter cable.", i:[["HEAD","8 more electrodes"],["PL1","AVDD and AVSS from the Cyton"],[dz("R6"),"bias drive"]], o:[[dz("D1"),"TVS diodes (underneath)"],[dz("D2"),"TVS diodes (underneath)"],[dz("U1"),"analog power"]]},
   [dz("J1")]:{b:"conn", s:"Daisy bus pins", t:"Daisy J1: the Daisy bus (8 pins)", d:"Eight pins pointing down from the Daisy's underside, which plug into the Cyton's black J1 socket. Eight wires: DVDD (3.3 V), GND, MISO, SCK, RST, CLK, MOSI and CS2. There is no DRDY wire: the Daisy's DRDY pin goes nowhere, because both chips share one clock and the PIC32 just listens to the Cyton's DRDY.", i:[["J1","Cyton's Daisy port"]], o:[[dz("U1"),"SPI, clock, reset, power"],["J1","MISO: Daisy samples"]]},
   [dz("J2")]:{b:"conn", s:"Daisy BIAS_INV pins", t:"Daisy J2: BIAS_INV and AGND pins", d:"Like J2 on the Cyton: brings out the Daisy bias amplifier's minus input, for experiments.", i:[[dz("U1"),"BIAS_INV"]], o:[]},
   [dz("R5")]:{b:"daisy", s:"bias 1 MΩ", t:"Daisy R5: bias feedback (1 MΩ)", d:"The Daisy chip's bias amplifier gets the same feedback pair as the Cyton's: R5 (1 MΩ) with C9 (1 nF) across it, from BIAS_OUT back to BIAS_IN.", i:[[dz("U1"),"BIAS_OUT"]], o:[[dz("R6"),"BIAS_DRV"]]},
@@ -745,16 +748,16 @@ Object.assign(TOURS, {
     ["U5","The Daisy has no regulators of its own. DVDD (3.3 V) from the Cyton's U5…"],
     ["J1","…goes up pin 1 of the Daisy bus."],
     ["U4","AVDD (+2.5 V) from U4, and AVSS (−2.5 V) from VR1…"],
-    ["PL1","…reach the AVDD and AVSS pins of the Cyton's electrode header…"],
-    ["Daisy PL1","…which line up with the Daisy header's AVDD and AVSS pins."],
+    ["PL1","…reach two small 2-hole sockets at the AVSS and AVDD ends of the Cyton's electrode header…"],
+    ["Daisy PL1","…and the Daisy's AVSS and AVDD pins plug straight down into them."],
     ["Daisy U1","So both ADS1299s run on the very same ±2.5 V rails. The Daisy's capacitors (C6 to C22) sit right at its power pins."]]},
   daisybias:{name:"Daisy bias", col:"#ff9f7a", daisy:true, paths:[["Daisy U1","Daisy R5","Daisy R6","Daisy PL1","HEAD"],["Daisy D6","Daisy PL1"]], steps:[
     ["Daisy U1","The Daisy chip has its own bias amplifier, and the firmware switches it on too: the same CONFIG3 setting goes to both chips. It averages channels 9 to 16."],
     ["Daisy R5","R5 (1 MΩ) with C9 (1 nF) across it: the same feedback pair as R5 and C16 on the Cyton."],
     ["Daisy R6","One resistor in the R6 array (2.2 kΩ) carries the drive, BIAS_DRV, toward the BIAS pin."],
     ["Daisy D6","D6 underneath clamps static on the BIAS, AVDD and AGND pins."],
-    ["Daisy PL1","The Daisy's BIAS pin lines up with the Cyton's, so both bias amplifiers push on one bias electrode, each through its own 2.2 kΩ."],
-    ["HEAD","One bias electrode, driven by both chips, cancels the shared hum for all 16 channels."]]},
+    ["Daisy PL1","Out through the Daisy's own BIAS pin. It is separate from the Cyton's BIAS pin: you can leave it unused and let the Cyton's bias electrode serve all 16 channels, or wire the two together."],
+    ["HEAD","Either way, the bias electrode pushes the hum your whole body shares back down, for all 16 channels."]]},
 });
 
 // ---- off-board nodes, header pin markers ----
@@ -792,7 +795,7 @@ for (const [n, w, d] of [["J1", 20.5, 3], ["J2", 3, 5.6], ["J3", 10.5, 3], ["J4"
 }
 for (const n of ["J1","J2","J3","J4"]) if (byName[n]) byName[n].grp.children[0].userData.ghostBox = true;
 // female headers on the Cyton, as shipped: J1 (Daisy port, 8 holes), J3 and J4 (4 holes each)
-for (const [n, cnt, alongX] of [["J1", 8, true], ["J3", 4, true], ["J4", 4, false]]){
+for (const [n, cnt, alongX] of [["J1", 8, true], ["J2", 2, false], ["J3", 4, true], ["J4", 4, false]]){
   const j = byName[n]; if (!j) continue;
   const len = cnt * 2.54, H = 8.5, body = new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6}), hole = new THREE.MeshStandardMaterial({color:0x020202});
   const b = new THREE.Mesh(new THREE.BoxGeometry(alongX ? len : 2.54, alongX ? 2.54 : len, H), body); b.position.z = H / 2 - 0.4; j.grp.add(b);
@@ -800,6 +803,21 @@ for (const [n, cnt, alongX] of [["J1", 8, true], ["J3", 4, true], ["J4", 4, fals
   for (let k = 0; k < cnt; k++){
     const o = (k - (cnt - 1) / 2) * 2.54, h = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.06), hole);
     h.position.set(alongX ? o : 0, alongX ? 0 : o, H - 0.4 + 0.03); j.grp.add(h); h.userData.info = j; pickables.push(h);
+  }
+}
+{ // AVSS and AVDD: 2-hole sockets at the ends of the Cyton's electrode header; the Daisy's power pins plug in here
+  const pl = byName.PL1, body = new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6}), hole = new THREE.MeshStandardMaterial({color:0x020202});
+  for (const X of [617, 1817]){
+    const [x, y] = mm(X, 2119), g = new THREE.Group(); g.position.set(x, y, T_HALF); board.add(g);
+    const b = new THREE.Mesh(new THREE.BoxGeometry(2.54, 5.08, 8.5), body); b.position.z = 4.25; g.add(b); b.userData.info = pl; pickables.push(b);
+    for (const o of [-1.27, 1.27]){ const h = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.06), hole); h.position.set(0, o, 8.53); g.add(h); h.userData.info = pl; pickables.push(h); }
+  }
+}
+{ // ...and the Daisy's AVSS / AVDD pads have pins pointing down into them
+  const pl = byName["Daisy PL1"], gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
+  for (const X of [619, 1819]) for (const Y of [1211, 1311]){
+    const [x, y] = mm(X + DZ_DX, Y + DZ_DY), pin = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, T + 1 + PIN_DOWN), gold);
+    pin.position.set(x, y, T / 2 + 1 - (T + 1 + PIN_DOWN) / 2); daisy.add(pin); pin.userData.info = pl; pickables.push(pin);
   }
 }
 scene.updateMatrixWorld(true);

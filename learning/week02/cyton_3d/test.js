@@ -132,7 +132,8 @@ function run(){
       const [k, i, all] = q.split(","); const md = new URLSearchParams(location.search).get("mode"); if (md) c.setDaisyMode(md);
       if (new URLSearchParams(location.search).get("copper")) document.getElementById("finish").click();
       if (all) document.getElementById("allflows").click();
-      if (k === "top"){ c.exitTour(); setView(new THREE.Vector3(0, 125, 0.01)); }
+      if (k === "cam"){ c.exitTour(); const P = new URLSearchParams(location.search); setView(new THREE.Vector3(+P.get("cx"), +P.get("cy"), +P.get("cz"))); controls.target.set(0, +P.get("ty") || 0, 0); controls.update(); }
+      else if (k === "top"){ c.exitTour(); setView(new THREE.Vector3(0, 125, 0.01)); }
       else if (k === "none"){ c.exitTour(); setView(VIEWS.iso()); controls.target.set(0, c.state().daisyMode === "lifted" ? 12 : 0, 0); controls.update(); }
       else c.startTour(k, +i);
       const raf = window.requestAnimationFrame; window.requestAnimationFrame = () => 0;

@@ -45,3 +45,7 @@ Compared against OpenBCI's product photos (`compare_with_photo.jpg`: model on th
 - ADS1299 (TQFP-64) and PIC32 (SSOP-28) have their legs.
 - OpenBCI gear logo on both boards, "V3 - 32" and "chipKIT™" placed as printed; cream RST / PROG buttons.
 Small passives are still generic shapes with typical sizes, so very close up it is a model, not a photo.
+- From photos of real boards: the electrode headers are right-angle 2 x 11 (SRB to AGND), pins pointing out past the edge;
+  the AVSS / AVDD ends are 2-hole sockets on the Cyton with the Daisy's power pins plugged in (that is how the Daisy gets ±2.5 V);
+  J2 is a 2-hole socket; stacked, the Daisy rests on the Cyton's 8.5 mm sockets. The Daisy's BIAS and SRB are its own pins.
+  See `compare_with_photos_2.jpg`.
