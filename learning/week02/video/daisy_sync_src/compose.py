@@ -13,7 +13,7 @@ TITLES = ["Cyton + Daisy: 16 channels", "Two identical ADS1299 chips", "Channels
           "Sync trick 1: one clock", "Sync trick 2: one START", "Sync trick 3: one doorbell", "Taking turns on the radio", "Summary"]
 
 def spoken(t):  # narration text -> on-screen text
-    for a, b in [("E E G", "EEG"), ("A D S 1299", "ADS1299"), ("T V S", "TVS"), ("S P I", "SPI"), ("C S 2", "CS2"), ("C S 1", "CS1"),
+    for a, b in [("A.D.S. twelve ninety-nine", "ADS1299"), ("T.V.S.", "TVS"), ("S.P.I.", "SPI"), ("C.S. 2", "CS2"), ("C.S. 1", "CS1"), ("C.L.K.", "CLK"), ("PIC 32", "PIC32"), ("S.R.B.", "SRB"), ("E E G", "EEG"), ("A D S 1299", "ADS1299"), ("T V S", "TVS"), ("S P I", "SPI"), ("C S 2", "CS2"), ("C S 1", "CS1"),
                  ("C L K", "CLK"), ("P I C 32", "PIC32"), ("S R B", "SRB"), ("2.2 kilo-ohm", "2.2 kΩ"), ("1 nanofarad", "1 nF"), ("megahertz", "MHz")]:
         t = t.replace(a, b)
     return t
