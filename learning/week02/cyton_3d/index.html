@@ -13,7 +13,7 @@
 }
 html,body{background:var(--bg);color:var(--fg)}
 body{font-family:var(--display);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
-.wrap{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
 h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:balance;letter-spacing:-.01em}
 .lede{color:var(--muted);max-width:65ch;line-height:1.55;margin:0;font-size:15px}
@@ -39,6 +39,34 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
 .fact dd small{display:block;font-weight:400;font-size:12px;color:var(--muted);margin-top:2px}
 .note{font-size:13px;color:var(--muted);line-height:1.55;max-width:80ch;margin:0}
 .note a{color:var(--cyan)}
+.wrap{max-width:1320px}
+.viewer{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:12px;align-items:start}
+@media (max-width:920px){.viewer{grid-template-columns:minmax(0,1fr)} #panel{max-height:none}}
+#panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;max-height:clamp(340px,64vh,720px);overflow:auto;min-width:0}
+.ph{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#tours{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tourbtn,.chip{font-family:var(--mono);font-size:12px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;line-height:1.3}
+.tourbtn i,.chip i{width:8px;height:8px;border-radius:50%;flex:none}
+.tourbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.tourbtn:hover,.chip:hover{border-color:var(--muted)}
+.chip b{font-weight:500;color:var(--muted)}
+#tourbox{border:1px solid var(--c,var(--line));border-radius:8px;padding:12px;background:var(--bg)}
+.tb-head{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:12px;color:var(--c)}
+.tb-text{margin:8px 0 10px;font-size:15px;line-height:1.5}
+.tb-dots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.dot{width:11px;height:11px;border-radius:50%;border:1px solid var(--muted);background:transparent;padding:0;cursor:pointer}
+.dot.on{background:var(--c);border-color:var(--c)}
+.tb-nav{display:flex;gap:6px;flex-wrap:wrap}
+.tb-nav button{font-family:var(--mono);font-size:12px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+.tb-nav button:disabled{opacity:.4;cursor:default}
+.badge{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#0d1311;background:var(--c);padding:2px 8px;border-radius:3px;margin-top:8px}
+#partbox h3{font-size:19px;margin:8px 0 6px;font-weight:700;text-wrap:balance}
+.desc{font-size:14.5px;line-height:1.55;margin:0 0 10px;color:var(--fg)}
+.io{margin:8px 0}.io .h{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.none{font-size:12.5px;color:var(--muted)}
+.meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px}
+.allf{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer}
+#panel button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style>
 
@@ -46,13 +74,21 @@ h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;text-wrap:bal
   <header>
     <div class="eyebrow">OpenBCI Cyton · layout V4 rev C</div>
     <h1>Cyton board in 3D</h1>
-    <p class="lede">Drag to turn the board all the way round, scroll or pinch to zoom. Hover or tap a part to see its name. Every part sits where OpenBCI's own placement file puts it, on the side it is soldered to.</p>
+    <p class="lede">Click any part to see what it does, where its signal comes from and where it goes next. Or follow a flow, step by step: the brain signal, power, the bias loop and more, drawn in 3D right through the board. Drag to turn, scroll or pinch to zoom.</p>
   </header>
 
+  <div class="viewer">
   <div id="stage" aria-label="Rotatable 3D model of the OpenBCI Cyton board">
     <div id="loading">Loading board…</div>
     <div id="labels"></div>
     <div id="tip" hidden></div>
+  </div>
+  <aside id="panel" aria-label="Board explorer">
+    <div><div class="ph">Follow a flow</div><div id="tours"></div></div>
+    <div id="tourbox" hidden></div>
+    <label class="allf"><input type="checkbox" id="allflows"> Show every flow at once</label>
+    <div><div class="ph">Selected part</div><div id="partbox"><p class="desc" style="margin-top:8px">Click any part on the board, or start a flow above. Each part tells you what it does, where its signal comes from, and where it goes next. Click those links to walk along the board.</p></div></div>
+  </aside>
   </div>
 
   <div class="tools" role="toolbar" aria-label="View controls">
@@ -284,7 +320,7 @@ for (const p of PARTS){
   if (L.lever){ const lv = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.2, 1.4), new THREE.MeshStandardMaterial({color:0x202020}));
     lv.position.set(0, -(L.d / 2 + 1.0), 0); grp.add(lv); }
   board.add(grp);
-  const info = {p, grp, up, mats:[].concat(mats)};
+  const info = {p, grp, up, h:L.h, mats:[].concat(mats)};
   grp.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
   byName[p.n] = info;
 }
@@ -343,7 +379,7 @@ function pick(ev){
   const hit = ray.intersectObjects(pickables, false)[0];
   if (!hit){ tip.hidden = true; return; }
   const {p} = hit.object.userData.info;
-  tip.innerHTML = `<b>${p.n}</b> · ${p.s === "Top" ? "top side" : "underside"}<br>${p.c}${LABELS[p.n] ? "<br>" + LABELS[p.n] : ""}`;
+  tip.innerHTML = `<b>${p.virtual ? p.c : p.n}</b> · ${p.virtual ? "off the board" : p.s === "Top" ? "top side" : "underside"}<br>${p.virtual ? "click to explore" : p.c + "<br>" + (window.cyton ? window.cyton.infoFor(p.n).s : "")}`;
   tip.hidden = false;
   const x = Math.min(ev.clientX - r.left + 14, r.width - tip.offsetWidth - 8), y = Math.min(ev.clientY - r.top + 14, r.height - tip.offsetHeight - 8);
   tip.style.left = x + "px"; tip.style.top = y + "px";
@@ -352,6 +388,319 @@ renderer.domElement.addEventListener("pointermove", pick);
 renderer.domElement.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse") pick(e); });
 renderer.domElement.addEventListener("pointerleave", () => tip.hidden = true);
 controls.addEventListener("start", () => { if (fly) fly = null; });
+
+// ================= explorer: click any part, follow the flows =================
+const BLOCKS = {
+  conn:{name:"Connector", col:"#c9d2dc"}, prot:{name:"Protection", col:"#ff6b6b"}, ads:{name:"ADS1299 · EEG chip", col:"#a77bff"},
+  pow:{name:"Power", col:"#ffb347"}, mcu:{name:"Microcontroller", col:"#5aa9ff"}, radio:{name:"Radio", col:"#f28fb0"},
+  extra:{name:"Extras", col:"#2ec4a0"}, off:{name:"Off the board", col:"#f0e04a"}, misc:{name:"Other", col:"#93a59d"}
+};
+const TVS_R = {D2:"R1", D3:"R2", D4:"R3", D5:"R4", D6:"R6"};
+const R_C = {R1:"C3", R2:"C9", R3:"C11", R4:"C26", R6:"C34"};
+const R_TVS = Object.fromEntries(Object.entries(TVS_R).map(([d, r]) => [r, d]));
+const C_R = Object.fromEntries(Object.entries(R_C).map(([r, c]) => [c, r]));
+const LINES = {D2:"1P, 1N, SRB1 and SRB2", D3:"2P, 2N, 3P and 3N", D4:"4P, 4N, 5P and 5N", D5:"6P, 6N, 7P and 7N", D6:"8P, 8N and BIAS", D7:"the header's BIAS, AVDD and AGND pins"};
+const ADS_DEC = ["C12","C13","C14","C17","C18","C21","C22","C24","C27","C28"];
+const ADS_REF = ["C1","C5","C6","C7","C2","C15","C19"];
+const POW_CAPS = ["C29","C30","C31","C32","C33","C35","C36","C37","C38","C39","C40"];
+
+const INFO = {
+  HEAD:{b:"off", s:"your head", t:"Your head", d:"Your brain makes tiny voltages, 10 to 100 µV. Electrodes on your scalp pick them up, together with a much bigger hum from the mains that your whole body carries.", i:[], o:[["PL1","electrode wires"]]},
+  PC:{b:"off", s:"dongle → PC", t:"USB dongle → computer", d:"The OpenBCI USB dongle receives the radio packets. BrainFlow or the OpenBCI GUI on your computer turn them back into µV and plot your EEG.", i:[["BLE1","radio packets"]], o:[]},
+  PL1:{b:"conn", s:"electrode header", t:"Electrode header", d:"Your electrode wires plug in here. Each channel has its own pins (N1P to N8P, and the N side underneath), plus SRB (the shared reference, usually your ear clip), BIAS, and supply pins. The pins go right through the board.", i:[["HEAD","electrodes on your head"],["R6","BIAS drive coming back out"]], o:[["D2","TVS diodes (underneath)"],["D3","TVS diodes (underneath)"]]},
+  U6:{b:"ads", s:"ADS1299", t:"ADS1299: the EEG chip", d:"The heart of the board. For each of the 8 channels it subtracts the reference, amplifies ×24 and converts to a 24-bit number, all channels at the same instant, 250 times a second. Then it rings DRDY so the PIC32 reads the sample over SPI. Its bias amplifier also drives the BIAS electrode.", i:[["C9","filtered electrode signals"],["U4","AVDD +2.5 V"],["VR1","AVSS −2.5 V"],["U5","DVDD 3.3 V"]], o:[["U7","samples over SPI + DRDY"],["R5","bias drive output"]]},
+  R5:{b:"ads", s:"bias 1 MΩ", t:"R5: bias resistor (1 MΩ)", d:"Sits between the ADS1299's BIAS_OUT pin and the bias electrode. It limits the current into your body to about 2.5 µA, even in the worst case.", i:[["U6","BIAS_OUT"]], o:[["R6","2.2 kΩ on the BIAS line"]]},
+  C16:{b:"ads", s:"bias 1 nF", t:"C16: 1 nF across R5", d:"Lets fast changes bypass R5, so the bias loop responds quickly and stays stable instead of ringing.", i:[["U6","BIAS_OUT"]], o:[["R6","BIAS line"]]},
+  B1:{b:"pow", s:"battery plug", t:"B1: battery plug", d:"The battery connects here, on the underside at the edge: 3 to 6 V. The Cyton is meant for battery power only, which keeps you isolated from the mains.", i:[], o:[["SW2","power switch"],["D9","reverse-polarity diode"]]},
+  SW2:{b:"pow", s:"power switch", t:"SW2: power switch (BLE · OFF · PC)", d:"It doesn't carry the board's current. It only drives the 3.3 V regulator's enable line, which turns the whole board on. In the BLE position it also tells the radio to use Bluetooth, through D8, R11 and D10.", i:[["B1","battery"]], o:[["U5","3V Enable"],["D8","BLE Enable"]]},
+  D9:{b:"pow", s:"reverse diode", t:"D9: reverse-polarity diode", d:"A one-way valve: if the battery is plugged in backwards, no current flows and nothing is damaged. It costs about 0.3 V. What comes out is called RAW.", i:[["B1","battery +"]], o:[["U5","RAW"]]},
+  U5:{b:"pow", s:"+3.3 V regulator", t:"U5: +3.3 V regulator (LP5907)", d:"Turns RAW into a steady 3.3 V called DVDD. Every other supply on the board is built from DVDD, so this is the main power stage. (The V3 schematic shows an MCP1754 doing the same job.)", i:[["D9","RAW"],["SW2","enable"]], o:[["U7","PIC32"],["BLE1","radio"],["U4","+2.5 V regulator"],["U3","voltage inverter"],["U6","ADS1299 digital side"],["U1","accelerometer"],["CONN1","SD card"]]},
+  U4:{b:"pow", s:"+2.5 V regulator", t:"U4: +2.5 V regulator (TLV700)", d:"Makes AVDD, +2.5 V, for the ADS1299's analog side. It is fed from DVDD, which is already clean, so AVDD is extra quiet.", i:[["U5","DVDD"]], o:[["U6","AVDD"]]},
+  U3:{b:"pow", s:"inverter", t:"U3: voltage inverter (LM2664)", d:"A charge pump: thousands of times a second it charges a small capacitor from DVDD, flips it upside down, and pours it into the output. The result is about −3.3 V, called −RAW.", i:[["U5","DVDD"]], o:[["VR1","−RAW"]]},
+  VR1:{b:"pow", s:"−2.5 V regulator", t:"VR1: −2.5 V regulator (TPS72325)", d:"Cleans the inverter's slightly rippled −RAW into a steady −2.5 V called AVSS. With AVDD that gives the ADS1299 5 V in total, centred on 0 V.", i:[["U3","−RAW"]], o:[["U6","AVSS"]]},
+  U7:{b:"mcu", s:"PIC32", t:"U7: PIC32 microcontroller", d:"The board's brain, running the firmware. It waits for DRDY, reads each sample from the ADS1299 over SPI, adds the accelerometer data, packs a 33-byte packet and passes it to the radio. It can also log to the SD card.", i:[["U6","EEG samples (SPI, CS1)"],["U1","motion data (CS4, INT1)"],["X1","8 MHz clock"],["U5","DVDD power"],["SW3","reset"],["SW1","boot select"]], o:[["BLE1","packets over UART (TXD)"],["CONN1","SD card (CS3)"],["J1","Daisy connector (CS2)"],["D1","status LED"]]},
+  X1:{b:"mcu", s:"8 MHz crystal", t:"X1: 8 MHz crystal", d:"An exact heartbeat for the PIC32. The chip multiplies it up to run its processor, and uses it to time its serial links accurately.", i:[["C20","18 pF"],["C23","18 pF"]], o:[["U7","clock pins"]]},
+  C20:{b:"mcu", s:"crystal cap", t:"C20: crystal capacitor (18 pF)", d:"One of the two small capacitors that help the crystal start and settle at exactly 8 MHz.", i:[], o:[["X1","crystal"]]},
+  C23:{b:"mcu", s:"crystal cap", t:"C23: crystal capacitor (18 pF)", d:"One of the two small capacitors that help the crystal start and settle at exactly 8 MHz.", i:[], o:[["X1","crystal"]]},
+  C25:{b:"mcu", s:"PIC32 Vcap", t:"C25: PIC32 Vcap capacitor", d:"A reservoir for the PIC32's built-in core regulator, the same idea as the ADS1299's VCAP pins.", i:[], o:[["U7","Vcap pin"]]},
+  SW3:{b:"mcu", s:"RST button", t:"SW3: reset button", d:"Pressing it pulls the PIC32's MCLR pin to ground, which restarts the chip. When you let go, R7 pulls MCLR back up and the program runs again.", i:[], o:[["R7","MCLR line"],["U7","MCLR (reset)"]]},
+  R7:{b:"mcu", s:"reset pull-up", t:"R7: reset pull-up (470 kΩ)", d:"Holds the PIC32's MCLR pin high, so it keeps running until you press reset.", i:[["SW3","reset button"]], o:[["U7","MCLR"]]},
+  SW1:{b:"mcu", s:"PROG button", t:"SW1: PROG (boot) button", d:"Hold it while resetting and BOOT_EN goes high: the PIC32 starts its bootloader and waits for new firmware, instead of running its program.", i:[], o:[["R9","BOOT_EN line"],["U7","BOOT_EN"]]},
+  R9:{b:"mcu", s:"boot pull-down", t:"R9: boot pull-down (470 kΩ)", d:"Holds BOOT_EN low, so normally the PIC32 just runs its program.", i:[["SW1","PROG button"]], o:[["U7","BOOT_EN"]]},
+  D1:{b:"mcu", s:"blue LED", t:"D1: blue status LED", d:"A status light driven by the PIC32. It shares the PGD programming pin, through R8.", i:[["U7","PGD pin"]], o:[["R8","to ground"]]},
+  R8:{b:"mcu", s:"LED resistor", t:"R8: LED resistor (1 kΩ)", d:"Limits the LED's current so it doesn't burn out.", i:[["D1","LED"]], o:[]},
+  BLE1:{b:"radio", s:"RFduino radio", t:"BLE1: RFduino radio module", d:"Receives packets from the PIC32 over a serial link and transmits them wirelessly to the USB dongle, or over Bluetooth in BLE mode. It can also reprogram the PIC32 over the air using the PGC and PGD lines.", i:[["U7","packets over UART"],["U5","DVDD power"],["R11","BLE mode select"]], o:[["PC","wireless to the USB dongle"]]},
+  PL2:{b:"radio", s:"radio programming pads", t:"PL2: RFduino programming pads", d:"Contacts used to program the radio module itself.", i:[], o:[["BLE1","radio"]]},
+  D8:{b:"radio", s:"BLE-mode diode", t:"D8: BLE-mode diode", d:"A diode-OR. In the BLE switch position it also turns on 3V Enable, so the board powers up, but it stops the PC position from accidentally signalling BLE mode.", i:[["SW2","BLE position"]], o:[["U5","3V Enable"],["R11","BLE Enable"]]},
+  R11:{b:"radio", s:"BLE-enable resistor", t:"R11: BLE-enable resistor", d:"Limits the current from the battery-voltage switch signal into the radio's mode pin. D10 (a 3 V Zener) clamps the voltage and R10 pulls the pin low when not in BLE mode.", i:[["D8","BLE Enable"]], o:[["BLE1","GPIO4: use Bluetooth"]]},
+  D10:{b:"radio", s:"3 V clamp", t:"D10: 3 V Zener clamp", d:"Stops the battery-voltage BLE Enable signal from going above about 3 V, which protects the radio's input pin.", i:[["R11","BLE Enable"]], o:[["BLE1","GPIO4"]]},
+  R10:{b:"radio", s:"BLE pull-down", t:"R10: BLE-enable pull-down", d:"Pulls the radio's mode pin firmly low when the switch isn't in BLE, so it is never left floating.", i:[["R11","BLE Enable"]], o:[["BLE1","GPIO4"]]},
+  U1:{b:"extra", s:"accelerometer", t:"U1: LIS3DH accelerometer", d:"Measures head tilt and movement on x, y and z. The values go into the 6 aux bytes of every packet, so software can flag motion artifacts.", i:[["U5","DVDD"],["U2","data pin (through the OR gate)"]], o:[["U7","SPI (CS4) + INT1 doorbell"]]},
+  U2:{b:"extra", s:"OR gate", t:"U2: OR gate (SN74LVC1G32)", d:"An earplug for the accelerometer. When the accelerometer isn't selected, it holds its data pin high, so the busy SPI traffic can never look like an I²C start signal.", i:[["U7","MOSI and CS4"]], o:[["U1","accelerometer data pin"]]},
+  C8:{b:"extra", s:"accel decoupling", t:"C8: accelerometer decoupling", d:"Keeps the accelerometer's 3.3 V supply steady right at its pins.", i:[["U5","DVDD"]], o:[["U1","accelerometer"]]},
+  C10:{b:"extra", s:"accel decoupling", t:"C10: accelerometer decoupling", d:"Keeps the accelerometer's 3.3 V supply steady right at its pins.", i:[["U5","DVDD"]], o:[["U1","accelerometer"]]},
+  CONN1:{b:"extra", s:"microSD slot", t:"CONN1: microSD slot", d:"Lets the PIC32 record data to a card over SPI (CS3), with no computer needed.", i:[["U7","SPI (CS3)"],["U5","DVDD"]], o:[]},
+  C4:{b:"extra", s:"SD reservoir", t:"C4: SD card reservoir (100 µF)", d:"Covers the SD card's big current bursts while it writes.", i:[["U5","DVDD"]], o:[["CONN1","SD card"]]},
+  J1:{b:"conn", s:"Daisy connector", t:"J1: Daisy connector", d:"Adds the Daisy board's second ADS1299 for 16 channels. It shares SPI, the clock, RESET and power, and gets its own chip select (CS2).", i:[["U7","SPI + CS2"],["U6","shared clock"]], o:[]},
+  J2:{b:"conn", s:"BIAS_INV pins", t:"J2: BIAS_INV and AGND pins", d:"Brings out the bias amplifier's minus input, so you can experiment with the bias loop.", i:[["U6","BIAS_INV"]], o:[]},
+  J3:{b:"conn", s:"spare pins", t:"J3: spare PIC32 pins", d:"D13, D12, VDD and GND, for your own add-ons.", i:[["U7","spare pins"]], o:[]},
+  J4:{b:"conn", s:"spare pins", t:"J4: spare PIC32 pins", d:"D17, RST, D18 and D11, for your own add-ons.", i:[["U7","spare pins"]], o:[]},
+};
+for (const [d, r] of Object.entries(TVS_R)) INFO[d] = {b:"prot", s:"TVS diodes", t:`${d}: TVS diodes (4 in one)`, d:`Lightning rods for ${LINES[d]}. Normally invisible; on a static zap they switch on in nanoseconds and dump it to ground. They sit underneath, right below the header pins, so a zap is caught before it travels anywhere.`, i:[["PL1","header pins"]], o:[[r, "2.2 kΩ resistors (on top)"]]};
+INFO.D7 = {b:"prot", s:"TVS diodes", t:"D7: TVS diodes (4 in one)", d:`Lightning rods for ${LINES.D7}.`, i:[["PL1","header pins"]], o:[]};
+for (const [r, c] of Object.entries(R_C)) INFO[r] = {b:"prot", s:"2.2 kΩ array", t:`${r}: 2.2 kΩ resistor array (4 in one)`, d:`Speed bumps for ${LINES[R_TVS[r]]}: they limit current into the ADS1299 if a surge gets past the TVS. With the capacitors underneath they also form a radio filter (cutoff about 72 kHz).` + (r === "R6" ? " R6 also carries the bias drive (BIAS_DRV) back out to the BIAS pin." : ""), i:[[R_TVS[r], "TVS (underneath)"]].concat(r === "R6" ? [["R5", "bias drive"]] : []), o:[[c, "1 nF capacitors (underneath)"]].concat(r === "R6" ? [["PL1", "BIAS pin"]] : [])};
+for (const [c, r] of Object.entries(C_R)) INFO[c] = {b:"prot", s:"1 nF array", t:`${c}: 1 nF capacitor array (4 in one)`, d:`Radio filter for ${LINES[R_TVS[r]]}: drains Wi-Fi and phone noise to ground. Brain signals, below 100 Hz, pass completely untouched.`, i:[[r, "2.2 kΩ resistors"]], o:[["U6", "ADS1299 input pins"]]};
+for (const c of ADS_DEC) INFO[c] = {b:"ads", s:"ADS decoupling", t:`${c}: ADS1299 decoupling capacitor`, d:"A small energy tank right at an ADS1299 power pin (most sit directly underneath the chip). It supplies the chip's quick current gulps so its supply doesn't bounce into your EEG.", i:[["U4","AVDD"],["VR1","AVSS"],["U5","DVDD"]], o:[["U6","ADS1299 power pins"]]};
+for (const c of ADS_REF) INFO[c] = {b:"ads", s:"ADS reference/VCAP", t:`${c}: ADS1299 reference / VCAP capacitor`, d:"Keeps one of the ADS1299's internal nodes steady: its 4.5 V reference (the ruler every sample is compared against) or a VCAP pin." + (c === "C2" ? " C2 is the big 100 µF one, on VCAP1." : ""), i:[], o:[["U6","ADS1299"]]};
+for (const c of POW_CAPS) INFO[c] = {b:"pow", s:"power cap", t:`${c}: power-supply capacitor`, d:"An input or output capacitor of a nearby regulator" + (c === "C31" || c === "C33" ? ", here at the voltage inverter (U3)" : "") + ". It keeps that supply steady and the regulator stable.", i:[], o:[]};
+
+function infoFor(n){
+  if (INFO[n]) return INFO[n];
+  const p = byName[n] ? byName[n].p : {c:"?"};
+  return {b:"misc", s:p.c, t:`${n}: ${p.c}`, d:"A supporting part.", i:[], o:[]};
+}
+
+const TOURS = {
+  signal:{name:"Brain signal", col:"#2ec4a0", paths:[["HEAD","PL1","D3","R2","C9","U6","U7","BLE1","PC"]], steps:[
+    ["HEAD","Your brain makes tiny voltages, 10 to 100 µV. Electrodes on your scalp pick them up, along with hum from the mains."],
+    ["PL1","The electrode wires plug into this header. Each channel has its own pin, plus SRB (the shared reference, your ear clip) and BIAS."],
+    ["D3","First stop, on the underside right below the pins: a TVS diode catches static zaps before they go any further."],
+    ["R2","Through the board to the top: a 2.2 kΩ resistor array limits current into the chip."],
+    ["C9","Back underneath: 1 nF capacitors drain radio noise to ground. Brain signals pass untouched."],
+    ["U6","The ADS1299 subtracts the reference, amplifies ×24 and turns all 8 channels into 24-bit numbers at the same instant, 250 times a second. Then it rings DRDY."],
+    ["U7","The PIC32 hears DRDY, reads 27 bytes over SPI, adds the accelerometer data and packs a 33-byte packet."],
+    ["BLE1","The packet goes over a serial link (TXD) to the RFduino radio on the underside, which transmits it."],
+    ["PC","The USB dongle receives it, and BrainFlow or the OpenBCI GUI plot your EEG. Every 4 ms, the whole journey repeats."]]},
+  power:{name:"Power", col:"#ffb347", paths:[["B1","SW2"],["B1","D9","U5","U3","VR1","U6"],["U5","U4","U6"],["U5","U7"],["U5","BLE1"]], steps:[
+    ["B1","The battery plugs in here, on the underside: 3 to 6 V."],
+    ["SW2","The power switch doesn't carry the board's current. It drives the 3.3 V regulator's enable line, and that turns the board on."],
+    ["D9","D9 is a one-way valve that blocks a backwards battery. It costs about 0.3 V. What's left is called RAW."],
+    ["U5","U5 turns RAW into a steady 3.3 V called DVDD. Every other supply is built from DVDD."],
+    ["U7","DVDD powers the PIC32 directly…"],
+    ["BLE1","…and the radio, the accelerometer, the SD card and the ADS1299's digital side."],
+    ["U4","U4 makes +2.5 V (AVDD) for the ADS1299's analog side, from the already-clean DVDD."],
+    ["U3","U3, a charge pump, flips DVDD upside down: about −3.3 V, called −RAW."],
+    ["VR1","VR1 cleans −RAW into a steady −2.5 V called AVSS."],
+    ["U6","The ADS1299 gets AVDD (+2.5 V) and AVSS (−2.5 V): 5 V in total for its analog side, centred on 0 V."]]},
+  bias:{name:"Bias loop", col:"#ff8a5c", paths:[["U6","R5","R6","D6","PL1","HEAD"]], steps:[
+    ["U6","The ADS1299 averages the electrodes to find the hum your whole body shares. Its bias amplifier drives the opposite out of BIAS_OUT."],
+    ["R5","R5 (1 MΩ), with C16 across it, limits the current into your body to about 2.5 µA and keeps the loop stable."],
+    ["R6","A 2.2 kΩ protection resistor on the BIAS line…"],
+    ["D6","…and a TVS diode underneath, like every other line."],
+    ["PL1","Out through the header's BIAS pin to the bias electrode."],
+    ["HEAD","The opposite signal cancels most of the hum on your body, so every channel is cleaner. The loop closes through you."]]},
+  motion:{name:"Motion", col:"#a77bff", paths:[["U1","U7"],["U7","U2","U1"]], steps:[
+    ["U1","The accelerometer measures how your head tilts and moves."],
+    ["U2","The OR gate holds its data pin high whenever it isn't selected, so the shared SPI traffic can't confuse it."],
+    ["U7","The PIC32 reads it over SPI (CS4) when INT1 rings, and puts x, y, z into the 6 aux bytes of each packet."]]},
+  storage:{name:"SD card", col:"#7fe3e3", paths:[["U7","CONN1"]], steps:[
+    ["U7","Instead of (or as well as) sending packets to the radio, the PIC32 can write them to a card."],
+    ["CONN1","The microSD slot on the underside shares the SPI bus, with its own chip select (CS3)."]]},
+  clock:{name:"Clock", col:"#f0e04a", paths:[["X1","U7"]], steps:[
+    ["X1","The 8 MHz crystal, with C20 and C23, gives the PIC32 an exact heartbeat."],
+    ["U7","The PIC32 multiplies it up to run its processor. (The ADS1299 has its own 2.048 MHz clock inside, which times the samples.)"]]},
+  controls:{name:"Buttons & switch", col:"#c9d2dc", paths:[["SW3","R7","U7"],["SW1","R9","U7"],["SW2","D8","R11","BLE1"]], steps:[
+    ["SW3","RST: pulls the PIC32's reset pin low to restart it. R7 holds it high the rest of the time."],
+    ["SW1","PROG: hold while resetting to make the PIC32 wait for new firmware. R9 holds it low otherwise."],
+    ["SW2","The power switch: PC, OFF or BLE."],
+    ["D8","In BLE, D8 also switches the board on…"],
+    ["BLE1","…and R11, D10 and R10 safely tell the radio to use Bluetooth."]]},
+};
+
+// ---- off-board nodes, header pin markers ----
+scene.updateMatrixWorld(true);
+const wpos = n => { const v = new THREE.Vector3(); byName[n].grp.getWorldPosition(v); return v; };
+const T_HALF = T / 2;
+function addNode(n, title, pos, side, obj){
+  obj.position.copy(pos); scene.add(obj);
+  const mats = []; obj.traverse(o => { if (o.isMesh) mats.push(o.material); });
+  const info = {p:{n, c:title, s:"Off", virtual:true}, grp:obj, up:0, side, h:0, mats};
+  obj.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
+  byName[n] = info; return info;
+}
+{
+  const head = new THREE.Group();
+  head.add(new THREE.Mesh(new THREE.SphereGeometry(8, 32, 20), new THREE.MeshStandardMaterial({color:0xe2b48c, roughness:0.7, transparent:true, opacity:0.6})));
+  for (let k = 0; k < 6; k++){
+    const a = k / 6 * Math.PI * 2, e = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 8), new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.6, roughness:0.4}));
+    e.position.set(Math.cos(a) * 5.5, 5.6, Math.sin(a) * 5.5); head.add(e);
+  }
+  addNode("HEAD", "Your head", wpos("PL1").add(new THREE.Vector3(0, 30, -24)), 1, head);
+  const dongle = new THREE.Group();
+  dongle.add(new THREE.Mesh(new THREE.BoxGeometry(14, 3, 6), new THREE.MeshStandardMaterial({color:0x2a2f36, roughness:0.6})));
+  const plug = new THREE.Mesh(new THREE.BoxGeometry(5, 2, 4.5), new THREE.MeshStandardMaterial({color:0xc4c9ce, metalness:0.7, roughness:0.35})); plug.position.x = 9.5; dongle.add(plug);
+  addNode("PC", "USB dongle → computer", wpos("BLE1").add(new THREE.Vector3(0, -14, 30)), -1, dongle);
+}
+for (const [n, w, d] of [["J1", 20.5, 3], ["J2", 3, 5.6], ["J3", 10.5, 3], ["J4", 3, 10.5]]){
+  const p = PARTS.find(q => q.n === n); if (!p) continue;
+  const [x, y] = mm(p.x, p.y), grp = new THREE.Group();
+  grp.position.set(x, y, T_HALF + 0.4); grp.rotation.z = (n === "J3" ? 45 : n === "J1" ? -45 : 0) * Math.PI / 180;
+  const mat = new THREE.MeshStandardMaterial({color:0xffd166, emissive:0x000000, transparent:true, opacity:0, depthWrite:false});
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, d, 0.8), mat); grp.add(m); board.add(grp);
+  const info = {p, grp, up:1, h:0.8, mats:[mat], ghost:true};
+  m.userData.info = info; pickables.push(m); byName[n] = info;
+}
+scene.updateMatrixWorld(true);
+let ghostLit = null;
+function setSel(info){
+  if (ghostLit){ ghostLit.mats[0].opacity = 0; ghostLit = null; }
+  highlight(info || null);
+  if (info && info.ghost){ info.mats[0].opacity = 0.55; ghostLit = info; }
+}
+
+// ---- 3D flow lines ----
+const UPV = new THREE.Vector3(0, 1, 0);
+const DOT_GEO = new THREE.SphereGeometry(0.95, 12, 8), VIA_GEO = new THREE.TorusGeometry(0.95, 0.22, 8, 24);
+const VIA_MAT = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.8, roughness:0.3});
+function anchor(n){
+  const info = byName[n], v = wpos(n), s = info.p.virtual ? info.side : info.up;
+  if (!info.p.virtual) v.addScaledVector(UPV, s * ((info.h || 1) / 2 + 0.9));
+  return {p:v, s};
+}
+function edgeCurve(a, b){
+  const A = anchor(a), B = anchor(b), d = A.p.distanceTo(B.p);
+  if (A.s === B.s){
+    const mid = A.p.clone().lerp(B.p, 0.5).addScaledVector(UPV, A.s * (3 + d * 0.16));
+    return {curve:new THREE.CatmullRomCurve3([A.p, mid, B.p]), via:null};
+  }
+  const via = A.p.clone().lerp(B.p, 0.5); via.y = 0;
+  const a1 = A.p.clone().lerp(via, 0.5); a1.y = A.s * (2.5 + d * 0.06);
+  const b1 = B.p.clone().lerp(via, 0.5); b1.y = B.s * (2.5 + d * 0.06);
+  return {curve:new THREE.CatmullRomCurve3([A.p, a1, via, b1, B.p]), via};
+}
+const tourGroups = {};
+function buildTour(key){
+  if (tourGroups[key]) return tourGroups[key];
+  scene.updateMatrixWorld(true);
+  const tour = TOURS[key], g = new THREE.Group(), edges = [], seen = new Set();
+  const dmat = new THREE.MeshBasicMaterial({color:new THREE.Color(tour.col).lerp(new THREE.Color(0xffffff), 0.45)});
+  for (const path of tour.paths) for (let i = 0; i + 1 < path.length; i++){
+    const a = path[i], b = path[i + 1], k = a + ">" + b;
+    if (seen.has(k) || !byName[a] || !byName[b]) continue; seen.add(k);
+    const {curve, via} = edgeCurve(a, b);
+    const mat = new THREE.MeshBasicMaterial({color:tour.col, transparent:true, opacity:0.55, depthWrite:false});
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 80, 0.45, 8, false), mat));
+    const len = curve.getLength(), n = Math.max(2, Math.round(len / 9)), dots = [];
+    for (let j = 0; j < n; j++){ const s = new THREE.Mesh(DOT_GEO, dmat); g.add(s); dots.push(s); }
+    if (via) for (const yy of [T_HALF + 0.04, -T_HALF - 0.04]){ const r = new THREE.Mesh(VIA_GEO, VIA_MAT); r.rotation.x = Math.PI / 2; r.position.set(via.x, yy, via.z); g.add(r); }
+    edges.push({a, b, curve, len, mat, dots});
+  }
+  g.visible = false; scene.add(g);
+  return tourGroups[key] = {g, edges};
+}
+const STILL = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let activeTour = null, stepIdx = 0, allFlows = false, focusName = null;
+function showGroups(){
+  for (const key of Object.keys(TOURS)){
+    const on = allFlows || key === activeTour;
+    if (on) buildTour(key).g.visible = true; else if (tourGroups[key]) tourGroups[key].g.visible = false;
+  }
+}
+function updateFlows(){
+  const now = performance.now() / 1000;
+  for (const key in tourGroups){
+    const {g, edges} = tourGroups[key]; if (!g.visible) continue;
+    for (const e of edges){
+      const emph = focusName && (e.a === focusName || e.b === focusName);
+      e.mat.opacity = focusName ? (emph ? 0.95 : 0.3) : 0.6;
+      const n = e.dots.length;
+      for (let j = 0; j < n; j++){
+        const u = STILL ? (j + 0.5) / n : ((now * 16 / e.len) + j / n) % 1;
+        e.dots[j].position.copy(e.curve.getPointAt(u));
+        e.dots[j].scale.setScalar(emph ? 1.35 : 1);
+      }
+    }
+  }
+}
+
+// ---- selection, camera, panel ----
+const panel = document.getElementById("panel"), partBox = document.getElementById("partbox"), tourBox = document.getElementById("tourbox");
+const sideText = p => p.virtual ? "off the board" : p.s === "Top" ? "top side" : "underside";
+function flyToPart(n){
+  const info = byName[n], w = wpos(n), s = info.p.virtual ? info.side : info.up;
+  const off = n === "HEAD" ? new THREE.Vector3(30, 22, 40) : n === "PC" ? new THREE.Vector3(30, -22, 40) : new THREE.Vector3(20, s * 52, 44);
+  flyTo(w.clone().add(off), w);
+}
+function chip(n, label){
+  if (!byName[n]) return "";
+  const inf = infoFor(n), col = BLOCKS[inf.b].col;
+  return `<button class="chip" data-go="${n}"><i style="background:${col}"></i><b>${n === "HEAD" || n === "PC" ? "" : n + " · "}</b>${label || inf.s}</button>`;
+}
+function toursWith(n){
+  const out = [];
+  for (const [k, t] of Object.entries(TOURS)){
+    const at = t.steps.findIndex(s => s[0] === n);
+    if (at >= 0 || t.paths.some(p => p.includes(n))) out.push([k, Math.max(0, at)]);
+  }
+  return out;
+}
+function renderPart(n){
+  const info = byName[n], inf = infoFor(n), blk = BLOCKS[inf.b];
+  const ins = inf.i.map(([m, l]) => chip(m, l)).join("") || `<span class="none">nothing on the board feeds it</span>`;
+  const outs = inf.o.map(([m, l]) => chip(m, l)).join("") || `<span class="none">end of the line</span>`;
+  const tours = toursWith(n).map(([k, at]) => `<button class="chip tour" data-tour="${k}" data-step="${at}"><i style="background:${TOURS[k].col}"></i>${TOURS[k].name}</button>`).join("") || `<span class="none">not on a guided flow</span>`;
+  partBox.innerHTML = `<div class="badge" style="--c:${blk.col}">${blk.name}</div>
+    <h3>${inf.t}</h3><p class="desc">${inf.d}</p>
+    <div class="io"><div class="h">Comes from</div><div class="chips">${ins}</div></div>
+    <div class="io"><div class="h">Goes to next</div><div class="chips">${outs}</div></div>
+    <div class="io"><div class="h">Follow it in a flow</div><div class="chips">${tours}</div></div>
+    <div class="meta">${info.p.virtual ? "off the board" : info.p.c + " · " + sideText(info.p)}</div>`;
+}
+function selectPart(n, fly = true){
+  const info = byName[n]; if (!info) return;
+  setSel(info); focusName = n; renderPart(n);
+  if (fly){ setSpin(false); flyToPart(n); }
+  if (find.value !== n) find.value = byName[n] && [...find.options].some(o => o.value === n) ? n : "";
+}
+function renderTourBox(){
+  document.querySelectorAll("#tours .tourbtn").forEach(b => b.setAttribute("aria-pressed", b.dataset.tour === activeTour));
+  if (!activeTour){ tourBox.hidden = true; return; }
+  const t = TOURS[activeTour], [n, text] = t.steps[stepIdx];
+  tourBox.hidden = false; tourBox.style.setProperty("--c", t.col);
+  tourBox.innerHTML = `<div class="tb-head"><span>${t.name}</span><span>Step ${stepIdx + 1} of ${t.steps.length}</span></div>
+    <div class="tb-text">${text}</div>
+    <div class="tb-dots">${t.steps.map((s, i) => `<button class="dot${i === stepIdx ? " on" : ""}" data-step="${i}" aria-label="Step ${i + 1}: ${infoFor(s[0]).s}"></button>`).join("")}</div>
+    <div class="tb-nav"><button data-nav="back"${stepIdx === 0 ? " disabled" : ""}>← Back</button><button data-nav="next">${stepIdx === t.steps.length - 1 ? "Finish" : "Next →"}</button><button data-nav="exit">Exit</button></div>`;
+}
+function startTour(key, at = 0){ activeTour = key; showGroups(); goStep(at); }
+function goStep(i){
+  const t = TOURS[activeTour]; stepIdx = Math.max(0, Math.min(t.steps.length - 1, i));
+  selectPart(t.steps[stepIdx][0]); renderTourBox();
+}
+function exitTour(){ activeTour = null; showGroups(); renderTourBox(); }
+document.getElementById("tours").innerHTML = Object.entries(TOURS).map(([k, t]) => `<button class="tourbtn" data-tour="${k}" aria-pressed="false"><i style="background:${t.col}"></i>${t.name}</button>`).join("");
+panel.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.go) selectPart(b.dataset.go);
+  else if (b.classList.contains("tourbtn")) { if (activeTour === b.dataset.tour) exitTour(); else startTour(b.dataset.tour); }
+  else if (b.dataset.tour) startTour(b.dataset.tour, +b.dataset.step);
+  else if (b.dataset.nav === "back") goStep(stepIdx - 1);
+  else if (b.dataset.nav === "next") { if (stepIdx === TOURS[activeTour].steps.length - 1) exitTour(); else goStep(stepIdx + 1); }
+  else if (b.dataset.nav === "exit") exitTour();
+  else if (b.classList.contains("dot")) goStep(+b.dataset.step);
+});
+document.getElementById("allflows").addEventListener("change", e => { allFlows = e.target.checked; showGroups(); if (allFlows && !activeTour){ setSpin(false); flyTo(new THREE.Vector3(90, 80, 125), new THREE.Vector3(0, 6, 0)); } });
+document.addEventListener("keydown", e => {
+  const tg = e.target; if (!activeTour || (tg && tg.closest && tg.closest("select, input"))) return;
+  if (e.key === "ArrowRight") goStep(stepIdx + 1); else if (e.key === "ArrowLeft") goStep(stepIdx - 1); else if (e.key === "Escape") exitTour();
+});
+find.onchange = () => { if (find.value) selectPart(find.value); };
+let downAt = null;
+renderer.domElement.addEventListener("pointerdown", e => { downAt = {x:e.clientX, y:e.clientY}; });
+renderer.domElement.addEventListener("pointerup", e => {
+  if (!downAt) return; const moved = Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y); downAt = null;
+  if (moved > 6) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const hit = ray.intersectObjects(pickables.filter(o => o.visible !== false), false)[0];
+  if (hit) selectPart(hit.object.userData.info.p.n);
+});
+for (const [n, text] of [["HEAD", "Your head"], ["PC", "USB dongle → PC"]]){
+  const el = document.createElement("div"); el.className = "lbl"; el.textContent = text; labelLayer.appendChild(el); labelEls.push({el, info:byName[n]});
+}
+window.cyton = {selectPart, startTour, goStep, exitTour, TOURS, INFO, byName, infoFor, state:() => ({activeTour, stepIdx, focusName, allFlows})};
+
 
 // ---- size + loop ----
 function resize(){ const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
@@ -364,6 +713,7 @@ function loop(){
     if (camera.position.distanceTo(fly.pos) < 0.4) fly = null;
   }
   controls.update();
+  updateFlows();
   renderer.render(scene, camera);
   if (showLabels){
     up.set(0, 0, 1).applyQuaternion(board.getWorldQuaternion(new THREE.Quaternion()));
@@ -371,7 +721,7 @@ function loop(){
     for (const {el, info} of labelEls){
       info.grp.getWorldPosition(tmp);
       toCam.copy(camera.position).sub(tmp);
-      const facing = up.dot(toCam) * info.up > 0;
+      const facing = info.up === 0 ? camera.position.y * info.side > -5 : up.dot(toCam) * info.up > 0;
       tmp.addScaledVector(up, info.up * 3).project(camera);
       if (!facing || tmp.z > 1){ el.hidden = true; continue; }
       el.hidden = false;

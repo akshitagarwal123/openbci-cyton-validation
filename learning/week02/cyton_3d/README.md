@@ -10,3 +10,14 @@ Open `index.html` through any web server (it loads three.js from a CDN and the t
 Live version: https://claude.ai/artifact/1jhBo5jJ9rSSQ4mTTuaEn5
 
 Positions and rotations are exact. Part heights and package sizes are typical values, so the 3D shapes are close approximations.
+
+## Explorer (5 Nov)
+
+- Click any part: what it does, where its signal comes from, where it goes next (clickable links), and which flows it belongs to.
+- Guided flows with 3D flow lines and moving particles, including where a line passes through the board (gold via rings):
+  brain signal, power, bias loop, motion, SD card, clock, buttons and switch. Back / Next, step dots, arrow keys, Esc.
+- "Show every flow at once" zooms out and draws all 7 flows.
+
+`test.js` is the automated test (run in headless Chrome): it selects all 84 parts, checks all 177 links,
+runs all 37 tour steps, clicks the panel controls and clicks parts on the 3D board from the top and from underneath.
+Last run: all pass, no JavaScript errors.
