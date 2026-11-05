@@ -37,7 +37,7 @@ const SCENES = [
    {at:0.53, cam:() => camPart("Daisy R2"), focus:"Daisy R2", flows:["vsig"], labels:[["Daisy R2","2.2 kΩ · on top"]]},
    {at:0.68, cam:() => camPart("Daisy C12"), focus:"Daisy C12", flows:["vsig"], labels:[["Daisy C12","1 nF · underneath"]]},
    {at:0.84, cam:() => camPart("Daisy U1"), focus:"Daisy U1", flows:["vsig"], labels:[["Daisy U1","Daisy ADS1299"]]}],
-  [{at:0, cam:camJ1, focus:null, keep:["J1","Daisy J1"], flows:["daisybus"], labels:[["J1","Cyton J1 · 8 pins"],["Daisy J1","Daisy socket"]]}],
+  [{at:0, cam:camJ1, focus:null, keep:["J1","Daisy J1"], flows:["daisybus"], labels:[["J1","Cyton J1 · 8-hole socket"],["Daisy J1","Daisy pins (pointing down)"]]}],
   [{at:0, cam:camSide, focus:null, fadeD:0.35, flows:["vclock"], labels:[["U6","Cyton ADS1299"],["Daisy U1","Daisy ADS1299"]]},
    {at:0.17, cam:() => camPart("Daisy U1", 0.9), focus:"Daisy U1", flows:["vclock"], labels:[["Daisy U1","CLKSEL tied to ground: no own clock"]]},
    {at:0.36, cam:() => camPart("U6", 0.9), focus:"U6", flows:["vclock"], labels:[["U6","2.048 MHz out on CLK"]]},
