@@ -133,8 +133,8 @@ const uvOf = (xmil, ymil) => [(IMG.px0 + (xmil - X0) * IMG.s) / IMG.w, 1 - (IMG.
 // ---- what each package looks like: [width x, depth y, height, colour] before rotation ----
 function look(p){
   const c = p.c, n = p.n;
-  if (c.includes("ADS1299")) return {w:10,d:10,h:1.2,col:"#1c1e22",leads:12};
-  if (c.includes("PIC32")) return {w:10.2,d:5.3,h:1.8,col:"#1c1e22"};
+  if (c.includes("ADS1299")) return {w:10,d:10,h:1.2,col:"#1c1e22",tqfp:true};
+  if (c.includes("PIC32")) return {w:10.2,d:5.3,h:1.8,col:"#1c1e22",ssop:true};
   if (c.includes("RFD22301")) return {w:15,d:15,h:2.4,col:"#2e3a4f"};
   if (c.includes("LIS3DH")) return {w:3,d:3,h:1,col:"#1c1e22"};
   if (/LM2664|LP5907|TLV700|TPS72325/.test(c)) return {w:2.9,d:1.6,h:1.1,col:"#1c1e22"};
@@ -180,6 +180,7 @@ board.rotation.x = -Math.PI / 2;                             // lay the board fl
 scene.add(board);
 
 const shape = new THREE.Shape(OUTLINE.map(([x, y]) => new THREE.Vector2(...mm(x, y))));
+for (const [hx, hy] of [[124, 802], [124, 1622], [2299, 802], [2299, 1622]]){ const h = new THREE.Path(); h.absarc(...mm(hx, hy), 1.6, 0, Math.PI * 2, true); shape.holes.push(h); }
 const edge = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, {depth:T, bevelEnabled:false}),
   new THREE.MeshStandardMaterial({color:0x1e2a24, roughness:0.8}));
 edge.position.z = -T / 2; board.add(edge);
@@ -210,6 +211,21 @@ const J2P = [[1611, 1533], [1611, 1433]];
 const PADS = [...J1P, ...J4P, ...J3P, ...J2P];
 for (let i = 0; i < 13; i++) PADS.push([617 + 100 * i, 2069], [617 + 100 * i, 2169]);
 const HOLES = [[124, 802], [124, 1622], [2299, 802], [2299, 1622]];
+function drawLogo(g, x, y, R){                                 // OpenBCI's gear-ring logo with a little circuit brain
+  g.save(); g.translate(x, y); g.fillStyle = SILK; g.strokeStyle = SILK;
+  for (let k = 0; k < 16; k++){ g.save(); g.rotate(k * Math.PI / 8); g.fillRect(-R * 0.09, -R, R * 0.18, R * 0.2); g.restore(); }
+  g.lineWidth = R * 0.07; g.beginPath(); g.arc(0, 0, R * 0.84, 0, 7); g.stroke();
+  g.lineWidth = R * 0.05; g.beginPath(); g.arc(0, 0, R * 0.7, 0, 7); g.stroke();
+  g.lineWidth = R * 0.045; g.beginPath();
+  g.moveTo(-R * 0.42, R * 0.18); g.bezierCurveTo(-R * 0.6, -R * 0.1, -R * 0.35, -R * 0.5, -R * 0.02, -R * 0.42);
+  g.bezierCurveTo(R * 0.35, -R * 0.52, R * 0.6, -R * 0.15, R * 0.4, R * 0.12); g.bezierCurveTo(R * 0.3, R * 0.36, R * 0.05, R * 0.4, -R * 0.05, R * 0.3);
+  g.lineTo(-R * 0.05, R * 0.5); g.stroke();
+  for (const [a, b, c, d] of [[-0.3, -0.15, 0.05, -0.15], [-0.25, 0.05, 0.2, 0.05], [0.05, -0.3, 0.3, -0.3], [-0.15, 0.2, 0.15, 0.2]]){
+    g.beginPath(); g.moveTo(R * a, R * b); g.lineTo(R * c, R * d); g.stroke();
+    g.beginPath(); g.arc(R * c, R * d, R * 0.05, 0, 7); g.fill();
+  }
+  g.restore();
+}
 function drawSilk(cv, side){
   const N = cv.width, g = cv.getContext("2d"), sx = N / (X1 - X0), sy = N / (Y1 - Y0), mirror = side === "Bottom";
   const P = (X, Y) => [(X - X0) * sx, (Y1 - Y) * sy];
@@ -223,7 +239,7 @@ function drawSilk(cv, side){
     const [x, y] = P(X, Y); g.save(); g.translate(x, y); g.rotate(-rot * Math.PI / 180);
     g.strokeStyle = SILK; g.lineWidth = 6 * sx; g.strokeRect(-w * sx / 2, -d * sy / 2, w * sx, d * sy); g.restore();
   };
-  for (const [X, Y] of HOLES){ const [x, y] = P(X, Y); g.fillStyle = "#2a2f33"; g.beginPath(); g.arc(x, y, 100 * sx, 0, 7); g.fill(); g.strokeStyle = "#d4d9dc"; g.lineWidth = 14 * sx; g.stroke(); }
+  for (const [X, Y] of HOLES){ const [x, y] = P(X, Y); g.fillStyle = "#d9dde0"; g.beginPath(); g.arc(x, y, 104 * sx, 0, 7); g.fill(); g.strokeStyle = "#b9bfc4"; g.lineWidth = 8 * sx; g.stroke(); }
   for (const [X, Y] of PADS){ const [x, y] = P(X, Y); g.fillStyle = "#c9a44c"; g.beginPath(); g.arc(x, y, 34 * sx, 0, 7); g.fill(); g.fillStyle = "#3a3220"; g.beginPath(); g.arc(x, y, 18 * sx, 0, 7); g.fill(); }
   for (const p of PARTS){
     if (p.s !== side || p.n === "LOGO1" || p.n === "PL1") continue;
@@ -241,15 +257,14 @@ function drawSilk(cv, side){
     box(1611, 1483, 115, 230, 0); text("BIAS_INV", 1690, 1600, {size:36, align:"left"}); text("AGND", 1690, 1365, {size:36, align:"left"}); text("J2", 1700, 1483, {size:32, align:"left"});
     text("PROG", 2060, 1331, {size:52, align:"left", bold:true}); text("RST", 2060, 1002, {size:52, align:"left", bold:true});
     text("BLE    OFF    PC", 2372, 1200, {size:34, rot:90});
-    text("V3 - 32", 250, 985, {size:80, bold:true, color:"#173e74"});
+    text("V3 - 32", 235, 1090, {size:78, color:SILK});
     const [gx, gy] = P(500, 1770); g.save(); g.translate(gx, gy); g.fillStyle = SILK;
     for (let k = 0; k < 8; k++){ g.rotate(Math.PI / 4); g.fillRect(-26 * sx, -118 * sx, 52 * sx, 60 * sx); }
     g.beginPath(); g.arc(0, 0, 88 * sx, 0, 7); g.fill(); g.fillStyle = MASK; g.beginPath(); g.arc(0, 0, 34 * sx, 0, 7); g.fill(); g.fillRect(-14 * sx, 0, 28 * sx, 92 * sx); g.restore();
     text("open source", 500, 1600, {size:62}); text("hardware", 500, 1535, {size:62});
-    const [bx, by] = P(470, 700); g.strokeStyle = SILK; g.lineWidth = 12 * sx;
-    for (const r of [150, 108]){ g.beginPath(); g.arc(bx, by, r * sx, 0, 7); g.stroke(); }
-    text("OpenBCI", 450, 350, {size:74, bold:true, color:"#173e74"});
-    text("chipKIT", 1330, 330, {size:66, bold:true, color:"#1b1b1b"});
+    { const [bx, by] = P(495, 805); drawLogo(g, bx, by, 205 * sx); }
+    text("OpenBCI", 495, 480, {size:80, color:SILK});
+    text("chipKIT™", 1310, 445, {size:66, bold:true, color:"#1b1b1b"});
   } else {
     text("www.openbci.com", 620, 1480, {size:74, rot:-45});
   }
@@ -316,9 +331,19 @@ for (const p of PARTS){
     const mk = new THREE.Mesh(new THREE.PlaneGeometry(L.w * 0.92, L.d * 0.92), new THREE.MeshBasicMaterial({map:mt, transparent:true}));
     mk.position.z = up * (L.h / 2 + 0.02); grp.add(mk);
   }
+  if (L.tqfp || L.ssop){                                      // gull-wing legs around the chip
+    const lm = new THREE.MeshStandardMaterial({color:0xc3c8cd, metalness:0.85, roughness:0.3});
+    const zl = -up * (L.h / 2 - 0.12), sides = L.tqfp ? [0, 1, 2, 3] : [1, 3], n = L.tqfp ? 16 : 14, pitch = L.tqfp ? 0.5 : 0.65;
+    const lg = new THREE.BoxGeometry(L.tqfp ? 0.22 : 0.3, 1.1, 0.16);
+    for (const sd of sides) for (let i = 0; i < n; i++){
+      const a = sd * Math.PI / 2, half = (sd % 2 ? L.d : L.w) / 2 + 0.5, along = (i - (n - 1) / 2) * pitch;
+      const m = new THREE.Mesh(lg, lm); m.rotation.z = a + Math.PI / 2;
+      m.position.set(Math.cos(a) * half - Math.sin(a) * along, Math.sin(a) * half + Math.cos(a) * along, zl); grp.add(m);
+    }
+  }
   if (L.leads){ const lf = new THREE.Mesh(new THREE.BoxGeometry(L.leads, L.leads, 0.2), new THREE.MeshStandardMaterial({color:0xb9bec4, metalness:0.8, roughness:0.35}));
     lf.position.z = -up * (L.h / 2 - 0.1); grp.add(lf); }
-  if (L.button){ const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.7, 20), new THREE.MeshStandardMaterial({color:0x202020, roughness:0.6}));
+  if (L.button){ const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.7, 20), new THREE.MeshStandardMaterial({color:0xeadfc6, roughness:0.55}));
     cap.rotation.x = Math.PI / 2; cap.position.z = up * (L.h / 2 + 0.35); grp.add(cap); }
   if (L.lever){ const lv = new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.2, 1.4), new THREE.MeshStandardMaterial({color:0x202020}));
     lv.position.set(0, -(L.d / 2 + 1.0), 0); grp.add(lv); }
@@ -402,6 +427,7 @@ function drawDaisySilk(cv, side){
     for (let k = 0; k < 8; k++){ g.rotate(Math.PI / 4); g.fillRect(-26 * s, -118 * s, 52 * s, 60 * s); }
     g.beginPath(); g.arc(0, 0, 88 * s, 0, 7); g.fill(); g.fillStyle = MASK; g.beginPath(); g.arc(0, 0, 34 * s, 0, 7); g.fill(); g.fillRect(-14 * s, 0, 28 * s, 92 * s); g.restore();
     text("open source", 470, 820, {size:62}); text("hardware", 470, 755, {size:62});
+    { const [lx, ly] = P(2010, 860); drawLogo(g, lx, ly, 215 * s); } text("OpenBCI", 2010, 560, {size:80});
   } else {
     text("www.openbci.com", 690, 600, {size:74, rot:-45});
   }
@@ -446,6 +472,16 @@ for (const p of DZ_PARTS){
     const mk = new THREE.Mesh(new THREE.PlaneGeometry(L.w * 0.92, L.d * 0.92), new THREE.MeshBasicMaterial({map:mt, transparent:true}));
     mk.position.z = up * (L.h / 2 + 0.02); grp.add(mk);
   }
+  if (L.tqfp || L.ssop){                                      // gull-wing legs around the chip
+    const lm = new THREE.MeshStandardMaterial({color:0xc3c8cd, metalness:0.85, roughness:0.3});
+    const zl = -up * (L.h / 2 - 0.12), sides = L.tqfp ? [0, 1, 2, 3] : [1, 3], n = L.tqfp ? 16 : 14, pitch = L.tqfp ? 0.5 : 0.65;
+    const lg = new THREE.BoxGeometry(L.tqfp ? 0.22 : 0.3, 1.1, 0.16);
+    for (const sd of sides) for (let i = 0; i < n; i++){
+      const a = sd * Math.PI / 2, half = (sd % 2 ? L.d : L.w) / 2 + 0.5, along = (i - (n - 1) / 2) * pitch;
+      const m = new THREE.Mesh(lg, lm); m.rotation.z = a + Math.PI / 2;
+      m.position.set(Math.cos(a) * half - Math.sin(a) * along, Math.sin(a) * half + Math.cos(a) * along, zl); grp.add(m);
+    }
+  }
   if (L.leads){ const lf = new THREE.Mesh(new THREE.BoxGeometry(L.leads, L.leads, 0.2), new THREE.MeshStandardMaterial({color:0xb9bec4, metalness:0.8, roughness:0.35}));
     lf.position.z = -up * (L.h / 2 - 0.1); grp.add(lf); }
   daisy.add(grp);
@@ -453,20 +489,20 @@ for (const p of DZ_PARTS){
   grp.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
   byName[p.n] = info;
 }
-// Daisy J1: an 8-way socket underneath that plugs onto the Cyton's J1 pins
-const SOCK_H = 8.5;
+// Daisy J1: 8 male pins pointing down (on a black spacer) that plug into the Cyton's J1 socket
+const PIN_DOWN = 6, SPACER = 2.5;
 {
   const p = DZ_PARTS.find(q => q.short === "J1"), [x, y] = mm(p.x, p.y), grp = new THREE.Group();
-  grp.position.set(x, y, -(T / 2 + SOCK_H / 2)); grp.rotation.z = -Math.PI / 4;
+  grp.position.set(x, y, -T / 2); grp.rotation.z = -Math.PI / 4;
   const mat = new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6});
-  grp.add(new THREE.Mesh(new THREE.BoxGeometry(20.6, 2.6, SOCK_H), mat));
-  const holeM = new THREE.MeshStandardMaterial({color:0x020202}), gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
+  const sp = new THREE.Mesh(new THREE.BoxGeometry(20.3, 2.5, SPACER), mat); sp.position.z = -SPACER / 2; grp.add(sp);
+  const gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
   for (let k = 0; k < 8; k++){
-    const h = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.1), holeM); h.position.set((k - 3.5) * 2.54, 0, -SOCK_H / 2 - 0.05); grp.add(h);
-    const t = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, T + 1.6), gold); t.position.set((k - 3.5) * 2.54, 0, SOCK_H / 2 + (T + 1.6) / 2); grp.add(t);
+    const pin = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, SPACER + PIN_DOWN), gold); pin.position.set((k - 3.5) * 2.54, 0, -(SPACER + PIN_DOWN) / 2); grp.add(pin);
+    const t = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, T + 1.5), gold); t.position.set((k - 3.5) * 2.54, 0, (T + 1.5) / 2); grp.add(t);
   }
   daisy.add(grp);
-  const info = {p, grp, up:-1, h:SOCK_H, mats:[mat], daisy:true};
+  const info = {p, grp, up:-1, h:2 * (SPACER + PIN_DOWN), mats:[mat], daisy:true};
   grp.traverse(o => { if (o.isMesh){ o.userData.info = info; pickables.push(o); } });
   byName[p.n] = info;
 }
@@ -478,7 +514,7 @@ const SOCK_H = 8.5;
   const info = {p, grp, up:1, h:0.8, mats:[mat], ghost:true, daisy:true};
   m.userData.info = info; pickables.push(m); byName[p.n] = info;
 }
-Object.assign(LABELS, {"Daisy U1":"Daisy ADS1299", "Daisy PL1":"Daisy electrode header", "Daisy J1":"Daisy bus"});
+Object.assign(LABELS, {"Daisy U1":"Daisy ADS1299", "Daisy PL1":"Daisy electrode header", "Daisy J1":"Daisy bus pins"});
 document.getElementById("f-daisy").innerHTML = `61.4 × 39.7 mm<small>${dzTop + dzBot + 2} parts · channels 9–16</small>`;
 window.__daisyReady = true; daisyFinish(real);
 
@@ -599,8 +635,8 @@ const INFO = {
   C4:{b:"extra", s:"SD reservoir", t:"C4: SD card reservoir (100 µF)", d:"Covers the SD card's big current bursts while it writes.", i:[["U5","DVDD"]], o:[["CONN1","SD card"]]},
   J1:{b:"conn", s:"Daisy connector", t:"J1: Daisy connector", d:"Adds the Daisy board's second ADS1299 for 16 channels. It shares SPI, the clock, RESET and power, and gets its own chip select (CS2).", i:[["U7","SPI + CS2"],["U6","shared clock"]], o:[]},
   J2:{b:"conn", s:"BIAS_INV pins", t:"J2: BIAS_INV and AGND pins", d:"Brings out the bias amplifier's minus input, so you can experiment with the bias loop.", i:[["U6","BIAS_INV"]], o:[]},
-  J3:{b:"conn", s:"spare pins", t:"J3: spare PIC32 pins", d:"D13, D12, VDD and GND, for your own add-ons.", i:[["U7","spare pins"]], o:[]},
-  J4:{b:"conn", s:"spare pins", t:"J4: spare PIC32 pins", d:"D17, RST, D18 and D11, for your own add-ons.", i:[["U7","spare pins"]], o:[]},
+  J3:{b:"conn", s:"spare pins", t:"J3: spare PIC32 pins", d:"A black 4-hole socket with D13, D12, VDD and GND, for your own add-ons.", i:[["U7","spare pins"]], o:[]},
+  J4:{b:"conn", s:"spare pins", t:"J4: spare PIC32 pins", d:"A black 4-hole socket with D17, RST, D18 and D11, for your own add-ons.", i:[["U7","spare pins"]], o:[]},
 };
 for (const [d, r] of Object.entries(TVS_R)) INFO[d] = {b:"prot", s:"TVS diodes", t:`${d}: TVS diodes (4 in one)`, d:`Lightning rods for ${LINES[d]}. Normally invisible; on a static zap they switch on in nanoseconds and dump it to ground. They sit underneath, right below the header pins, so a zap is caught before it travels anywhere.`, i:[["PL1","header pins"]], o:[[r, "2.2 kΩ resistors (on top)"]]};
 INFO.D7 = {b:"prot", s:"TVS diodes", t:"D7: TVS diodes (4 in one)", d:`Lightning rods for ${LINES.D7}.`, i:[["PL1","header pins"]], o:[]};
@@ -619,7 +655,7 @@ const dz = n => "Daisy " + n;
 Object.assign(INFO, {
   [dz("U1")]:{b:"daisy", s:"Daisy ADS1299", t:"Daisy U1: the second ADS1299", d:"The same EEG chip as the Cyton's, adding channels 9 to 16: ×24 gain, 24-bit, all 8 channels at the same instant. It has no clock of its own: CLKSEL is tied to ground, so it runs on the Cyton ADS1299's 2.048 MHz clock (CLK pin) and shares its RESET line. That keeps both chips sampling in lock-step. The PIC32 picks it with CS2.", i:[[dz("C12"),"filtered electrode signals"],[dz("J1"),"SPI, CLK, RESET and DVDD"],[dz("PL1"),"AVDD and AVSS from the Cyton"]], o:[[dz("J1"),"samples back on MISO"],[dz("R5"),"bias drive"]]},
   [dz("PL1")]:{b:"conn", s:"Daisy electrode header", t:"Daisy PL1: electrode header (channels 9–16)", d:"Same layout as the Cyton's header and sitting right on top of it. Its N1P to N8P pins are channels 9 to 16. Its AVDD, AVSS, AGND and BIAS pins line up with the Cyton's, which is how the Daisy gets its analog power. SRB is separate: for one shared reference, join the two SRB pins with a Y-splitter cable.", i:[["HEAD","8 more electrodes"],["PL1","AVDD, AVSS, AGND, BIAS from the Cyton"],[dz("R6"),"bias drive"]], o:[[dz("D1"),"TVS diodes (underneath)"],[dz("D2"),"TVS diodes (underneath)"],[dz("U1"),"analog power"]]},
-  [dz("J1")]:{b:"conn", s:"Daisy bus socket", t:"Daisy J1: the Daisy bus (8 pins)", d:"A socket underneath that plugs onto the Cyton's J1 pins. Eight wires: DVDD (3.3 V), GND, MISO, SCK, RST, CLK, MOSI and CS2. There is no DRDY wire: the Daisy's DRDY pin goes nowhere, because both chips share one clock and the PIC32 just listens to the Cyton's DRDY.", i:[["J1","Cyton's Daisy port"]], o:[[dz("U1"),"SPI, clock, reset, power"],["J1","MISO: Daisy samples"]]},
+  [dz("J1")]:{b:"conn", s:"Daisy bus pins", t:"Daisy J1: the Daisy bus (8 pins)", d:"Eight pins pointing down from the Daisy's underside, which plug into the Cyton's black J1 socket. Eight wires: DVDD (3.3 V), GND, MISO, SCK, RST, CLK, MOSI and CS2. There is no DRDY wire: the Daisy's DRDY pin goes nowhere, because both chips share one clock and the PIC32 just listens to the Cyton's DRDY.", i:[["J1","Cyton's Daisy port"]], o:[[dz("U1"),"SPI, clock, reset, power"],["J1","MISO: Daisy samples"]]},
   [dz("J2")]:{b:"conn", s:"Daisy BIAS_INV pins", t:"Daisy J2: BIAS_INV and AGND pins", d:"Like J2 on the Cyton: brings out the Daisy bias amplifier's minus input, for experiments.", i:[[dz("U1"),"BIAS_INV"]], o:[]},
   [dz("R5")]:{b:"daisy", s:"bias 1 MΩ", t:"Daisy R5: bias feedback (1 MΩ)", d:"The Daisy chip's bias amplifier gets the same feedback pair as the Cyton's: R5 (1 MΩ) with C9 (1 nF) across it, from BIAS_OUT back to BIAS_IN.", i:[[dz("U1"),"BIAS_OUT"]], o:[[dz("R6"),"BIAS_DRV"]]},
   [dz("C9")]:{b:"daisy", s:"bias 1 nF", t:"Daisy C9: 1 nF across R5", d:"Keeps the Daisy's bias loop stable, just like C16 on the Cyton.", i:[[dz("U1"),"BIAS_OUT"]], o:[[dz("R5"),"in parallel"]]},
@@ -631,7 +667,7 @@ for (const [c, r] of Object.entries(DZ_C_R)) INFO[dz(c)] = {b:"prot", s:"1 nF ar
 for (const c of ["C6","C7","C14","C15","C16","C17","C18","C19","C21","C22"]) INFO[dz(c)] = {b:"daisy", s:"Daisy decoupling", t:`Daisy ${c}: decoupling capacitor`, d:"A small energy tank at one of the Daisy ADS1299's power pins (" + (c === "C6" || c === "C7" ? "DVDD, the 3.3 V from the Daisy bus" : "AVDD to AVSS, the ±2.5 V that comes up the header") + ").", i:[[c === "C6" || c === "C7" ? dz("J1") : dz("PL1"), c === "C6" || c === "C7" ? "DVDD" : "AVDD / AVSS"]], o:[[dz("U1"),"power pins"]]};
 const DZ_REFTXT = {C1:"VREFP to VREFN, 10 µF: holds the 4.5 V reference steady", C3:"VREFP to VREFN, 0.1 µF: the fast partner of C1", C2:"VCAP1, 100 µF: the big one", C4:"VCAP4, 1 µF", C5:"VCAP2, 1 µF", C8:"VCAP3, 0.1 µF", C10:"VCAP3, 1 µF"};
 for (const [c, t] of Object.entries(DZ_REFTXT)) INFO[dz(c)] = {b:"daisy", s:"reference / VCAP", t:`Daisy ${c}: reference / VCAP capacitor`, d:`${t}. The same job as on the Cyton: it keeps one of the chip's internal nodes steady.`, i:[], o:[[dz("U1"),"Daisy ADS1299"]]};
-INFO.J1 = {b:"conn", s:"Daisy port", t:"J1: Daisy port (8 pins)", d:"The Daisy module plugs onto these pins. It shares the SPI bus (MISO, MOSI, SCK), RESET, DVDD and GND, gets its own chip select (CS2), and gets the Cyton ADS1299's 2.048 MHz clock on CLK. The firmware turns that clock output on only when it finds a Daisy.", i:[["U7","SPI + CS2"],["U6","clock out (CLK)"],["U5","DVDD"]], o:[[dz("J1"),"Daisy bus socket"]]};
+INFO.J1 = {b:"conn", s:"Daisy port", t:"J1: Daisy port (8 pins)", d:"A black 8-hole socket: the Daisy's pins plug in here. It shares the SPI bus (MISO, MOSI, SCK), RESET, DVDD and GND, gets its own chip select (CS2), and gets the Cyton ADS1299's 2.048 MHz clock on CLK. The firmware turns that clock output on only when it finds a Daisy.", i:[["U7","SPI + CS2"],["U6","clock out (CLK)"],["U5","DVDD"]], o:[[dz("J1"),"Daisy bus pins"]]};
 
 function infoFor(n){
   if (INFO[n]) return INFO[n];
@@ -703,7 +739,7 @@ Object.assign(TOURS, {
     ["U7","The PIC32 drives the shared SPI bus: SCK ticks, MOSI carries commands, MISO brings data back. CS2 picks the Daisy chip."],
     ["U6","When the firmware finds a Daisy, it turns on the Cyton ADS1299's clock output, so its 2.048 MHz clock appears on the CLK pin."],
     ["J1","Eight pins carry it all up: DVDD, GND, MISO, SCK, RST, CLK, MOSI and CS2."],
-    ["Daisy J1","The Daisy's socket plugs onto those pins."],
+    ["Daisy J1","The Daisy's 8 pins point down and plug into that socket."],
     ["Daisy U1","At start-up the PIC32 reads the Daisy chip's ID register through CS2. If it answers 0x3E, the firmware switches to 16 channels and sends the same settings to both chips."]]},
   daisypower:{name:"Daisy power", col:"#ffd36e", daisy:true, paths:[["U5","J1","Daisy J1","Daisy U1"],["U4","PL1","Daisy PL1","Daisy U1"],["VR1","PL1"]], steps:[
     ["U5","The Daisy has no regulators of its own. DVDD (3.3 V) from the Cyton's U5…"],
@@ -755,11 +791,16 @@ for (const [n, w, d] of [["J1", 20.5, 3], ["J2", 3, 5.6], ["J3", 10.5, 3], ["J4"
   m.userData.info = info; pickables.push(m); byName[n] = info;
 }
 for (const n of ["J1","J2","J3","J4"]) if (byName[n]) byName[n].grp.children[0].userData.ghostBox = true;
-{ // the Cyton's Daisy port: 8 gold pins on a plastic strip
-  const j = byName.J1, gold = new THREE.MeshStandardMaterial({color:0xd8b45a, metalness:0.85, roughness:0.3});
-  const strip = new THREE.Mesh(new THREE.BoxGeometry(20.3, 2.5, 2.5), new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6}));
-  strip.position.z = 0.85; j.grp.add(strip); strip.userData.info = j; pickables.push(strip);
-  for (let k = 0; k < 8; k++){ const pin = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.64, 8.5), gold); pin.position.set((k - 3.5) * 2.54, 0, 3.85); j.grp.add(pin); pin.userData.info = j; pickables.push(pin); }
+// female headers on the Cyton, as shipped: J1 (Daisy port, 8 holes), J3 and J4 (4 holes each)
+for (const [n, cnt, alongX] of [["J1", 8, true], ["J3", 4, true], ["J4", 4, false]]){
+  const j = byName[n]; if (!j) continue;
+  const len = cnt * 2.54, H = 8.5, body = new THREE.MeshStandardMaterial({color:0x17191c, roughness:0.6}), hole = new THREE.MeshStandardMaterial({color:0x020202});
+  const b = new THREE.Mesh(new THREE.BoxGeometry(alongX ? len : 2.54, alongX ? 2.54 : len, H), body); b.position.z = H / 2 - 0.4; j.grp.add(b);
+  b.userData.info = j; pickables.push(b);
+  for (let k = 0; k < cnt; k++){
+    const o = (k - (cnt - 1) / 2) * 2.54, h = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 0.06), hole);
+    h.position.set(alongX ? o : 0, alongX ? 0 : o, H - 0.4 + 0.03); j.grp.add(h); h.userData.info = j; pickables.push(h);
+  }
 }
 scene.updateMatrixWorld(true);
 let ghostLit = null;

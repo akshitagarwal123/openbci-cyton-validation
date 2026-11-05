@@ -132,7 +132,8 @@ function run(){
       const [k, i, all] = q.split(","); const md = new URLSearchParams(location.search).get("mode"); if (md) c.setDaisyMode(md);
       if (new URLSearchParams(location.search).get("copper")) document.getElementById("finish").click();
       if (all) document.getElementById("allflows").click();
-      if (k === "none"){ c.exitTour(); setView(VIEWS.iso()); controls.target.set(0, c.state().daisyMode === "lifted" ? 12 : 0, 0); controls.update(); }
+      if (k === "top"){ c.exitTour(); setView(new THREE.Vector3(0, 125, 0.01)); }
+      else if (k === "none"){ c.exitTour(); setView(VIEWS.iso()); controls.target.set(0, c.state().daisyMode === "lifted" ? 12 : 0, 0); controls.update(); }
       else c.startTour(k, +i);
       const raf = window.requestAnimationFrame; window.requestAnimationFrame = () => 0;
       for (let f = 0; f < 400 && fly; f++) loop();

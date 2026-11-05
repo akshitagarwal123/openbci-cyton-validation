@@ -36,3 +36,12 @@ Shifted by (−2, +858) mils, its J1 sits exactly on the Cyton's J1 (Daisy port)
   Daisy DRDY not wired out, START unused, CONFIG3 = 0b11101100 sent to both chips (both bias amplifiers on), Daisy ID 0x3E switches the firmware to 16 channels.
 
 Last test run: 123 parts, 259 links, 65 tour steps across 11 flows, 25 clicks on the 3D boards (both boards, both sides, including through the see-through board). All pass, no JavaScript errors.
+
+## Closer to the real board (5 Nov)
+
+Compared against OpenBCI's product photos (`compare_with_photo.jpg`: model on the left, photo on the right) and fixed:
+- Connector gender: the Cyton's J1, J3 and J4 are black female sockets; the Daisy's J1 is 8 pins pointing down into J1.
+- Mounting holes are now real holes with a plated ring.
+- ADS1299 (TQFP-64) and PIC32 (SSOP-28) have their legs.
+- OpenBCI gear logo on both boards, "V3 - 32" and "chipKIT™" placed as printed; cream RST / PROG buttons.
+Small passives are still generic shapes with typical sizes, so very close up it is a model, not a photo.
