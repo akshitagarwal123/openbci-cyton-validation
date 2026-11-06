@@ -10,6 +10,7 @@ on:
       - "learning/week02/cyton_3d/**"
       - "learning/week02/course/chapters/**"
       - "learning/week02/video/**"
+      - "learning/week03/video/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -41,6 +42,7 @@ jobs:
           for v in daisy_sync bias_average lead_off_detection reference_explained cyton_power_supply cyton_power_detail charge_pump_inverter input_protection ads1299_top_pins ads1299_side_pins ads1299_block_diagram ads1299_features pic32_microcontroller accelerometer_or_gate; do
             cp "learning/week02/video/$v.mp4" _site/videos/
           done
+          cp learning/week03/video/ads1299_pins_capacitors.mp4 _site/videos/
           du -sh _site
           find _site -type f | sort
 
