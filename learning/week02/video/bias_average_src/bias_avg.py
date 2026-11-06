@@ -161,25 +161,31 @@ def sc5(cv, t, T, R):
     if t >= T(4): cv.rect((850, 430, 1230, 520), outline=al(GRN, R(4)), r=12); cv.text((1040, 462), 'OpenBCI GUI', 24, al(GRN, R(4)), True, 'mm'); cv.text((1040, 495), '"Bias" per channel', 22, al(FG, R(4)), False, 'mm')
 
 def sc6(cv, t, T, R):
-    tau0 = t * 0.04; a = R(1); rows = [(190, 'P'), (330, 'N'), (470, '(P + N) ÷ 2')]
+    tau0 = t * 0.04
+    ES = lambda tau: 0.14 * (0.8 * math.sin(2 * math.pi * 9 * tau + 0.5) + 0.5 * math.sin(2 * math.pi * 21 * tau + 2.0))
+    REF = lambda tau: HUM(tau); ELE = lambda tau: HUM(tau) + ES(tau); AVG = lambda tau: (REF(tau) + ELE(tau)) / 2; DIF = lambda tau: 4 * (ELE(tau) - REF(tau))
     cv.rect((60, 110, 880, 560), outline=al(GRY, 1), r=14)
-    P = lambda tau: HUM(tau) + EEG(tau) / 2; N = lambda tau: HUM(tau) - EEG(tau) / 2; A_ = lambda tau: (P(tau) + N(tau)) / 2
-    if t >= T(0): cv.text((70, 92), 'one channel, drawn slowed down', 18, al(MUTED, R(0)), False, 'lm')
-    if a > 0:
-        for (yc, lab), fn, col in zip(rows[:2], (P, N), (BLU, PUR)):
-            cv.text((75, yc), lab, 26, al(col, a), True, 'lm'); wave(cv, 170, 860, yc, 46, fn, col, tau0, a=a)
-    if t >= T(2):
-        b = R(2)
-        for yc in (190, 330): wave(cv, 170, 860, yc, 46, HUM, MUTED, tau0, w=1.5, a=0.7 * b)
-        cv.text((860, 128), 'dotted = the shared hum', 18, al(MUTED, b), False, 'rm')
+    cv.text((70, 92), 'one channel, drawn slowed down', 18, al(MUTED, R(0)), False, 'lm')
+    a1 = R(1); r2 = t >= T(2)
+    if a1 > 0:
+        for yc, nm, col, fn, lab in ((175, 'A', BLU, REF, 'reference'), (275, 'B', PUR, ELE, 'electrode')):
+            cv.text((75, yc), lab if r2 else f'input {nm}', 20, al(col if r2 else MUTED, a1), True, 'lm'); wave(cv, 175, 860, yc, 38, fn, col, tau0, a=a1)
     if t >= T(4):
-        c = R(4); cv.text((75, 470), '(P+N)÷2', 20, al(YEL, c), True, 'lm'); wave(cv, 170, 860, 470, 46, A_, YEL, tau0, w=4, a=c)
-    panel(cv, (905, 110, 1250, 560), R(3))
-    if t >= T(3): cv.text((925, 190), 'P = hum + ½ EEG', 26, al(BLU, R(3)), True, 'lm'); cv.text((925, 245), 'N = hum − ½ EEG', 26, al(PUR, R(3)), True, 'lm')
-    if t >= T(4): cv.text((925, 340), '(P + N) ÷ 2', 26, al(YEL, R(4)), True, 'lm'); cv.text((925, 380), '= hum only', 34, al(YEL, R(4)), True, 'lm')
-    if t >= T(5): cv.text((925, 440), 'the common mode', 24, al(FG, R(5)), False, 'lm')
-    if t >= T(6): cv.text((925, 495), 'P − N = EEG', 28, al(CY, R(6)), True, 'lm')
-    if t >= T(2): cv.text((1077, 538), 'not to scale: the real hum is far bigger', 15, al(MUTED, R(2)), False, 'mm')
+        b = R(4)
+        for yc in (175, 275): wave(cv, 175, 860, yc, 38, HUM, MUTED, tau0, w=1.5, a=0.7 * b)
+        cv.text((860, 128), 'dotted = the shared hum', 18, al(MUTED, b), False, 'rm')
+    if t >= T(6):
+        c = R(6); cv.text((75, 375), 'average', 20, al(YEL, c), True, 'lm'); wave(cv, 175, 860, 375, 38, AVG, YEL, tau0, w=4, a=c)
+        if t >= T(7): wave(cv, 175, 860, 375, 38, HUM, MUTED, tau0, w=1.5, a=0.8 * R(7))
+    if t >= T(8):
+        d = R(8); cv.text((75, 470), 'difference', 20, al(CY, d), True, 'lm'); cv.text((75, 494), '(zoomed ×4)', 14, al(MUTED, d), False, 'lm'); wave(cv, 175, 860, 478, 38, DIF, CY, tau0, w=3, a=d)
+    panel(cv, (905, 110, 1250, 560), R(2))
+    if t >= T(2): cv.text((925, 170), 'one input = the reference', 22, al(BLU, R(2)), True, 'lm'); cv.text((925, 205), 'other = scalp electrode', 22, al(PUR, R(2)), True, 'lm')
+    if t >= T(3): cv.text((925, 265), 'Cyton: SRB2 → P side', 20, al(MUTED, R(3)), False, 'lm'); cv.text((925, 293), 'TI example: SRB1 → N side', 20, al(MUTED, R(3)), False, 'lm')
+    if t >= T(6): cv.text((925, 355), '(reference + electrode) ÷ 2', 22, al(YEL, R(6)), True, 'lm'); cv.text((925, 390), '= hum + ½ EEG', 28, al(YEL, R(6)), True, 'lm')
+    if t >= T(7): cv.text((925, 445), 'EEG is tiny next to the hum', 20, al(FG, R(7)), False, 'lm'); cv.text((925, 478), '→ almost pure hum', 26, al(YEL, R(7)), True, 'lm')
+    if t >= T(8): cv.text((925, 525), 'difference = EEG', 28, al(CY, R(8)), True, 'lm')
+    if t >= T(4): cv.text((880, 92), 'not to scale: real hum is far bigger', 15, al(MUTED, R(4)), False, 'rm')
 
 def sc7(cv, t, T, R):
     tau0 = t * 0.04; a = R(0); cv.rect((60, 100, 880, 580), outline=al(GRY, 1), r=14)
