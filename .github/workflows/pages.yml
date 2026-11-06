@@ -1,0 +1,54 @@
+name: Deploy the Cyton + Daisy site to GitHub Pages
+
+# Publishes only what the site needs (the landing page, the 3D explorer and the videos),
+# so the rest of the repository (recordings, notes) is not part of the site.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "learning/week02/cyton_3d/**"
+      - "learning/week02/course/chapters/**"
+      - "learning/week02/video/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble the site
+        run: |
+          mkdir -p _site/explorer _site/course _site/videos
+          cp site/index.html site/watch.html _site/
+          touch _site/.nojekyll
+          cd learning/week02/cyton_3d && cp index.html layerTop.jpg layerBottom_noMirror.jpg daisyTop.jpg daisyBottom.jpg ../../../_site/explorer/ && cd ../../..
+          for f in learning/week02/course/chapters/ch*.mp4; do cp "$f" "_site/course/$(basename "$f" | cut -c1-4).mp4"; done
+          for v in daisy_sync bias_average lead_off_detection reference_explained cyton_power_supply cyton_power_detail charge_pump_inverter input_protection ads1299_top_pins ads1299_side_pins ads1299_block_diagram ads1299_features pic32_microcontroller accelerometer_or_gate; do
+            cp "learning/week02/video/$v.mp4" _site/videos/
+          done
+          du -sh _site
+          find _site -type f | sort
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
