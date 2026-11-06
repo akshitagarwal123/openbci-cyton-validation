@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Watch · The Cyton + Daisy, explained</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#0d1311;--panel:#151d1a;--line:#25312c;--fg:#e8efeb;--muted:#93a59d;--accent:#f0e04a;--cyan:#7fe3e3;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-family:"Archivo","Helvetica Neue",Arial,sans-serif;padding:20px max(16px,env(safe-area-inset-right)) 40px max(16px,env(safe-area-inset-left))}
+.wrap{max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+a{color:var(--cyan)}
+.top{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px}
+h1{font-size:clamp(22px,3.5vw,32px);font-weight:800;margin:0}
+video{width:100%;background:#000;border:1px solid var(--line);border-radius:10px;display:block;aspect-ratio:16/9}
+.err{color:#ff8a5c}
+.muted{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="./">← All videos</a> · <a href="explorer/">3D explorer</a></div>
+  <h1 id="t">Video</h1>
+  <video id="v" controls playsinline autoplay></video>
+  <p class="muted" id="m">Made with the help of an AI assistant and an AI voice. Hardware credit: <a href="https://openbci.com">OpenBCI</a> (CC BY-SA). If something looks wrong, please <a href="https://github.com/akshitagarwal123/openbci-cyton-validation/issues">open an issue</a>.</p>
+</div>
+<script>
+const q = new URLSearchParams(location.search), f = q.get("v") || "", title = q.get("title") || "Video", at = parseFloat(q.get("t") || "0");
+const ok = /^(course|videos)\/[A-Za-z0-9_.-]+\.mp4$/.test(f);
+document.getElementById("t").textContent = ok ? title : "Video not found";
+document.title = (ok ? title : "Video not found") + " · The Cyton + Daisy, explained";
+const v = document.getElementById("v");
+if (ok){ v.src = f; if (at > 0) v.addEventListener("loadedmetadata", () => { v.currentTime = at; }, {once: true}); v.play().catch(() => {}); }
+else { v.hidden = true; document.getElementById("m").innerHTML = '<span class="err">That video link is not valid.</span> <a href="./">See all videos</a>.'; }
+</script>
+</body>
+</html>

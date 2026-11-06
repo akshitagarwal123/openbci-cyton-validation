@@ -31,6 +31,10 @@ function run(){
       c.selectPart(name, false); n++;
       const html = document.getElementById("partbox").innerHTML;
       if (!html.includes("<h3>")) fail.push("no title for " + name);
+      if (!c.byName[name].p.virtual && !html.includes("Specification")) fail.push("no specification for " + name);
+      if (!c.byName[name].p.virtual && !html.includes("<dt>Mounted</dt>")) fail.push("no mounted row for " + name);
+      if (!html.includes('class="chip vid"')) fail.push("no video link for " + name);
+      if (!html.includes(">Role<")) fail.push("no role heading for " + name);
       if (c.infoFor(name).b === "misc") generic.push(name);
     } catch (e){ fail.push("select " + name + " threw " + e.message); }
   }
@@ -51,6 +55,7 @@ function run(){
         if (!document.querySelector("#tourbox .tb-text").textContent.length) fail.push(`empty tour text ${k} ${i}`);
       } catch (e){ fail.push(`tour ${k} step ${i} threw ${e.message}`); }
     }
+    c.startTour(k, 0); if (!document.querySelector("#tourbox .tb-watch .chip.vid")) fail.push("no video link on tour " + k);
     const g = tourGroups[k];
     out.push(`tour ${k}: ${t.steps.length} steps, ${g ? g.edges.length : 0} flow lines, ${g ? g.edges.reduce((a, e) => a + e.dots.length, 0) : 0} particles`);
   }
@@ -121,6 +126,7 @@ function run(){
   for (const name of ["Daisy D3", "Daisy C12", "Daisy J1", "Daisy C16"]){ c.selectPart("Daisy C14", false); const xy = clickAt(name); const ok = st().focusName === name; dclicks.push(`${name}@${xy}:${ok ? "ok" : "got " + st().focusName}`); if (!ok) fail.push("3D click Daisy bottom " + name); }
   out.push("Daisy clicks: " + dclicks.join(" "));
   c.exitTour(); c.selectPart("HEAD", false);
+  out.push("video chips in panel: " + document.querySelectorAll("#vidlist .chip.vid").length);
   // 7. finish switch still works
   document.getElementById("finish").click(); document.getElementById("finish").click();
   out.push(fail.length ? "RESULT FAIL" : "RESULT PASS"); fail.forEach(f => out.push("FAIL " + f));
@@ -129,7 +135,7 @@ function run(){
   report(out, () => {
     document.getElementById("testout").style.display = q ? "none" : "block";
     if (q){
-      const [k, i, all] = q.split(","); const md = new URLSearchParams(location.search).get("mode"); if (md) c.setDaisyMode(md);
+      const [k, i, all] = q.split(","); const PP = new URLSearchParams(location.search).get("part"); if (PP) c.selectPart(PP, false); const md = new URLSearchParams(location.search).get("mode"); if (md) c.setDaisyMode(md);
       if (new URLSearchParams(location.search).get("copper")) document.getElementById("finish").click();
       if (all) document.getElementById("allflows").click();
       if (k === "cam"){ c.exitTour(); const P = new URLSearchParams(location.search); setView(new THREE.Vector3(+P.get("cx"), +P.get("cy"), +P.get("cz"))); controls.target.set(0, +P.get("ty") || 0, 0); controls.update(); }
