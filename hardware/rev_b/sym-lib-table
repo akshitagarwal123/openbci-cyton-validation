@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "BrainTech")(type "KiCad")(uri "${KIPRJMOD}/lib/BrainTech.kicad_sym")(options "")(descr "BrainTech-8 parts not in the KiCad libraries"))
+)

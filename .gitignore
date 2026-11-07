@@ -26,3 +26,10 @@ learning/week02/esp32_brainflow_fake8/secrets.h
 
 # course video: full file is over GitHub's 100 MB limit (chapters are committed)
 learning/week02/course/Cyton_Daisy_course_full.mp4
+
+# KiCad local files
+*.kicad_prl
+fp-info-cache
+*-backups/
+\#auto_saved_files\#
+~*.lck

@@ -1,0 +1,20 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "28f62a96-383f-46f9-8430-e56d65c88426")
+	(paper "A3")
+	(title_block
+		(title "BrainTech-8: 8-channel EEG")
+		(rev "B")
+		(company "BrainTech")
+		(comment 1 "Front end derived from OpenBCI Cyton (CC BY-SA)")
+	)
+	(lib_symbols)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
