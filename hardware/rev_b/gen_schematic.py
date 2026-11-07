@@ -45,6 +45,45 @@ def bbox(pl):
     return min(xs), min(ys), max(xs), max(ys)
 
 
+
+CHAR = 1.05     # approximate width of one 1.27 mm label character, mm
+
+
+def body_points(node, out):
+    """collect the drawn outline points (rectangle corners, polyline/arc/circle points) of a symbol, skipping pins."""
+    if not isinstance(node, list) or not node:
+        return out
+    if node[0] in ("pin", "property"):
+        return out
+    if node[0] in ("start", "end", "xy", "center", "mid") and len(node) >= 3:
+        try:
+            out.append((float(node[1]), -float(node[2])))
+        except ValueError:
+            pass
+    for c in node[1:]:
+        body_points(c, out)
+    return out
+
+
+def extent(p, pl, sym=None):
+    """box (sheet coords, relative to the symbol origin) covering the drawn body and every pin's net label,
+    plus whether the part is a small vertical one (all pins up/down) whose text goes to the right."""
+    x0, y0, x1, y1 = bbox(pl)
+    for bx_, by_ in body_points(sym, []) if sym is not None else []:
+        x0, y0, x1, y1 = min(x0, bx_), min(y0, by_), max(x1, bx_), max(y1, by_)
+    vertical = len(pl) <= 2 and all(int(a) % 180 == 90 for *_, a, _t in pl)
+    for num, name, px, py, ang, _t in pl:
+        net = pin_net(p, num, name)
+        L = (len(net) * CHAR + 1.5) if net else 1.5
+        ex, ey = px, -py
+        la = {0: 180, 180: 0, 90: 270, 270: 90}[int(ang) % 360]
+        if la == 180: x0 = min(x0, ex - L)
+        elif la == 0: x1 = max(x1, ex + L)
+        elif la == 270: y1 = max(y1, ey + L)
+        else: y0 = min(y0, ey - L)
+    return x0, y0, x1, y1, vertical
+
+
 lib_syms, placed, items = {}, [], []
 blocks = []
 for p in parts:
@@ -69,12 +108,18 @@ for block, plist in blocks:
         sym = get_symbol(p["lib_id"])
         lib_syms[p["lib_id"]] = sym
         pl = pins(sym)
-        x0, y0, x1, y1 = bbox(pl)
-        w = (x1 - x0) + (34 if len(pl) > 6 else 30)        # room for labels on both sides
-        h = (y1 - y0) + 14
+        x0, y0, x1, y1, vert = extent(p, pl, sym)
+        tw = max(len(p["ref"]), len(p["value"])) * CHAR + 2
+        if vert:
+            x1 = max(x1, max([bbox(pl)[2]] + [q_[0] for q_ in body_points(sym, [])]) + 1.5 + tw)                  # ref + value to the right of the body
+        else:
+            y0, y1 = y0 - 3.5, y1 + 3.5                          # ref above, value below everything
+            x0, x1 = min(x0, -tw / 2), max(x1, tw / 2)
+        w = (x1 - x0) + 8
+        h = (y1 - y0) + 8
         if x + w > bx + bw:
             x, y, row_h = bx, y + row_h, 0
-        sx, sy = snap(x - x0 + 15), snap(y - y0 + 4)
+        sx, sy = snap(x - x0 + 4), snap(y - y0 + 3)
         placed.append((p, sx, sy, pl))
         x += w
         row_h = max(row_h, h)
@@ -86,11 +131,17 @@ for p, sx, sy, pl in placed:
              ("Datasheet", "", 0, 0), ("MPN", p["mpn"], 0, 9)]
     hidden = {"Footprint", "Datasheet", "MPN"}
     ptxt = []
-    _, y0, _, y1 = bbox(pl)
+    ex0, ey0, ex1, ey1, vert = extent(p, pl, lib_syms[lid])
+    bx1 = max([bbox(pl)[2]] + [x for x, _ in body_points(lib_syms[lid], [])])
     for k, v, dx, dy in props:
-        py = sy + (y0 - 2.5 if k == "Reference" else y1 + 2.5 if k == "Value" else y1 + 5)
-        eff = "(effects (font (size 1.27 1.27))" + (" hide" if k in hidden else "") + ")"
-        ptxt.append(f'(property {q(k)} {q(v)} (at {sx} {py:.2f} 0) {eff})')
+        if vert:
+            px_, py = sx + bx1 + 1.5, sy + {"Reference": -1.4, "Value": 1.4}.get(k, 4)
+            just = " (justify left)"
+        else:
+            px_, py = sx, sy + (ey0 - 2.0 if k == "Reference" else ey1 + 2.0 if k == "Value" else ey1 + 4.5)
+            just = ""
+        eff = "(effects (font (size 1.27 1.27))" + just + (" hide" if k in hidden else "") + ")"
+        ptxt.append(f'(property {q(k)} {q(v)} (at {px_:.2f} {py:.2f} 0) {eff})')
     pins_txt = " ".join(f'(pin {q(num)} (uuid {q(U())}))' for num, *_ in pl)
     is_flag = p["ref"].startswith("#")
     sym_items.append(
