@@ -94,9 +94,9 @@ for p in parts:
 # block regions on the A1 sheet (x, y, width) in mm
 REGIONS = {
     "Power": (20, 30, 550),
-    "MCU": (20, 200, 260),
-    "ADS1299": (300, 200, 270),
-    "Electrode inputs + protection": (20, 330, 550),
+    "ADS1299": (20, 175, 550),
+    "MCU": (20, 300, 260),
+    "Electrode inputs + protection": (300, 300, 270),
 }
 
 for block, plist in blocks:

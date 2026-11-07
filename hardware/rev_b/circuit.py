@@ -98,3 +98,55 @@ C("10uF", "AVSS", "GND", B, FP_C0805)
 
 for net in ("VBUS", "VSYS", "3V3", "GND"):   # VBAT is driven by the charger output
     add("#FLG", "power:PWR_FLAG", "PWR_FLAG", "", {"#1": net}, B)
+
+# ------------------------------------------------------------------ ADS1299 --------------------------------------------
+# Pin rules: TI ADS1299 datasheet SBAS499C pin table (p. 6-7), unused-pin rules (p. 61), layout notes (p. 70-72).
+# Capacitor choices are the week-3 decisions in learning/week03/ads1299_pins_and_power.md.
+B = "ADS1299"
+add("U", "Analog_ADC:ADS1299", "ADS1299 (8 ch EEG ADC)", "Package_QFP:TQFP-64_10x10mm_P0.5mm", {
+    "AVDD": "AVDD", "AVSS": "AVSS",                       # pins 19,21,22,56,59 / 20,23,32,57,58
+    "AVDD1": "AVDD1", "AVSS1": "AVSS1",                   # pins 54 / 53: joined to AVDD/AVSS at one point (net ties below)
+    "DVDD": "3V3", "DGND": "GND",                         # pins 48,50 / 33,49,51: one ground net on this board
+    "VREFP": "VREFP", "VREFN": "AVSS",                    # internal reference: VREFN to AVSS (p. 7)
+    "VCAP1": "VCAP1", "VCAP2": "VCAP2", "VCAP3": "VCAP3", "VCAP4": "VCAP4",
+    "RESV1": "GND",                                       # p. 6: connect RESV1 directly to DGND
+    "DAISY_IN": "GND",                                    # p. 61: tie to DGND when not daisy-chaining
+    "CLKSEL": "CLKSEL",                                   # pulled up below: internal 2.048 MHz oscillator; CLK pin left open
+    "SCLK": "SCLK", "DIN": "MOSI", "DOUT": "MISO", "~{CS}": "ADS_CS", "~{DRDY}": "ADS_DRDY",
+    "START": "ADS_START", "~{RESET}": "ADS_RESET", "~{PWDN}": "ADS_PWDN",
+    "GPIO1": "ADS_GPIO1", "GPIO2": "ADS_GPIO2", "GPIO3": "ADS_GPIO3", "GPIO4": "ADS_GPIO4",
+    "SRB2": "SRB",                                        # week-3 decision: reference on SRB2 (as the Cyton), SRB1 left open (p. 61)
+    "BIASOUT": "BIAS_OUT", "BIASIN": "BIAS_OUT", "BIASINV": "BIAS_INV",   # bias network drawn with the electrode inputs
+    "BIASREF": "AVSS",                                    # internal bias reference used (CONFIG3.BIASREF_INT = 1), pin to AVSS (p. 61)
+    **{f"IN{ch}N": f"CH{ch}" for ch in range(1, 9)},     # electrodes on the negative inputs; SRB2 drives every positive input
+}, B, "ADS1299IPAGR")
+
+# Supply capacitors: 1 uF + 100 nF at every power pin, placed beside that pin.
+for pin in ("19", "21", "22", "56", "59/58 (charge pump)"):     # one pair per AVDD pin, to AVSS
+    C("1uF", "AVDD", "AVSS", B); C("100nF", "AVDD", "AVSS", B)
+C("1uF", "AVDD1", "AVSS1", B); C("100nF", "AVDD1", "AVSS1", B)   # pins 54-53
+add("NT", "Device:NetTie_2", "AVDD1 to AVDD (single point)", "NetTie:NetTie-2_SMD_Pad0.5mm", {"#1": "AVDD1", "#2": "AVDD"}, B)
+add("NT", "Device:NetTie_2", "AVSS1 to AVSS (single point)", "NetTie:NetTie-2_SMD_Pad0.5mm", {"#1": "AVSS1", "#2": "AVSS"}, B)
+for pin in ("48", "50"):                                         # DVDD pins, to ground
+    C("1uF", "3V3", "GND", B); C("100nF", "3V3", "GND", B)
+# Split +-2.5 V supply: each rail also gets a pair to ground at the chip (as the Cyton's C22/C24 and C18/C21)
+C("1uF", "AVDD", "GND", B); C("100nF", "AVDD", "GND", B)
+C("1uF", "AVSS", "GND", B); C("100nF", "AVSS", "GND", B)
+
+# Reference and internal nodes (pin table p. 6-7, Figure 78 p. 71; same values as the Cyton)
+C("10uF", "VREFP", "AVSS", B, FP_C0805); C("100nF", "VREFP", "AVSS", B)   # VREFP-VREFN >= 10 uF
+C("100uF", "VCAP1", "AVSS", B, "Capacitor_SMD:C_1206_3216Metric")         # DECISION open: X5R (as Cyton) or tantalum (p. 70)
+C("1uF", "VCAP2", "AVSS", B)
+C("1uF", "VCAP3", "AVSS", B); C("100nF", "VCAP3", "AVSS", B)
+C("1uF", "VCAP4", "AVSS", B)
+
+# Mode and unused pins: two-state pins through >= 10 kOhm (p. 6)
+R("10k", "CLKSEL", "3V3", B)                    # CLKSEL = 1: internal oscillator
+for g in range(1, 5):
+    R("10k", f"ADS_GPIO{g}", "GND", B)          # unused GPIO1-4 to DGND
+# Defined levels while the ESP32 boots (its pins float until firmware runs): stay powered, out of reset, not converting
+R("10k", "ADS_RESET", "3V3", B)
+R("10k", "ADS_PWDN", "3V3", B)
+R("10k", "ADS_START", "GND", B)                 # START held low; conversions started by the START command (p. 35)
+for net in ("AVDD1", "AVSS1"):                  # fed through the net ties: tell ERC these are supplied
+    add("#FLG", "power:PWR_FLAG", "PWR_FLAG", "", {"#1": net}, B)
