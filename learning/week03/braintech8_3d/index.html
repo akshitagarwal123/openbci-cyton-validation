@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BrainTech-8 Concept 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same bench-lamp look as the Cyton explorer: one big dark stage, tools under it, facts in silkscreen yellow. */
+:root{--bg:#0d1311;--panel:#151d1a;--line:#25312c;--fg:#e8efeb;--muted:#93a59d;--accent:#f0e04a;--cyan:#7fe3e3;--lime:#aadc6e;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-family:var(--display);padding:20px max(16px,env(safe-area-inset-right)) 32px max(16px,env(safe-area-inset-left))}
+.wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-size:clamp(26px,4vw,40px);font-weight:800;margin:4px 0 6px;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0;max-width:75ch;line-height:1.5}
+.warn{font-family:var(--mono);font-size:12px;color:#ff8a5c;border:1px solid #5a2e22;background:#1d1411;border-radius:8px;padding:8px 12px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+#stage{position:relative;height:min(68vh,640px);min-height:380px;background:#0a0f0d;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+#stage canvas{display:block;touch-action:none}
+#tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 9px;font-family:var(--mono);font-size:12px;white-space:nowrap}
+#legend{position:absolute;left:10px;bottom:10px;font-family:var(--mono);font-size:11px;color:var(--muted);background:rgba(13,19,17,.85);border:1px solid var(--line);border-radius:8px;padding:8px 10px;line-height:1.6;max-width:calc(100% - 20px)}
+#legend b{color:var(--fg)}
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.tools button{font-family:var(--mono);font-size:13px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer}
+.tools button:hover{border-color:var(--muted)}
+.tools button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h2{font-size:18px;margin:0 0 4px}
+.ph{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.badge{display:inline-block;font-family:var(--mono);font-size:11px;color:#0d1311;background:var(--c,var(--accent));padding:2px 8px;border-radius:3px;margin:4px 0 8px}
+dl{display:grid;grid-template-columns:90px 1fr;gap:4px 10px;margin:8px 0 0;font-size:14px}
+dt{color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+dd{margin:0}
+.why{margin:10px 0 0;font-size:14px;line-height:1.5;color:var(--fg)}
+.list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow:auto}
+.grp .h{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:5px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-family:var(--mono);font-size:12px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 9px;cursor:pointer}
+.chip:hover,.chip[aria-current="true"]{border-color:var(--c,var(--accent));color:var(--c,var(--accent))}
+.notes{color:var(--muted);font-size:14px;line-height:1.55}
+.notes b{color:var(--fg)}
+a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BrainTech-8 · rev B concept</div>
+    <h1>The board we plan to build, in 3D</h1>
+    <p class="lede">An 8-channel EEG board: one ADS1299, an ESP32-S3 with Wi-Fi, a LiPo with USB-C charging, on a 4-layer board of about 40 × 35 mm. Drag to turn it, scroll to zoom, click a part to see what it does and why it sits where it does.</p>
+  </header>
+  <div class="warn">Concept placement for learning, not a routed layout. Part sizes are from typical datasheets; positions, the electrode connector's pin count and the Layer 3 power areas are proposals to check during the KiCad layout (week 4).</div>
+  <div class="main">
+    <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+      <div id="stage"><div id="tip" hidden></div><div id="legend"></div></div>
+      <div class="tools" role="toolbar" aria-label="View options">
+        <button id="bExplode" aria-pressed="false">Explode the 4 layers</button>
+        <button id="bZones" aria-pressed="false">Analog / digital halves</button>
+        <button id="bReturn" aria-pressed="false">Show a return current</button>
+        <button id="bCyton" aria-pressed="false">Compare with the Cyton's size</button>
+        <button id="bFlip">Flip to the bottom</button>
+        <button id="bReset">Reset view</button>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card" id="info">
+        <div class="ph">Selected part</div>
+        <h2 id="iName">Click a part</h2>
+        <div id="iBadge"></div>
+        <dl id="iSpec"></dl>
+        <p class="why" id="iWhy">Or pick one from the list below. Try the buttons under the board: “Explode the 4 layers” shows the stack-up from the video, and “Show a return current” draws the shadow under an SPI trace.</p>
+      </div>
+      <div class="card"><div class="ph">All parts</div><div class="list" id="plist"></div></div>
+    </div>
+  </div>
+  <div class="card notes">
+    <div class="ph">How this layout follows the lessons</div>
+    <p><b>Stack-up:</b> Top (parts + fast signals) · Layer 2 one solid ground · Layer 3 power areas (+2.5 V, −2.5 V, 3.3 V, battery) · Bottom (parts + slow signals). Every top-layer trace has unbroken ground about 0.2 mm below it.</p>
+    <p><b>Halves, not split grounds:</b> the ADS1299, its inputs and the ±2.5 V supplies sit on the left; the ESP32, USB-C, charger and buck on the right, over the same ground plane.</p>
+    <p><b>Noise sources far from the inputs:</b> the buck and the charge pump are at the bottom edge, about 25 mm from the electrode connector at the top-left. The ESP32's antenna sits at the top-right corner with a keep-out on every layer.</p>
+    <p><b>Capacitors at the pins:</b> 1 µF + 0.1 µF at every ADS1299 power pin (supply pairs under the chip on the bottom, as on the Cyton, but with short vias), 10 µF at each regulator output, VREF and VCAP capacitors beside their pins on the top. See the <a href="../">overview site</a> for the videos.</p>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ---------- board geometry (mm). Board 40 x 35, origin at the bottom-left corner in the part table, centred in 3D ----------
+const BW = 40, BH = 35, T = 1.6, CX = BW / 2, CY = BH / 2;
+const ZONES = {analog: {c: '#f0e04a', n: 'Analog half'}, digital: {c: '#aadc6e', n: 'Digital half'}, power: {c: '#ff8a5c', n: 'Power'}, input: {c: '#7fe3e3', n: 'Electrode inputs'}};
+// id, name, part number, package, side, x, y (centre, mm from bottom-left), w, d, h, colour, zone, role, why here
+const P = [
+ ['J1','Electrode connector','JST SH 12-pin, SM12B-SRSS-TB (assumed)','1.0 mm pitch, side entry','top',10.5,32.7,15.9,4.25,2.9,'#e6e6e0','input','8 electrode inputs, SRB (reference), BIAS and 2 × ground in one small plug.','At the top-left edge, the far corner from the buck and the radio, so the microvolt input wires start in the quietest place. Pin count is a proposal.'],
+ ['D1','Input protection 1','TPD4E1B06DCKR','SC70-6','top',4.5,28.4,2.1,2.0,1.0,'#2a2a2a','input','Low-leakage TVS array: clamps static shocks on 4 lines.','Right behind the connector, so a static zap is clamped before it reaches anything else. As the Cyton.'],
+ ['D2','Input protection 2','TPD4E1B06DCKR','SC70-6','top',10.5,28.4,2.1,2.0,1.0,'#2a2a2a','input','TVS array for 4 more lines.','Same row: one straight line of protection between the plug and the chip.'],
+ ['D3','Input protection 3','TPD4E1B06DCKR','SC70-6','top',16.5,28.4,2.1,2.0,1.0,'#2a2a2a','input','TVS array for SRB and BIAS.','Same row.'],
+ ['RIN','Series resistors ×10','2.2 kΩ, 0402','0402','top',10.5,26.4,14,0.5,0.35,'#202020','input','One per input: limits current in a fault and forms an RF filter with the 47 pF.','In a straight row between the TVS and the chip, short and similar length for every channel.'],
+ ['CIN','Input capacitors ×10','47 pF C0G ±2 %','0402','top',10.5,25.2,14,0.5,0.5,'#c8a060','input','RF filter capacitor at each input.','Next to the series resistors, right before the ADS1299 pins.'],
+ ['U1','ADS1299','ADS1299IPAGR','TQFP-64, 10 × 10 mm','top',11,16,10,10,1.2,'#1c1c1c','analog','The EEG amplifier: 8 channels, 24-bit, gain 24.','Centre of the analog half: inputs arrive from the top, supplies from the bottom-left, SPI leaves to the right towards the ESP32.'],
+ ['CREF','VREF capacitor','10 µF + 0.1 µF','0805 + 0402','top',3.0,14.2,2.0,1.25,1.25,'#b08a50','analog','Keeps the 4.5 V reference quiet (VREFP–VREFN).','On the top, beside the reference pins, with no via in between.'],
+ ['CV1','VCAP1 capacitor','100 µF (decision: X5R or tantalum)','1206','top',3.0,18.2,3.2,1.6,1.6,'#b08a50','analog','Bypass for the internal reference node.','Beside pin 28. Dielectric still to decide: X5R picks up vibration.'],
+ ['CV234','VCAP2/3/4 capacitors','1 µF, 1 µF + 0.1 µF, 1 µF','0402','top',3.0,21.0,1.0,1.6,0.5,'#b08a50','analog','Bypass for the chip\'s internal supply nodes.','Each beside its own pin, same side as the chip.'],
+ ['CSUP','Supply capacitors ×6 pairs','1 µF + 0.1 µF each','0402','bottom',11,16,6,6,0.5,'#b08a50','analog','Energy tanks for every AVDD, AVSS, DVDD and charge-pump pin.','Under the chip on the bottom, like the Cyton, but with one short via per pad and a ground via beside each.'],
+ ['RB','BIAS network','2 × 100 kΩ + feedback RC','0402','top',19.0,22.5,1.6,3.0,0.4,'#202020','analog','Series resistors protect the BIAS electrode; the RC sets the bias loop.','Between the ADS1299 bias pins and the connector; test pads let rev B change the network.'],
+ ['U5','+2.5 V LDO','LP5907MFX-2.5','SOT-23-5','top',4.0,6.6,2.9,1.6,1.1,'#2a2a2a','power','Makes the quiet AVDD (+2.5 V) from 3.3 V.','Bottom-left, close to the ADS1299 supply pins, inside the analog half.'],
+ ['U6','−2.5 V LDO','ADP7182AUJZ-2.5','TSOT-23-5','top',9.0,6.6,2.9,1.6,1.0,'#2a2a2a','power','Cleans the charge pump\'s output into AVSS (−2.5 V).','Next to the +2.5 V LDO, both close to the chip.'],
+ ['U7','Charge pump','LM2776','SOT-23-6','top',14.5,4.0,2.9,1.6,1.1,'#2a2a2a','power','Turns +3.3 V into about −3.3 V.','On the bottom edge, as far from the electrode inputs as the analog half allows.'],
+ ['L1','Buck inductor','FNR4020S2R2MT, 2.2 µH','4 × 4 mm','top',21.6,8.4,4,4,2,'#3a3a3a','power','Energy store of the buck converter.','Bottom middle, next to its controller, about 25 mm from the inputs.'],
+ ['U4','3.3 V buck','TLV62569','SOT-23-5','top',21.6,3.6,2.9,1.6,1.1,'#2a2a2a','power','Efficient 3.3 V for the ESP32 (Wi-Fi peaks ≈ 350 mA) and DVDD.','On the digital side of the bottom edge, away from the inputs.'],
+ ['U3','LiPo charger','MCP73831','SOT-23-5','top',25.4,10.6,2.9,1.6,1.1,'#2a2a2a','power','Constant-current, constant-voltage charging to 4.2 V.','Between USB-C and the battery plug.'],
+ ['Q1','Ideal diode','P-MOSFET (to choose)','SOT-23','top',25.4,6.8,2.9,1.3,1.0,'#2a2a2a','power','Battery or USB path with almost no voltage drop.','Instead of the Cyton\'s diode, which wastes a few hundred millivolts of LiPo range.'],
+ ['J2','USB-C','16-pin receptacle (charge only while not worn)','mid-mount','top',31.5,3.65,8.94,7.3,3.2,'#c0c0c8','power','Charging and programming.','On the bottom edge of the digital half. Never record from a person while plugged in.'],
+ ['SW1','Power switch','SMD slide switch','≈ 6.7 × 2.6 mm','top',38.6,6.0,2.6,6.7,1.5,'#d0d0d0','power','Disconnects the battery.','On the right edge, reachable through the case.'],
+ ['U2','ESP32-S3-MINI-1','ESP32-S3-MINI-1-N8','15.4 × 20.5 mm module','top',31.5,24.0,15.4,20.5,2.4,'#b9bec4','digital','Reads the ADS1299 over SPI and streams over Wi-Fi.','Right half, with its antenna end at the top-right corner: no copper under or beside the antenna on any layer.'],
+ ['CESP','ESP32 decoupling','10 µF + 0.1 µF','0603 + 0402','top',22.6,14.6,1.6,1.6,0.8,'#b08a50','digital','Tank for the module\'s radio bursts.','At the module\'s 3.3 V pins.'],
+ ['LED','Status LEDs','2 × 0603','0603','top',21.5,30.5,1.6,2.6,0.6,'#ff5050','digital','Power and streaming status.','Visible edge of the digital half.'],
+ ['J3','Battery plug','JST SH 2-pin, SM02B-SRSS-TB','side entry','bottom',31.0,9.0,6,4.25,2.9,'#e6e6e0','power','1S LiPo connection.','Bottom side, under the digital half, so the battery sits under the board.'],
+ ['SWB','BOOT and RESET buttons','2 × SMD tact switch','3 × 4 mm','bottom',31.5,19.5,3,4,1.5,'#d0d0d0','digital','Programming and reset for the ESP32.','Bottom side, under the module, out of the way of the top layer.'],
+ ['RSENSE','Battery and USB sense','2 resistor dividers','0402','bottom',36.5,13.0,2,1.5,0.4,'#202020','digital','Lets the ESP32 read the battery voltage and know when USB is plugged in.','Next to the ESP32\'s ADC pins.'],
+ ['TP','Test pads','AVDD, AVSS, DVDD, VBAT, GND, BIAS, BIASIN, BIASINV, BIASREF','1.5 mm pads','bottom',6,28,1.5,1.5,0.05,'#d8b04a','analog','Where you measure during bring-up.','Bottom side, across the board. The bias pads let rev B change the bias network.'],
+];
+// ---------- three.js scene ----------
+const stage = document.getElementById('stage'), tip = document.getElementById('tip');
+const renderer = new THREE.WebGLRenderer({antialias: true}); renderer.setPixelRatio(Math.min(2, devicePixelRatio)); stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#0a0f0d');
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 1000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x203028, 0.9)); const dl = new THREE.DirectionalLight(0xffffff, 0.7); dl.position.set(30, 60, 40); scene.add(dl);
+const W3 = (x, y) => [x - CX, -(y - CY)];                                   // board mm -> 3D x, z
+const mat = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({color: c, roughness: .6, metalness: .1}, o));
+// layers: z positions (y up). Exploded positions spread them apart.
+const L = {top: {y: T / 2, ey: 18}, l2: {y: .26, ey: 6}, l3: {y: -.26, ey: -6}, bot: {y: -T / 2, ey: -18}};
+const groups = {}; for (const k in L) { groups[k] = new THREE.Group(); scene.add(groups[k]); }
+// FR-4 board (fades when exploded)
+const fr4 = new THREE.Mesh(new THREE.BoxGeometry(BW, T - .02, BH), mat('#1d5a3c', {transparent: true, opacity: 1})); scene.add(fr4);
+function sheet(w, h, col, op = 1) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat(col, {side: THREE.DoubleSide, transparent: true, opacity: op})); m.rotation.x = -Math.PI / 2; return m; }
+function addRect(g, x0, y0, x1, y1, col, op = 1, dy = 0) {
+  const s = sheet(x1 - x0, y1 - y0, col, op); const [x, z] = W3((x0 + x1) / 2, (y0 + y1) / 2); s.position.set(x, dy, z); g.add(s); return s;
+}
+// top & bottom solder mask surfaces + a few traces
+const topMask = addRect(groups.top, 0, 0, BW, BH, '#1f6b46', 1, .011), botMask = addRect(groups.bot, 0, 0, BW, BH, '#1f6b46', 1, -.011); botMask.rotation.x = Math.PI / 2;
+topMask.material.depthWrite = false; botMask.material.depthWrite = false;
+function trace(g, pts, col, w = .25, dy = .02) {
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i], [x1, y1] = pts[i + 1], len = Math.hypot(x1 - x0, y1 - y0);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(len, .035, w), mat(col, {metalness: .4})); const [x, z] = W3((x0 + x1) / 2, (y0 + y1) / 2);
+    m.position.set(x, dy, z); m.rotation.y = Math.atan2(y1 - y0, x1 - x0); g.add(m);
+  }
+}
+const CU = '#c9a35a';
+for (let k = 0; k < 10; k++) { const x = 4 + k * 1.45; trace(groups.top, [[x, 30.6], [x, 25], [6 + k * 1.1, 22.1]], CU, .2); }      // inputs: connector -> protection -> chip
+const SPI = [[[17.1, 18.5], [23.8, 18.5]], [[17.1, 17.3], [23.8, 17.3]], [[17.1, 16.1], [23.8, 16.1]], [[17.1, 14.9], [23.8, 14.9]]];
+SPI.forEach(p => trace(groups.top, p, CU, .2));
+trace(groups.top, [[21.6, 5.6], [21.6, 12.5], [23.8, 13.9]], CU, .5);                  // 3.3 V from buck to module
+trace(groups.bot, [[31, 11.1], [27, 11.1], [25.4, 11.6]], CU, .4, -.02);               // battery to charger
+// layer 2: one solid ground, with only the antenna keep-out removed
+const ANT = [23.8, 29.0, 39.2, 35];
+function planeWithHole(g, col, hole, dy) {
+  const sh = new THREE.Shape(); const c = (x, y) => W3(x, y);
+  [[0, 0], [BW, 0], [BW, BH], [0, BH]].forEach(([x, y], i) => { const [a, b] = c(x, y); i ? sh.lineTo(a, -b) : sh.moveTo(a, -b); });
+  if (hole) { const h = new THREE.Path(); [[hole[0], hole[1]], [hole[2], hole[1]], [hole[2], hole[3]], [hole[0], hole[3]]].forEach(([x, y], i) => { const [a, b] = c(x, y); i ? h.lineTo(a, -b) : h.moveTo(a, -b); }); sh.holes.push(h); }
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(sh), mat(col, {side: THREE.DoubleSide, transparent: true, opacity: .92, metalness: .3})); m.rotation.x = -Math.PI / 2; m.position.y = dy; g.add(m); return m;
+}
+const gndPlane = planeWithHole(groups.l2, '#46c8d2', ANT, 0);
+// layer 3: power areas (concept)
+const PAREAS = [['+2.5 V AVDD', 0.4, 2.5, 10.8, 24, '#f0e04a'], ['−2.5 V AVSS', 11.3, 2.5, 19.6, 24, '#7aa2ff'], ['+3.3 V', 20.1, 11, 39.6, 28.6, '#ff8a5c'], ['Battery / USB', 20.1, 0.4, 39.6, 10.5, '#c87af0']];
+const l3mats = PAREAS.map(([n, x0, y0, x1, y1, c]) => addRect(groups.l3, x0, y0, x1, y1, c, .85, 0));
+addRect(groups.l3, 0.4, 24.5, 19.6, 34.6, '#46c8d2', .5, 0);                          // ground fill under the input area
+// parts
+const pickables = [], byId = {};
+for (const p of P) {
+  const [id, name, pn, pkg, side, x, y, w, d, h, col, zone] = p;
+  const g = side === 'top' ? groups.top : groups.bot, sgn = side === 'top' ? 1 : -1;
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(col, {metalness: id === 'U2' ? .5 : .15, roughness: id === 'U2' ? .35 : .6}));
+  const [X, Z] = W3(x, y); m.position.set(X, sgn * (h / 2 + .02), Z); m.userData = {id}; g.add(m); pickables.push(m); byId[id] = m;
+  if (id === 'U1') for (let k = 0; k < 16; k++) for (const s of [-1, 1]) {                // TQFP leads
+    const off = -3.75 + k * .5; const a = new THREE.Mesh(new THREE.BoxGeometry(1, .15, .22), mat('#c0c0c0', {metalness: .8}));
+    a.position.set(X + s * 5.5, .1, Z + off); g.add(a); const b = a.clone(); b.rotation.y = Math.PI / 2; b.position.set(X + off, .1, Z + s * 5.5); g.add(b);
+  }
+  if (id === 'U2') { const ant = new THREE.Mesh(new THREE.BoxGeometry(15.4, .1, 5), mat('#2b2b2b')); const [ax, az] = W3(31.5, 31.5); ant.position.set(ax, 2.46, az); g.add(ant); }
+}
+// antenna keep-out marker on top
+const ko = addRect(groups.top, ANT[0], ANT[1], ANT[2], BH, '#ff5a5a', .25, .03);
+// zone overlays
+const zoneG = new THREE.Group(); scene.add(zoneG); zoneG.visible = false;
+addRect(zoneG, 0, 0, 20, BH, '#f0e04a', .38, T / 2 + .05); addRect(zoneG, 20, 0, BW, BH, '#7fe3e3', .38, T / 2 + .05);
+// return-current demo: a glowing band on layer 2 right under one SPI trace
+const retG = new THREE.Group(); groups.l2.add(retG); retG.visible = false;
+const band = addRect(retG, 16.5, 17.3 - .8, 24.4, 17.3 + .8, '#ffffff', 1, .04); band.material.emissive = new THREE.Color('#46ffd2'); band.material.emissiveIntensity = .9;
+const hiTrace = new THREE.Group(); groups.top.add(hiTrace); hiTrace.visible = false; trace(hiTrace, SPI[1], '#ff5a5a', .32, .06);
+for (let k = 0; k < 5; k++) { const [x, z] = W3(17.6 + k * 1.5, 17.3); const ln = new THREE.Mesh(new THREE.BoxGeometry(.06, 1, .06), new THREE.MeshBasicMaterial({color: '#46ffd2', transparent: true, opacity: .55})); ln.position.set(x, 0, z); ln.userData.drop = true; retG.add(ln); }
+// Cyton outline (61.5 mm octagon from OpenBCI's outline file, mils -> mm), centred on our board
+const cytG = new THREE.Group(); scene.add(cytG); cytG.visible = false;
+{ const O = [[2419.5, 1712.5], [1712.5, 2419.5], [711.5, 2419.5], [3.5, 1711.5], [3.5, 712.5], [710.5, 5.5], [1711.5, 5.5], [2419.5, 713.5]];
+  const mx = 1211.5, my = 1212.5, pts = O.concat([O[0]]).map(([x, y]) => new THREE.Vector3((x - mx) * .0254, T / 2 + .08, -(y - my) * .0254));
+  cytG.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: '#ff8a5c'}))); }
+// ---------- layer labels in the legend ----------
+const legend = document.getElementById('legend');
+function setLegend() {
+  const ex = state.explode;
+  legend.innerHTML = ex ? '<b>Exploded stack-up</b><br>Top: parts + fast signals<br><span style="color:#46c8d2">Layer 2: one solid ground</span> (hole only under the antenna)<br>Layer 3: power areas · <span style="color:#f0e04a">+2.5 V</span> · <span style="color:#7aa2ff">−2.5 V</span> · <span style="color:#ff8a5c">3.3 V</span> · <span style="color:#c87af0">battery</span><br>Bottom: parts + slow signals'
+    : '<b>BrainTech-8 concept</b> · 40 × 35 mm · 4 layers<br>Click a part · drag to turn · scroll to zoom' + (state.cyton ? '<br><span style="color:#ff8a5c">orange outline: the Cyton, 61.5 mm</span>' : '');
+}
+// ---------- state and animation ----------
+const state = {explode: false, e: 0, flip: false};
+function applyExplode(f) {
+  groups.top.position.y = T / 2 + f * (L.top.ey - T / 2); groups.bot.position.y = -T / 2 + f * (L.bot.ey + T / 2);
+  groups.l2.position.y = L.l2.y + f * (L.l2.ey - L.l2.y); groups.l3.position.y = L.l3.y + f * (L.l3.ey - L.l3.y);
+  fr4.material.opacity = 1 - f; fr4.visible = f < .05; topMask.material.opacity = 1 - .7 * f; botMask.material.opacity = 1 - .7 * f; gndPlane.material.opacity = .25 + .67 * f; l3mats.forEach(m => m.material.opacity = .2 + .65 * f);
+}
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+function home() { camera.position.set(0, 46, 44); controls.target.set(0, 0, 0); state.flip = false; }
+addEventListener('resize', resize); resize(); home(); setLegend();
+function tick() {
+  const tgt = state.explode ? 1 : 0; state.e += (tgt - state.e) * .12; applyExplode(state.e);
+  if (retG.visible) { band.material.emissiveIntensity = .55 + .45 * Math.sin(performance.now() / 250); const gap = groups.top.position.y - groups.l2.position.y; retG.children.forEach(c => { if (c.userData.drop) { c.scale.y = Math.max(.01, gap); c.position.y = gap / 2; } }); }
+  controls.update(); renderer.render(scene, camera); requestAnimationFrame(tick);
+}
+tick();
+// ---------- picking and the info panel ----------
+const ray = new THREE.Raycaster(), mouse = new THREE.Vector2(); let down = null;
+function pick(ev) { const r = renderer.domElement.getBoundingClientRect(); mouse.set((ev.clientX - r.left) / r.width * 2 - 1, -(ev.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(mouse, camera); const h = ray.intersectObjects(pickables); return h.length ? h[0].object.userData.id : null; }
+renderer.domElement.addEventListener('pointermove', ev => {
+  const id = pick(ev); if (!id) { tip.hidden = true; renderer.domElement.style.cursor = ''; return; }
+  const p = P.find(q => q[0] === id), r = stage.getBoundingClientRect(); tip.textContent = `${p[0]} · ${p[1]}`; tip.hidden = false;
+  tip.style.left = Math.min(ev.clientX - r.left + 12, r.width - tip.offsetWidth - 8) + 'px'; tip.style.top = (ev.clientY - r.top + 12) + 'px'; renderer.domElement.style.cursor = 'pointer';
+});
+renderer.domElement.addEventListener('pointerdown', ev => { down = [ev.clientX, ev.clientY]; });
+renderer.domElement.addEventListener('pointerup', ev => { if (down && Math.hypot(ev.clientX - down[0], ev.clientY - down[1]) < 5) { const id = pick(ev); if (id) select(id); } down = null; });
+let selected = null;
+function select(id) {
+  if (selected) byId[selected].material.emissive = new THREE.Color(0);
+  selected = id; const p = P.find(q => q[0] === id), m = byId[id]; m.material.emissive = new THREE.Color('#5a5000');
+  const [, name, pn, pkg, side, , , , , , , zone, role, why] = p, z = ZONES[zone];
+  document.getElementById('iName').textContent = `${id} · ${name}`;
+  document.getElementById('iBadge').innerHTML = `<span class="badge" style="--c:${z.c}">${z.n} · ${side} side</span>`;
+  document.getElementById('iSpec').innerHTML = `<dt>Part</dt><dd>${pn}</dd><dt>Package</dt><dd>${pkg}</dd><dt>Role</dt><dd>${role}</dd>`;
+  document.getElementById('iWhy').innerHTML = `<b>Why here:</b> ${why}`;
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-current', c.dataset.id === id));
+  if ((side === 'bottom') !== state.flip) flip();
+}
+// part list grouped by zone
+const plist = document.getElementById('plist');
+for (const zk of ['input', 'analog', 'power', 'digital']) {
+  const items = P.filter(p => p[11] === zk); if (!items.length) continue; const z = ZONES[zk];
+  const g = document.createElement('div'); g.className = 'grp'; g.innerHTML = `<div class="h" style="color:${z.c}">${z.n}</div><div class="chips"></div>`;
+  items.forEach(p => { const b = document.createElement('button'); b.className = 'chip'; b.style.setProperty('--c', z.c); b.dataset.id = p[0]; b.textContent = `${p[0]} ${p[1]}`; b.onclick = () => select(p[0]); g.querySelector('.chips').appendChild(b); });
+  plist.appendChild(g);
+}
+// ---------- buttons ----------
+const tog = (id, fn) => { const b = document.getElementById(id); b.onclick = () => { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', on); fn(on); setLegend(); }; };
+tog('bExplode', on => { state.explode = on; if (on) { camera.position.set(50, 14, 56); controls.target.set(0, 0, 0); } });
+tog('bZones', on => { zoneG.visible = on; });
+tog('bReturn', on => { retG.visible = on; hiTrace.visible = on; groups.l3.visible = !on; groups.bot.visible = !on; if (on && !state.explode) document.getElementById('bExplode').click(); if (on) { camera.position.set(-6, 30, 44); controls.target.set(2, 10, -2); }
+  document.getElementById('iName').textContent = on ? 'A return current' : 'Click a part'; document.getElementById('iBadge').innerHTML = ''; document.getElementById('iSpec').innerHTML = '';
+  document.getElementById('iWhy').innerHTML = on ? 'The red trace on the top layer is one SPI line from the ADS1299 to the ESP32. The glowing band on <b>Layer 2</b> is where its fast return current flows: right underneath, in the solid ground plane. Because Layer 2 has no cuts here, the loop stays tiny.' : ''; });
+tog('bCyton', on => { cytG.visible = on; if (on) { camera.position.set(0, 95, 1); controls.target.set(0, 0, 0); } });
+function flip() { state.flip = !state.flip; const p = camera.position.clone(); camera.position.set(p.x, -p.y || -40, p.z); }
+document.getElementById('bFlip').onclick = flip;
+// deep links for sharing a view: #explode, #return, #cyton, #zones
+setTimeout(() => { const h = location.hash.slice(1); ({explode: 'bExplode', return: 'bReturn', cyton: 'bCyton', zones: 'bZones'})[h] && document.getElementById(({explode: 'bExplode', return: 'bReturn', cyton: 'bCyton', zones: 'bZones'})[h]).click(); }, 50);
+document.getElementById('bReset').onclick = () => { home(); ['bExplode', 'bZones', 'bReturn', 'bCyton'].forEach(id => { const b = document.getElementById(id); if (b.getAttribute('aria-pressed') === 'true') b.click(); }); };
+</script>
+</body>
+</html>

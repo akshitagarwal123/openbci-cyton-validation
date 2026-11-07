@@ -11,6 +11,7 @@ on:
       - "learning/week02/course/chapters/**"
       - "learning/week02/video/**"
       - "learning/week03/video/**"
+      - "learning/week03/braintech8_3d/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -43,6 +44,7 @@ jobs:
             cp "learning/week02/video/$v.mp4" _site/videos/
           done
           cp learning/week03/video/*.mp4 _site/videos/
+          mkdir -p _site/braintech8 && cp learning/week03/braintech8_3d/index.html _site/braintech8/
           du -sh _site
           find _site -type f | sort
 
