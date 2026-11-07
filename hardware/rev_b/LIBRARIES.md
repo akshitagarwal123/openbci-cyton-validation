@@ -19,7 +19,7 @@ Not set yet (week 4 tasks): board outline, the layer stack-up thicknesses, and t
 
 | Ref | Part | Symbol | Footprint | LCSC | Check |
 |---|---|---|---|---|---|
-| U1 | ADS1299IPAGR | `Analog_ADC:ADS1299` | `Package_QFP:TQFP-64_10x10mm_P0.5mm` | C476817 | |
+| U1 | ADS1299IPAGR | `BrainTech:ADS1299_AllPins` (a copy of `Analog_ADC:ADS1299` with every supply pin drawn separately instead of stacked) | `Package_QFP:TQFP-64_10x10mm_P0.5mm` | C476817 | |
 | U2 | ESP32-S3-MINI-1-N8 | `RF_Module:ESP32-S3-MINI-1` | `RF_Module:ESP32-S2-MINI-1` | look up | **KiCad has no S3-MINI-1 footprint; the symbol points to the S2-MINI-1 one. Compare every pad and the antenna keep-out with the ESP32-S3-MINI-1 datasheet, or make a BrainTech footprint.** |
 | D1–D3 | TPD4E1B06DCKR | `BrainTech:TPD4E1B06DCK` | `Package_TO_SOT_SMD:SOT-363_SC-70-6` | C840093 | Pin numbers against the TI datasheet (done once in rev A) |
 | U3 | MCP73831-2-OT (4.2 V charger) | `Battery_Management:MCP73831-2-OT` | `Package_TO_SOT_SMD:SOT-23-5` | C424093 | |

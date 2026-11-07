@@ -103,7 +103,7 @@ for net in ("VBUS", "VSYS", "3V3", "GND"):   # VBAT is driven by the charger out
 # Pin rules: TI ADS1299 datasheet SBAS499C pin table (p. 6-7), unused-pin rules (p. 61), layout notes (p. 70-72).
 # Capacitor choices are the week-3 decisions in learning/week03/ads1299_pins_and_power.md.
 B = "ADS1299"
-add("U", "Analog_ADC:ADS1299", "ADS1299 (8 ch EEG ADC)", "Package_QFP:TQFP-64_10x10mm_P0.5mm", {
+add("U", "BrainTech:ADS1299_AllPins", "ADS1299 (8 ch EEG ADC)", "Package_QFP:TQFP-64_10x10mm_P0.5mm", {
     "AVDD": "AVDD", "AVSS": "AVSS",                       # pins 19,21,22,56,59 / 20,23,32,57,58
     "AVDD1": "AVDD1", "AVSS1": "AVSS1",                   # pins 54 / 53: joined to AVDD/AVSS at one point (net ties below)
     "DVDD": "3V3", "DGND": "GND",                         # pins 48,50 / 33,49,51: one ground net on this board
